@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE menus SYSTEM "C:\Users\Greenlamp\Documents\GitHub\Labos3eSup\E-Commerce\Applic_Head_Food\src\xml\exemple.dtd">
+<menus>
+	<menu>
+		<nom>Délices de Neptune</nom>
+		<vedette>Claude Kutty</vedette>
+
+		<entree id="1">
+			<nom>De la marée</nom>
+			<chaud/>
+			<ingredient>
+				<nom>gambas</nom>
+				<quantité>3</quantité>
+				<alergene>sauce aigre-douce</alergene>
+			</ingredient>
+		</entree>
+		<entree id="2">
+			<nom>De la marée 2</nom>
+			<chaud/>
+			<ingredient>
+				<nom>gambas</nom>
+				<quantité>3</quantité>
+				<alergene>sauce aigre-douce</alergene>
+			</ingredient>
+		</entree>
+
+		<plat id="1">
+			<nom>De la marée</nom>
+			<chaud/>
+			<ingredient>
+				<nom>gambas</nom>
+				<quantité>3</quantité>
+				<alergene>sauce aigre-douce</alergene>
+			</ingredient>
+		</plat>
+
+		<dessert id="1">
+			<nom>De la marée</nom>
+			<ingredient>
+				<nom>gambas</nom>
+				<quantité>3</quantité>
+				<alergene>sauce aigre-douce</alergene>
+			</ingredient>
+		</dessert>
+
+		<prix></prix>
+		<supplement>15</supplement>
+
+	</menu>
+</menus>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE menus SYSTEM "C:\Users\Greenlamp\Documents\GitHub\Labos3eSup\E-Commerce\Applic_Head_Food\src\xml\exemple.dtd">
+<menus>
+    <menu>
+        <nom>menu1</nom>
+        <vedette>kuty</vedette>
+        <entree id="1">
+            <nom>entree1</nom>
+            <chaud/>
+            <ingredient>
+                <nom>Concombre</nom>
+                <quantité>2</quantité>
+                <alergene/>
+            </ingredient>
+            <ingredient>
+                <nom>Piment d'espelette</nom>
+                <quantité>2</quantité>
+                <alergene/>
+            </ingredient>
+            <ingredient>
+                <nom>Ciboulette</nom>
+                <quantité>2</quantité>
+                <alergene/>
+            </ingredient>
+        </entree>
+        <entree id="2">
+            <nom>entree2</nom>
+            <ingredient>
+                <nom>Fromage à tartiner</nom>
+                <quantité>1</quantité>
+                <alergene/>
+            </ingredient>
+        </entree>
+        <plat id="1">
+            <nom>plat1</nom>
+            <chaud/>
+            <ingredient>
+                <nom>Escalope</nom>
+                <quantité>1</quantité>
+                <alergene/>
+            </ingredient>
+        </plat>
+        <plat id="2">
+            <nom>plat2</nom>
+            <chaud/>
+            <ingredient>
+                <nom>Crème fraîche</nom>
+                <quantité>1</quantité>
+                <alergene/>
+            </ingredient>
+        </plat>
+        <dessert id="1">
+            <nom>dessert1</nom>
+            <ingredient>
+                <nom>Sucre</nom>
+                <quantité>1</quantité>
+                <alergene/>
+            </ingredient>
+            <ingredient>
+                <nom>Chocolat noir</nom>
+                <quantité>1</quantité>
+                <alergene/>
+            </ingredient>
+        </dessert>
+        <dessert id="2">
+            <nom>dessert2</nom>
+            <ingredient>
+                <nom>Beurre</nom>
+                <quantité>1</quantité>
+                <alergene/>
+            </ingredient>
+            <ingredient>
+                <nom>Sucre roux</nom>
+                <quantité>1</quantité>
+                <alergene/>
+            </ingredient>
+        </dessert>
+        <prix>0</prix>
+        <supplement>0</supplement>
+    </menu>
+</menus>

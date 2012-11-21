@@ -1,0 +1,20 @@
+<!ELEMENT menus (menu*)>
+<!ELEMENT menu (nom, vedette, entree+, plat+, dessert+, prix, supplement)>
+	<!ELEMENT nom (#PCDATA)>
+	<!ELEMENT vedette (#PCDATA)>
+	<!ELEMENT prix (#PCDATA)>
+	<!ELEMENT supplement (#PCDATA)>
+
+<!ELEMENT entree (nom, chaud?, ingredient+)>
+	<!ATTLIST entree id CDATA #REQUIRED>
+	<!ELEMENT chaud EMPTY>
+
+<!ELEMENT plat (nom, chaud?, ingredient+)>
+	<!ATTLIST plat id CDATA #REQUIRED>
+
+<!ELEMENT dessert (nom, chaud?, ingredient+)>
+	<!ATTLIST dessert id CDATA #REQUIRED>
+
+<!ELEMENT ingredient (nom, quantité, alergene?)>
+	<!ELEMENT quantité (#PCDATA)>
+	<!ELEMENT alergene (#PCDATA)>

@@ -1,0 +1,180 @@
+body
+{
+	background:#f3f3f3 url('top_background.png') repeat-x;
+	margin:0px;
+	padding:0px;
+}
+img
+{
+	border:0px;
+}
+a
+{
+	color:#222222;
+	text-decoration:none;
+}
+a:hover
+{
+	color:#000000;
+}
+.site
+{
+	width:768px;
+	margin:auto;
+}
+.header
+{
+	height:132px;
+	background:url('header.png');
+	width:768px;
+	margin-top:5px;
+	border-bottom:1px solid #aaaaaa;
+}
+.header span
+{
+	display:block;
+	font-size:40px;
+	font-family:Arial, Helvetica, sans-serif;
+	color:#ffffff;
+	padding-top:40px;
+	padding-left:15px;
+	height:50px;
+}
+.foot
+{
+	margin:auto;
+	text-align:center;
+	width:768px;
+	height:53px;
+	background:url('foot.png');
+	padding-top:30px;
+	margin-bottom:10px;
+	border-top:1px solid #a3a3a3;
+}
+.foot a,.foot
+{
+	color:#666666;
+}
+.foot:hover a,.foot:hover
+{
+	color:#333333;
+}
+.foot a:hover
+{
+	color:#000000;
+}
+.menu_v
+{
+	float:left;
+	margin-bottom:10px;
+	width:174px;
+	padding-top:10px;
+}
+.menu_v_top
+{
+	padding-left:10px;
+	font-size:18px;
+	font-weight:bold;
+}
+.menu_v_ctn
+{
+	padding-bottom:3px;
+	padding-left:15px;
+}
+.separateur
+{
+	display:block;
+	margin:auto;
+	width:170px;
+	margin-top:10px;
+	margin-bottom:10px;
+}
+.corp
+{
+	width:768px;
+	background-color:#e6e6e6;
+}
+.corp_ctn
+{
+	border-left:1px solid #bfbfbf;
+	width:583px;
+	background-color:#ffffff;
+	padding-left:5px;
+	padding-right:5px;
+	margin-left:174px;
+}
+.clean
+{
+	clear:both;
+}
+h1,h2,h3,h4,h5,h6,p
+{
+	margin:0px;
+}
+h1,h2,h3
+{
+	color:#3a87bd;
+	border-bottom:2px solid #8dc5ec;
+	margin-left:10px;
+	padding-top:5px;
+}
+h4,h5,h6
+{
+	color:#3a87bd;
+	margin-left:10px;
+	padding-top:5px;
+}
+.paragraphe,p
+{
+	padding-left:10px;
+	padding-bottom:5px;
+	padding-top:5px;
+}
+ul
+{
+	list-style-image:url('puce01.png');
+}
+ul,ol
+{
+	margin:0px;
+	margin-top:5px;
+	margin-bottom:5px;
+	margin-left:10px;
+}
+/*button,input
+{
+	border:1px solid #94d0ec;
+}
+input[type=text],input[type=password]
+{
+	border:1px solid #94d0ec;
+}
+input:hover,input:focus,button:hover,button:focus
+{
+	border:1px solid #34a7db;
+}
+textarea
+{
+	border:1px solid #94d0ec;
+}
+textarea:hover,textarea:focus
+{
+	border:1px solid #34a7db;
+}*/
+.moteur_recherche
+{
+	float:right;
+	width:285px;
+	height:40px;
+	margin-right:5px;
+	padding-top:10px;
+	padding-left:15px;
+}
+.moteur_recherche input[type=text]
+{
+	background:#ffffff url('moteur_recherche.png') no-repeat 2px 1px;
+	padding-left:20px;
+	width:200px;
+	border:none;
+	height:19px;
+}

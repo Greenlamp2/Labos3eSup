@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE menus SYSTEM "C:\Users\Greenlamp\Documents\GitHub\Labos3eSup\E-Commerce\Applic_Head_Food\src\xml\exemple.dtd">
+<menus>
+    <menu>
+        <nom>a</nom>
+        <vedette>a</vedette>
+        <entree id="1">
+            <nom>a</nom>
+            <chaud/>
+            <ingredient>
+                <nom>Concombre</nom>
+                <quantité>1</quantité>
+                <alergene/>
+            </ingredient>
+        </entree>
+    </menu>
+</menus>

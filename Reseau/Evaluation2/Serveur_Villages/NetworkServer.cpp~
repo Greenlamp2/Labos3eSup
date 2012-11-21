@@ -187,19 +187,19 @@ int NetworkServer::getSocketServer() const
 {
     return this->socketServer;
 }
-int NetworkServer::getSocketClient() const
+int NetworkServer::getSocketClient()
 {
     return this->socketClient;
 }
-int NetworkServer::getPort() const
+int NetworkServer::getPort()
 {
     return this->port;
 }
-const sockaddr_in NetworkServer::getAdresseSocket() const
+const sockaddr_in NetworkServer::getAdresseSocket()
 {
     return this->adresseSocket;
 }
-const char* NetworkServer::getAdresseIp() const
+const char* NetworkServer::getAdresseIp()
 {
     return this->adresseIp;
 }

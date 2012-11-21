@@ -45,10 +45,10 @@ public:
     void setConnected(bool connected);
     //getters
     int getSocketServer() const;
-    int getSocketClient() const;
-    const char* getAdresseIp() const;
-    int getPort() const;
-    const struct sockaddr_in getAdresseSocket() const;
+    int getSocketClient();
+    const char* getAdresseIp();
+    int getPort();
+    const struct sockaddr_in getAdresseSocket();
     bool isConnected() const;
 };
 #endif

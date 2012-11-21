@@ -19,7 +19,7 @@
     
 class PoolThread{
 private:
-    pthread_t threadHandle[NB_MAX_CLIENT];
+    pthread_t threadHandle[NB_MAX_CLIENT]
 public:
     PoolThread();
     PoolThread(const PoolThread &p);

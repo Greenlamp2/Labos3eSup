@@ -1,5 +1,5 @@
-#ifndef DEF_NETWORKSERVER
-#define DEF_NETWORKSERVER
+#ifndef DEF_NETWORKCLIENT
+#define DEF_NETWORKCLIENT
 
 #ifdef LIN
     using namespace std;
@@ -12,34 +12,33 @@
     #include<iostream.h>
     #include<fstream.h>
 #endif
+    
 #include "properties.h"
     
-class NetworkServer{
+class NetworkClient{
 private:
-    int socketServer;
     int socketClient;
     char *adresseIp;
     int port;
     struct sockaddr_in adresseSocket;
-    bool connected;
 public:
-    NetworkServer();
-    NetworkServer(const NetworkServer &n);
-    NetworkServer(int socket);
-    ~NetworkServer();
+    NetworkClient();
+    NetworkClient(const NetworkClient &n);
+    ~NetworkClient();
     int createSocket();
-    void injectAdress();
-    void initInfos(const char* adresseIp, int port);
-    void listenSocket();
+    void initInfos(const char* adresseIP, int port);
     void disconnect();
-    int acceptSocket();
-    void sendMessage(const char* message);
-    const char* receiveMessage();
+    void connection();
+    void send(const char*);
+    const char* receive();
     
     //setters
+    void setSocketClient(int socketClient);
     void setAdresseIp(const char* adresseIp);
+    void setPort(int port);
+    void setAdresseSocket(struct sockaddr_in adresseSocket);
     //getters
+    int getSocketClient() const;
     const char* getAdresseIp() const;
-    bool isConnected() const;
 };
 #endif

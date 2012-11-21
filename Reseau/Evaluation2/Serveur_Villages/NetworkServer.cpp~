@@ -1,29 +1,29 @@
 #include "NetworkServer.h"
 
 NetworkServer::NetworkServer(){
-    this->setSocketServer(this->createSocket());
-    this->setSocketClient(-1);
+    this->socketServer = this->createSocket();
+    this->socketClient = -1;
     this->initInfos(IP, PORT_VILLAGE);
     this->injectAdress();
     this->listenSocket();
-    this->setSocketClient(this->acceptSocket());
+    this->socketClient = this->acceptSocket();
 }
 
 NetworkServer::NetworkServer(int socketClient)
 {
-    this->setSocketClient(socketClient);
-    this->setConnected(true);
+    this->socketClient = socketClient;
+    this->connected = true;
 }
 
 
 NetworkServer::NetworkServer(const NetworkServer& n)
 {
-    setSocketServer(n.getSocketServer());
-    this->setSocketClient(n.getSocketClient());
+    this->socketServer = n.socketServer;
+    this->socketClient = n.socketClient;
     this->setAdresseIp(n.getAdresseIp());
-    this->setPort(n.getPort());
-    this->setAdresseSocket(&n.getAdresseSocket());
-    this->setConnected(n.isConnected());
+    this->port = n.port;
+    this->adresseSocket = n.adresseSocket;
+    this->connected = n.connected;
 }
 
 
@@ -55,10 +55,9 @@ void NetworkServer::initInfos(const char* adresseIp, int port)
     struct hostent *infoHost;
     struct in_addr addIp;
 
-    this->adresseIp = new char[strlen(adresseIp) + 1];
-    strcpy(this->adresseIp, adresseIp);
+    this->setAdresseIp(adresseIp);
     this->port = port;
-    cout << "Mise à l'écoute sur l'adresse " << this->adresseIp << " et le port " << this->port << endl;
+    cout << "Mise à l'écoute sur l'adresse " << this->getAdresseIp() << " et le port " << this->port << endl;
 
     infoHost = gethostbyname(adresseIp);
     if(infoHost == 0){
@@ -113,7 +112,7 @@ void NetworkServer::disconnect()
     if(this->socketClient != -1){
         close(this->socketClient);
     }
-    this->connected = false;
+    this->setConnected(false);
 }
 
 int NetworkServer::acceptSocket()
@@ -156,26 +155,6 @@ const char* NetworkServer::receiveMessage()
 }
 
 //Setters
-void NetworkServer::setSocketServer(int socketServer)
-{
-    this->socketServer = socketServer;
-}
-void NetworkServer::setSocketClient(int socketClient)
-{
-    this->socketClient = socketClient;
-}
-void NetworkServer::setPort(int port)
-{
-    this->port = port;
-}
-void NetworkServer::setConnected(bool connected)
-{
-    this->connected = connected;
-}
-void NetworkServer::setAdresseSocket(const sockaddr_in *adresseSocket)
-{
-    memcpy(&this->adresseSocket, adresseSocket, sizeof(struct sockaddr_in));
-}
 void NetworkServer::setAdresseIp(const char* adresseIp)
 {
     this->adresseIp = new char[strlen(adresseIp) + 1];
@@ -183,23 +162,7 @@ void NetworkServer::setAdresseIp(const char* adresseIp)
 }
 
 //Getters
-int NetworkServer::getSocketServer() const
-{
-    return this->socketServer;
-}
-int NetworkServer::getSocketClient()
-{
-    return this->socketClient;
-}
-int NetworkServer::getPort()
-{
-    return this->port;
-}
-const sockaddr_in NetworkServer::getAdresseSocket()
-{
-    return this->adresseSocket;
-}
-const char* NetworkServer::getAdresseIp()
+const char* NetworkServer::getAdresseIp() const
 {
     return this->adresseIp;
 }

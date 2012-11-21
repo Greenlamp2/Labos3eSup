@@ -31,5 +31,8 @@ public:
     void connection();
     void send(const char*);
     const char* receive();
+    
+    void setAdresseIp(const char* adresseIp);
+    const char* getAdresseIp() const;
 };
 #endif

@@ -172,6 +172,11 @@ bool NetworkServer::isConnected() const
     return this->connected;
 }
 
+int NetworkServer::getSocketClient()
+{
+    return this->socketClient;
+}
+
 
 
 

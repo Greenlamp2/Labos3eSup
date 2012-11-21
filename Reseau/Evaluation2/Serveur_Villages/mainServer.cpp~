@@ -16,10 +16,12 @@
     
 int main(){
     PoolThread poolThread;
-    //NetworkServer server;
+    NetworkServer server;
+    while(1){
+        poolThread.inject(server.getSocketClient());
     // On balance la socket client au pool de thread
     // on refait accept
-    //server.disconnect();
-    
+    }
+    server.disconnect();
     return 0;
 }

@@ -1,6 +1,6 @@
 OBJS=mainServer.cpp NetworkServer.o PoolThread.o FHMP.o
 OBJC=mainClient.cpp NetworkClient.o
-CC=c++ -DLIN -g -lpthread
+CC=c++ -DLIN -g
 DEPRE=-Wno-Deprecated
 
 all:			Serveur_Villages Applic_Materiel

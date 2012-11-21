@@ -112,7 +112,7 @@ void NetworkServer::disconnect()
     if(this->socketClient != -1){
         close(this->socketClient);
     }
-    this->setConnected(false);
+    this->connected = false;
 }
 
 int NetworkServer::acceptSocket()

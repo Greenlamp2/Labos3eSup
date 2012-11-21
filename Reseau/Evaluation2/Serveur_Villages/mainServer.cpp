@@ -15,11 +15,14 @@
 #include "NetworkServer.h"
     
 int main(){
-    //PoolThread poolThread;
+    PoolThread poolThread;
     NetworkServer server;
+    while(1){
+        poolThread.inject(server.getSocketClient());
+        server.acceptSocket();
     // On balance la socket client au pool de thread
     // on refait accept
+    }
     server.disconnect();
-    
     return 0;
 }

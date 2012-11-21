@@ -37,18 +37,9 @@ public:
     const char* receiveMessage();
     
     //setters
-    void setSocketServer(int socketServer);
-    void setSocketClient(int socketClient);
     void setAdresseIp(const char* adresseIp);
-    void setPort(int port);
-    void setAdresseSocket(struct sockaddr_in adresseSocket);
-    void setConnected(bool connected);
     //getters
-    int getSocketServer() const;
-    int getSocketClient() const;
     const char* getAdresseIp() const;
-    int getPort() const;
-    struct sockaddr_in getAdresseSocket() const;
     bool isConnected() const;
 };
 #endif

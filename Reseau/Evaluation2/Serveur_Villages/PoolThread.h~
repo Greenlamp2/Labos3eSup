@@ -16,16 +16,28 @@
 #include "properties.h"
 #include "FHMP.h"
 #include "NetworkServer.h"
+#include <pthread.h>
     
 class PoolThread{
 private:
-    pthread_t threadHandle[NB_MAX_CLIENT]
+    pthread_t threadHandle[NB_MAX_CLIENT];
+    int sockets[NB_MAX_CLIENT];
+    int indiceCourant;
+    pthread_mutex_t mutexIndiceCourant;
+    pthread_cond_t condIndiceCourant;
 public:
     PoolThread();
     PoolThread(const PoolThread &p);
     ~PoolThread();
     void startThreads();
     void inject(int socket);
+    
+    pthread_mutex_t getMutexIndiceCourant();
+    pthread_cond_t getCondIndiceCourant();
+    int getIndiceCourant;
+    void setIndiceCourant(int indiceCourant);
+    int getSocket(int indice);
+    static void* fctThread(void* param);
 };
 
 #endif

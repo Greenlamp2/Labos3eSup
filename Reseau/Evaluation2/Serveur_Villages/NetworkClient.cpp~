@@ -1,7 +1,7 @@
 #include "NetworkClient.h"
 
 NetworkClient::NetworkClient(){
-    this->setSocketClient(this->createSocket());
+    this->socketClient = this->createSocket();
     this->initInfos(IP, PORT_VILLAGE);
     this->connection();
 }
@@ -83,14 +83,78 @@ void NetworkClient::connection()
     }
 }
 
-void NetworkClient::send(const char* )
+void NetworkClient::sendMessage(const char* message)
 {
-    
+    int taille = strlen(message);
+    char* buffer = new char[taille + 2];
+    strcpy(buffer, message);
+    buffer[taille] = '\r';
+    buffer[taille + 1] = '\n';
+    buffer[taille + 2] = '\0';
+    int ret = send(this->socketClient, buffer, taille + 2, 0);
+    if(ret == -1){
+        cout << "Erreur sur le send de la socket: " << errno << endl;
+        this->disconnect();
+        exit(1);
+    }
 }
 
-const char* NetworkClient::receive()
+const char* NetworkServer::receiveMessage()
 {
+    int tailleSegment = 0;
+    int nbByteRecu = 0;
+    int tailleMessage = 0;
+    int sizeInt = sizeof(int);
+    char *buffer = new char[SIZEMESSAGE];
+    char *msg = new char[SIZEMESSAGE];
+    bool finDetecte = false;
     
+    int ret = getsockopt(this->socketClient, IPPROTO_TCP, TCP_MAXSEG, &tailleSegment, (socklen_t*)&sizeInt);
+    if(ret == -1){
+        cout << "Erreur sur le getSockOpt de la socket: " << errno << endl;
+        this->disconnect();
+        exit(1);
+    }
+    
+    memset(buffer, 0, SIZEMESSAGE);
+    memset(msg, 0, SIZEMESSAGE);
+    
+    do{
+        nbByteRecu = recv(this->socketClient, buffer, tailleSegment, 0);
+        if(nbByteRecu == -1){
+            cout << "Erreur sur le recv de la socket: " << errno << endl;
+            this->disconnect();
+            exit(1);
+        }
+        finDetecte = this->verifMarqueur(buffer, nbByteRecu);
+        memcpy((char*)msg + tailleMessage, buffer, nbByteRecu);
+        tailleMessage += nbByteRecu;
+    }while(nbByteRecu != 0 && nbByteRecu != -1 && !finDetecte);
+    *(msg + tailleMessage - 2) = '\0'; //-2 pour enlever le \r\n
+    return msg;
+}
+
+bool NetworkServer::verifMarqueur(char* message, int nbByte)
+{
+    static bool rTrouver = false;
+    bool nTrouver = false;
+    int i=0;
+    char temp = message[0];
+    if(rTrouver == true && message[0] == '\n') return true;
+    else rTrouver = false;
+    
+    for(i=0; i<nbByte-1 && !nTrouver; i++){
+        char msgI = message[i];
+        char msgN = message[i+1];
+        if(message[i] == '\r' && message[i+1] == '\n') nTrouver = true;        
+    }
+    
+    char msgNbByte = message[nbByte] == '\r';
+    if(nTrouver) return true;
+    else if(message[nbByte] == '\r'){
+        rTrouver = true;
+        return false;
+    }else return false;
 }
 
 //Setters

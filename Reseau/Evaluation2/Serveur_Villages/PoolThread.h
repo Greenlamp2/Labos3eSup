@@ -30,12 +30,6 @@ public:
     ~PoolThread();
     void startThreads();
     void inject(int socket);
-    
-    pthread_mutex_t getMutexIndiceCourant();
-    pthread_cond_t getCondIndiceCourant();
-    int getIndiceCourant;
-    void setIndiceCourant(int indiceCourant);
-    int getSocket(int indice);
     static void* fctThread(void* param);
 };
 

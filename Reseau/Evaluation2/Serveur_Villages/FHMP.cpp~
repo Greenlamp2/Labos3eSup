@@ -28,10 +28,13 @@ void FHMP::parsePacket(const char* packet, char* type, char* message)
 const char* FHMP::actionType(const char* type, const char* message)
 {
     if(!strcmp(type, EOC)){
+        cout << EOC << endl;
         return EOC;
     }else if(!strcmp(type, LOGIN)){
+        cout << "LOGIN" << endl;
         return LOGIN_OUI;
     }else{
+        cout << "NOT LOGIN" << endl;
         return CLOSE;
     }
 }

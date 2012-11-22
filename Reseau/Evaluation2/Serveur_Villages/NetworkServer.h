@@ -35,6 +35,7 @@ public:
     int acceptSocket();
     void sendMessage(const char* message);
     const char* receiveMessage();
+    bool verifMarqueur(char* message, int nbByte);
     
     //setters
     void setAdresseIp(const char* adresseIp);

@@ -20,7 +20,6 @@ public:
     FHMP();
     const char* treatPacket(const char* packet);
     void parsePacket(const char* packet, char* type, char* message);
-    const char* actionType(const char* type, const char* message);
 };
 
 #endif

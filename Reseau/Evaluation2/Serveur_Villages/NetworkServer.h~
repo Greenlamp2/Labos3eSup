@@ -41,5 +41,6 @@ public:
     //getters
     const char* getAdresseIp() const;
     bool isConnected() const;
+    int getSocketClient();
 };
 #endif

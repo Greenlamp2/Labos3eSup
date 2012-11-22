@@ -39,28 +39,11 @@ void PoolThread::inject(int socket)
     }
 }
 
-pthread_cond_t PoolThread::getCondIndiceCourant()
-{
-    return this->condIndiceCourant;
-}
-pthread_mutex_t PoolThread::getMutexIndiceCourant()
-{
-    return this->mutexIndiceCourant;
-}
-int PoolThread::getSocket(int indice)
-{
-    return this->sockets[indice];
-}
-void PoolThread::setIndiceCourant(int indiceCourant)
-{
-    this->indiceCourant = indiceCourant;
-}
-
 void* PoolThread::fctThread(void* param){
     PoolThread* poolThread = (PoolThread*) param;
     int indice = 0;
     while(1){
-        cout << "thread en attente d'une tâche." << endl;
+        cout << "thread en attente" << endl;
         pthread_mutex_lock(&poolThread->mutexIndiceCourant);
         while(poolThread->indiceCourant == -1){
             pthread_cond_wait(&poolThread->condIndiceCourant, &poolThread->mutexIndiceCourant);
@@ -76,11 +59,18 @@ void* PoolThread::fctThread(void* param){
         NetworkServer networkServer(socket);
         FHMP fhmp;
         while(networkServer.isConnected()){
-            const char* messageFromServer = networkServer.receiveMessage();
-            const char* messageToClient = fhmp.treatPacket(messageFromServer);
-            networkServer.sendMessage(messageToClient);
+            const char* messageFromClient = networkServer.receiveMessage();
+            cout << "Message reçu: " << messageFromClient << endl;
+            const char* messageToClient = fhmp.treatPacket(messageFromClient);
+            cout << "Message à envoyer au client: " << messageToClient << endl;
+            if(!strcmp(messageToClient, EOC)){
+                networkServer.disconnect();
+            }else{
+                networkServer.sendMessage(messageToClient);
+            }
         }
-        
+        networkServer = NULL;
+        cout << "Fin du traitement par le thread" << endl;
         pthread_mutex_lock(&poolThread->mutexIndiceCourant);
         poolThread->sockets[indice] = -1;
         pthread_mutex_unlock(&poolThread->mutexIndiceCourant);

@@ -29,8 +29,9 @@ public:
     void initInfos(const char* adresseIP, int port);
     void disconnect();
     void connection();
-    void send(const char*);
-    const char* receive();
+    void sendMessage(const char* message);
+    const char* receiveMessage();
+    bool verifMarqueur(char* message, int nbByte);
     
     void setAdresseIp(const char* adresseIp);
     const char* getAdresseIp() const;

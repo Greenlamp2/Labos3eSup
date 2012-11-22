@@ -19,4 +19,4 @@
 #define LOGIN "LOGIN"
 #define LOGIN_OUI "LOGIN_OUI"
 #define LOGIN_NON "LOGIN_NON"
-#define CLOSE "CLOSE"
+#define CLOSE 0

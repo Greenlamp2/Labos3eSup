@@ -29,16 +29,10 @@ public:
     void initInfos(const char* adresseIP, int port);
     void disconnect();
     void connection();
-    void send(const char*);
-    const char* receive();
+    void sendMessage(const char* message);
+    const char* receiveMessage();
     
-    //setters
-    void setSocketClient(int socketClient);
     void setAdresseIp(const char* adresseIp);
-    void setPort(int port);
-    void setAdresseSocket(struct sockaddr_in adresseSocket);
-    //getters
-    int getSocketClient() const;
     const char* getAdresseIp() const;
 };
 #endif

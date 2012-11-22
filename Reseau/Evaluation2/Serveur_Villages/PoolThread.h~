@@ -27,7 +27,6 @@ private:
     pthread_cond_t condIndiceCourant;
 public:
     PoolThread();
-    PoolThread(const PoolThread &p);
     ~PoolThread();
     void startThreads();
     void inject(int socket);

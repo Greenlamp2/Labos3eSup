@@ -13,6 +13,7 @@
     #include<fstream.h>
 #endif
 #include "properties.h"
+#include "EasyProp.h"
     
 class NetworkServer{
 private:
@@ -22,8 +23,10 @@ private:
     int port;
     struct sockaddr_in adresseSocket;
     bool connected;
+    int sizeMessage;
 public:
     NetworkServer();
+    NetworkServer(const char* host, int port);
     NetworkServer(const NetworkServer &n);
     NetworkServer(int socket);
     ~NetworkServer();

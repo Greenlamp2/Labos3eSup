@@ -18,7 +18,7 @@ PoolThread::~PoolThread()
 void PoolThread::startThreads()
 {
     int i=0;
-    for(i = 0; i<NB_MAX_CLIENT; i++){
+    for(i = 0; i < NB_MAX_CLIENT; i++){
         pthread_create(&threadHandle[i], NULL, fctThread, (void*)this);
         sockets[i] = -1;
     }
@@ -61,7 +61,7 @@ void* PoolThread::fctThread(void* param){
         while(networkServer.isConnected()){
             const char* messageFromClient = networkServer.receiveMessage();
             cout << "Message reçu: " << messageFromClient << endl;
-            const char* messageToClient = fhmp.treatPacket(messageFromClient);
+            const char* messageToClient = fhmp.treatPacketServer(messageFromClient);
             cout << "Message à envoyer au client: " << messageToClient << endl;
             if(!strcmp(messageToClient, EOC)){
                 networkServer.disconnect();

@@ -5,13 +5,21 @@ FHMP::FHMP()
 
 }
 
-const char* FHMP::treatPacket(const char* packet)
+const char* FHMP::treatPacketServer(const char* packet)
 {
     char* type = new char[SIZEMESSAGE];
     char* message = new char[SIZEMESSAGE];
     int nbByte = strlen(packet);
     FHMP::parsePacket(packet, type, message);
-    return this->actionType(type, message);
+    return this->actionTypeServer(type, message);
+}
+const char* FHMP::treatPacketClient(const char* packet)
+{
+    char* type = new char[SIZEMESSAGE];
+    char* message = new char[SIZEMESSAGE];
+    int nbByte = strlen(packet);
+    FHMP::parsePacket(packet, type, message);
+    return this->actionTypeClient(type, message);
 }
 
 void FHMP::parsePacket(const char* packet, char* type, char* message)
@@ -25,18 +33,36 @@ void FHMP::parsePacket(const char* packet, char* type, char* message)
     strcpy(message, buffer);
 }
 
-const char* FHMP::actionType(const char* type, const char* message)
+const char* FHMP::actionTypeServer(const char* type, const char* message)
 {
     if(!strcmp(type, EOC)){
-        cout << EOC << endl;
         return EOC;
     }else if(!strcmp(type, LOGIN)){
-        cout << "LOGIN" << endl;
         return LOGIN_OUI;
     }else{
-        cout << "NOT LOGIN" << endl;
         return CLOSE;
     }
 }
+
+const char* FHMP::actionTypeClient(const char* type, const char* message){
+    if(!strcmp(type, LOGIN_OUI)){
+        return LOGIN_OUI;
+    }else if(!strcmp(type, LOGIN_NON)){
+        return LOGIN_NON;
+    }else{
+        return CLOSE;
+    }
+}
+
+char* FHMP::createPacket(const char* type, const char* message){
+    char* buffer = new char[255];
+    sprintf(buffer, "%s;%s", type, message);
+    char* buffer = new char[strlen(type) + strlen(message) + 2];
+    strcpy(buffer, type);
+    strcpy(buffer + strlen(type), ";");
+    strcpy(buffer + strlen(type) + 1, message);
+    return buffer;
+}
+
 
 

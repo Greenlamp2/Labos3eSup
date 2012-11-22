@@ -1,0 +1,28 @@
+#ifndef MESSAGE_H
+#define MESSAGE_H
+
+#ifdef LIN
+    using namespace std;
+    #include<iostream>
+    #include<fstream>
+    #include<string>
+#endif
+
+#ifdef SUN
+    #include<iostream.h>
+    #include<fstream.h>
+#endif
+    
+#include "properties.h"
+    
+class Message{
+private:
+public:
+    Message();
+    static void sendMessage(const char* message, int socket);
+    static const char* receiveMessage();
+    static bool verifMarqueur(char* message, int nbByte);
+    
+};
+
+#endif

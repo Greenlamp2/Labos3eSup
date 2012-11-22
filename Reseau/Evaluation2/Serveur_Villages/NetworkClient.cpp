@@ -2,7 +2,13 @@
 
 NetworkClient::NetworkClient(){
     this->socketClient = this->createSocket();
-    this->initInfos(IP, PORT_VILLAGE);
+    this->initInfos(EasyProp::getValue("properties.prop", "HOST"), atoi(EasyProp::getValue("properties.prop", "PORT_VILLAGE")));
+    this->connection();
+}
+
+NetworkClient::NetworkClient(const char* adresseIP, int port){
+    this->socketClient = this->createSocket();
+    this->initInfos(adresseIP, port);
     this->connection();
 }
 
@@ -130,6 +136,7 @@ const char* NetworkClient::receiveMessage()
         memcpy((char*)msg + tailleMessage, buffer, nbByteRecu);
         tailleMessage += nbByteRecu;
     }while(nbByteRecu != 0 && nbByteRecu != -1 && !finDetecte);
+    if(nbByteRecu == 0) return EOC;
     *(msg + tailleMessage - 2) = '\0'; //-2 pour enlever le \r\n
     return msg;
 }

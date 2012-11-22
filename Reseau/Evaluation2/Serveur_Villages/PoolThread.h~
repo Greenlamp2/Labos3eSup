@@ -27,15 +27,10 @@ private:
     pthread_cond_t condIndiceCourant;
 public:
     PoolThread();
+    PoolThread(int nbMaxClient);
     ~PoolThread();
     void startThreads();
     void inject(int socket);
-    
-    pthread_mutex_t getMutexIndiceCourant();
-    pthread_cond_t getCondIndiceCourant();
-    int getIndiceCourant;
-    void setIndiceCourant(int indiceCourant);
-    int getSocket(int indice);
     static void* fctThread(void* param);
 };
 

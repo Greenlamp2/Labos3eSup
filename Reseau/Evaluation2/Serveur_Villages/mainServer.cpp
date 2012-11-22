@@ -13,16 +13,19 @@
 #include "properties.h"
 #include "PoolThread.h"
 #include "NetworkServer.h"
+#include "EasyProp.h"
+#include "EasyCSV.h"
     
 int main(){
+    
+    const char* host = EasyProp::getValue("properties.prop", "HOST");
+    int port = atoi(EasyProp::getValue("properties.prop", "PORT_VILLAGE"));
+    
     PoolThread poolThread;
-    NetworkServer server;
+    NetworkServer server(host, port);
     while(1){
         poolThread.inject(server.getSocketClient());
-        server.setSocketClient(-1);
         server.acceptSocket();
-    // On balance la socket client au pool de thread
-    // on refait accept
     }
     server.disconnect();
     return 0;

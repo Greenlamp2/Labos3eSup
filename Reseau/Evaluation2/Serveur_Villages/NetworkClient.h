@@ -14,6 +14,7 @@
 #endif
     
 #include "properties.h"
+#include "EasyProp.h"
     
 class NetworkClient{
 private:
@@ -23,6 +24,7 @@ private:
     struct sockaddr_in adresseSocket;
 public:
     NetworkClient();
+    NetworkClient(const char* host, int port);
     NetworkClient(const NetworkClient &n);
     ~NetworkClient();
     int createSocket();

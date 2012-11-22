@@ -7,16 +7,30 @@
 #include<string.h> // memcpy
 #include<netinet/tcp.h> // TCP_MAXSEG
 
-#define PORT_VILLAGE 32020
-#define IP "127.0.0.1"
-
-#define NB_MAX_CLIENT 5
-#define SIZEMESSAGE 255
 #define EOC "END_OF_CONNEXION"
 #define DOC "DENY_OF_CONNEXION"
-
+#define NB_MAX_CLIENT 5
 //Protocole
+
+
 #define LOGIN "LOGIN"
 #define LOGIN_OUI "LOGIN_OUI"
 #define LOGIN_NON "LOGIN_NON"
-#define CLOSE 0
+#define BMAT "BMAT"
+#define BMAT_OUI "BMAT_OUI"
+#define BMAT_NON "BMAT_NON"
+#define CMAT "CMAT"
+#define CMAT_OUI "CMAT_OUI"
+#define CMAT_NON "CMAT_NON"
+#define ASKMAT "ASKMAT"
+#define ASKMAT_OUI "ASKMAT_OUI"
+#define ASKMAT_NON "ASKMAT_NON"
+#define CLOSE "CLOSE"
+
+//Admin
+#define LOGINA "LOGINA"
+#define LOGINA_OUI "LOGINA_OUI"
+#define LOGINA_NON "LOGINA_NON"
+#define LCLIENT "LCLIENT"
+#define PAUSE "PAUSE"
+#define STOP "STOP"

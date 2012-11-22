@@ -1,16 +1,30 @@
 #include "NetworkServer.h"
 
 NetworkServer::NetworkServer(){
+    this->sizeMessage = atoi(EasyProp::getValue("properties.prop", "SIZEMESSAGE"));
     this->socketServer = this->createSocket();
     this->socketClient = -1;
-    this->initInfos(IP, PORT_VILLAGE);
+    this->initInfos(EasyProp::getValue("properties.prop", "HOST"), atoi(EasyProp::getValue("properties.prop", "PORT_VILLAGE"));
     this->injectAdress();
     this->listenSocket();
     this->acceptSocket();
 }
 
+NetworkServer::NetworkServer(const char* host, int port)
+{
+    this->sizeMessage = atoi(EasyProp::getValue("properties.prop", "SIZEMESSAGE"));
+    this->socketServer = this->createSocket();
+    this->socketClient = -1;
+    this->initInfos(host, port);
+    this->injectAdress();
+    this->listenSocket();
+    this->acceptSocket();
+}
+
+
 NetworkServer::NetworkServer(int socketClient)
 {
+    this->sizeMessage = atoi(EasyProp::getValue("properties.prop", "SIZEMESSAGE"));
     this->socketClient = socketClient;
     this->connected = true;
 }
@@ -81,7 +95,6 @@ void NetworkServer::initInfos(const char* adresseIp, int port)
 
 void NetworkServer::injectAdress()
 {
-    cout << "== [BIND] ==" << endl;
     int ret = bind(this->socketServer, (struct sockaddr*) &this->adresseSocket, sizeof(struct sockaddr_in));
     if(ret == -1){
         cout << "Erreur sur le bind de la socket: " << errno << endl;
@@ -91,7 +104,6 @@ void NetworkServer::injectAdress()
 
 void NetworkServer::listenSocket()
 {
-    cout << "== [LISTEN] ==" << endl;
     int ret = -1;
     //SOMAXCONN = nombre de connexion pendante maximum ici 1024.
     ret = listen(this->socketServer, SOMAXCONN);
@@ -127,7 +139,6 @@ void NetworkServer::acceptSocket()
     }
     this->connected = true;
     this->socketClient = ret;
-    return ret;
 }
 
 void NetworkServer::sendMessage(const char* message)
@@ -152,8 +163,8 @@ const char* NetworkServer::receiveMessage()
     int nbByteRecu = 0;
     int tailleMessage = 0;
     int sizeInt = sizeof(int);
-    char *buffer = new char[SIZEMESSAGE];
-    char *msg = new char[SIZEMESSAGE];
+    char *buffer = new char[this->sizeMessage];
+    char *msg = new char[this->sizeMessage];
     bool finDetecte = false;
     
     int ret = getsockopt(this->socketClient, IPPROTO_TCP, TCP_MAXSEG, &tailleSegment, (socklen_t*)&sizeInt);
@@ -163,8 +174,8 @@ const char* NetworkServer::receiveMessage()
         exit(1);
     }
     
-    memset(buffer, 0, SIZEMESSAGE);
-    memset(msg, 0, SIZEMESSAGE);
+    memset(buffer, 0, this->sizeMessage);
+    memset(msg, 0, this->sizeMessage);
     
     do{
         nbByteRecu = recv(this->socketClient, buffer, tailleSegment, 0);

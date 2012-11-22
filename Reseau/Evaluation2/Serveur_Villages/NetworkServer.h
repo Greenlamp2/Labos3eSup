@@ -32,10 +32,11 @@ public:
     void initInfos(const char* adresseIp, int port);
     void listenSocket();
     void disconnect();
-    int acceptSocket();
+    void acceptSocket();
     void sendMessage(const char* message);
     const char* receiveMessage();
     bool verifMarqueur(char* message, int nbByte);
+    void setSocketClient(int socket);
     
     //setters
     void setAdresseIp(const char* adresseIp);

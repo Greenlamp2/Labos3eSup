@@ -19,6 +19,7 @@ int main(){
     NetworkServer server;
     while(1){
         poolThread.inject(server.getSocketClient());
+        server.setSocketClient(-1);
         server.acceptSocket();
     // On balance la socket client au pool de thread
     // on refait accept

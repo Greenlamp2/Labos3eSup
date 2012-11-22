@@ -6,7 +6,7 @@ NetworkServer::NetworkServer(){
     this->initInfos(IP, PORT_VILLAGE);
     this->injectAdress();
     this->listenSocket();
-    this->socketClient = this->acceptSocket();
+    this->acceptSocket();
 }
 
 NetworkServer::NetworkServer(int socketClient)
@@ -106,14 +106,16 @@ void NetworkServer::disconnect()
 {
     if(this->socketServer != -1){
         close(this->socketServer);
+        this->socketServer = -1;
     }
     if(this->socketClient != -1){
         close(this->socketClient);
+        this->socketClient = -1;
     }
     this->connected = false;
 }
 
-int NetworkServer::acceptSocket()
+void NetworkServer::acceptSocket()
 {
     cout << "En attente d'un client" << endl;
     int tailleStruct = sizeof(struct sockaddr_in);
@@ -124,7 +126,7 @@ int NetworkServer::acceptSocket()
         exit(1);
     }
     this->connected = true;
-    return ret;
+    this->socketClient = ret;
 }
 
 void NetworkServer::sendMessage(const char* message)
@@ -226,6 +228,10 @@ int NetworkServer::getSocketClient()
     return this->socketClient;
 }
 
+void NetworkServer::setSocketClient(int socket)
+{
+    this->socketClient = socket;
+}
 
 
 

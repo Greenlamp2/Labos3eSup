@@ -17,9 +17,8 @@
 #include "EasyCSV.h"
     
 int main(){
-    const char* host = EasyProp::getValue("properties.prop", "HOST");
-    int port = atoi(EasyProp::getValue("properties.prop", "PORT_VILLAGE"));
-    
+    string host = EasyProp::getValue("properties.prop", "HOST");
+    int port = atoi((EasyProp::getValue("properties.prop", "PORT_VILLAGE")).c_str());
     PoolThread poolThread;
     NetworkServer server(host, port);
     while(1){

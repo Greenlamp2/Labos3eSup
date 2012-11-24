@@ -19,8 +19,8 @@ class EasyProp{
 private:
 public:
     EasyProp();
-    static const char* getValue(const char* nameFile, const char* key);
-    static bool containsKey(const char* nameFile, const char* key);
+    static string getValue(string nameFile, string key);
+    static bool containsKey(string nameFile, string key);
 };
 
 #endif

@@ -20,7 +20,7 @@ private:
 public:
     EasyProp();
     static const char* getValue(const char* nameFile, const char* key);
-    static bool containsKey(const char* nameFile, const char* value);
+    static bool containsKey(const char* nameFile, const char* key);
 };
 
 #endif

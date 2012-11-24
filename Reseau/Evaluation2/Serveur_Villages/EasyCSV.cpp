@@ -5,9 +5,9 @@ EasyCSV::EasyCSV()
 
 }
 
-char* EasyCSV::getValue(const char* nameFile, const char* key){
+string EasyCSV::getValue(string nameFile, string key){
     FILE *file;
-    file = fopen(nameFile, "r");
+    file = fopen(nameFile.c_str(), "r");
     char* buffer = new char[255];
     
     char* buff;
@@ -18,7 +18,7 @@ char* EasyCSV::getValue(const char* nameFile, const char* key){
         fgets(buffer, 255, file);
         strcpy(retour, buffer);
         gauche = strtok_r(buffer, ";", &buff);
-        if(!strcmp(gauche, key)){
+        if(!strcmp(gauche, key.c_str())){
             retour[strlen(retour)-1] = '\0';
             fclose(file);
             delete [] buffer;
@@ -31,23 +31,23 @@ char* EasyCSV::getValue(const char* nameFile, const char* key){
     return NULL;
 }
 
-void EasyCSV::putValue(const char* nameFile, const char* key, const char* value){
+void EasyCSV::putValue(string nameFile, string key, string value){
     if(!EasyCSV::containsKey(nameFile, key)){
         FILE *file;
-        file = fopen(nameFile, "a");
+        file = fopen(nameFile.c_str(), "a");
         fputs("\n", file);
-        fputs(value, file);
+        fputs(value.c_str(), file);
         fclose(file);
     }
 }
 
-void EasyCSV::delValue(const char* nameFile, const char* key){
+void EasyCSV::delValue(string nameFile, string key){
 
 }
 
-bool EasyCSV::containsKey(const char* nameFile, const char* key){
+bool EasyCSV::containsKey(string nameFile, string key){
     FILE *file;
-    file = fopen(nameFile, "r");
+    file = fopen(nameFile.c_str(), "r");
     char* buffer = new char[255];
     
     char* buff;
@@ -56,7 +56,7 @@ bool EasyCSV::containsKey(const char* nameFile, const char* key){
     do{
         fgets(buffer, 255, file);
         gauche = strtok_r(buffer, ";", &buff);
-        if(!strcmp(gauche, key)){
+        if(!strcmp(gauche, key.c_str())){
             fclose(file);
             delete [] buffer;
             return true;
@@ -67,9 +67,9 @@ bool EasyCSV::containsKey(const char* nameFile, const char* key){
     return false;
 }
 
-bool EasyCSV::containsName(const char* nameFile, const char* key){
+bool EasyCSV::containsName(string nameFile, string key){
     FILE *file;
-    file = fopen(nameFile, "r");
+    file = fopen(nameFile.c_str(), "r");
     char* buffer = new char[255];
     
     char* buff;
@@ -79,7 +79,7 @@ bool EasyCSV::containsName(const char* nameFile, const char* key){
         fgets(buffer, 255, file);
         gauche = strtok_r(buffer, ";", &buff);
         gauche = strtok_r(buff, ";", &buff);
-        if(!strcmp(gauche, key)){
+        if(!strcmp(gauche, key.c_str())){
             fclose(file);
             delete [] buffer;
             return true;
@@ -90,9 +90,9 @@ bool EasyCSV::containsName(const char* nameFile, const char* key){
     return false;
 }
 
-char* EasyCSV::getLast(const char* nameFile){
+char* EasyCSV::getLast(string nameFile){
     FILE *file;
-    file = fopen(nameFile, "r");
+    file = fopen(nameFile.c_str(), "r");
     char* buffer = new char[255];
     
     char* buff;

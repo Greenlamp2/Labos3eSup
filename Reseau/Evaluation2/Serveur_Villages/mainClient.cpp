@@ -16,37 +16,39 @@
 #include "NetworkClient.h"
 #include "FHMP.h"
 
-char * gestionLogin();
+string gestionLogin();
 int menu();
 void pauseScreen();
-const char* gestionChoix(int choix);
+string gestionChoix(int choix);
 int menuAction();
-const char* gestionChoixAction(int choix);
-void gestionMessageFromServer(const char* messageFromServer);
+string gestionChoixAction(int choix);
+void gestionMessageFromServer(string messageFromServer);
     
 int main(){
-    const char* host = EasyProp::getValue("properties.prop", "HOST");
-    int port = atoi(EasyProp::getValue("properties.prop", "PORT_VILLAGE"));
+    string host = EasyProp::getValue("properties.prop", "HOST");
+    int port = atoi((EasyProp::getValue("properties.prop", "PORT_VILLAGE")).c_str());
     
-    char* chaine = gestionLogin();
+    string chaine = gestionLogin();
     
     NetworkClient client(host, port);
     FHMP fhmp;
-    const char* messageToSend = FHMP::createPacket(LOGIN, chaine);
+    string messageToSend = LOGIN;
+    messageToSend += ";";
+    messageToSend += chaine;
     cout << "messageToSend: " << messageToSend << endl;
     client.sendMessage(messageToSend);
-    const char* reponseFromServer = fhmp.treatPacketClient(client.receiveMessage());
+    string reponseFromServer = fhmp.treatPacketClient(client.receiveMessage());
     cout << "reponseFromServer: " << reponseFromServer << endl;
-    if(!strcmp(reponseFromServer, LOGIN_OUI)){
+    if(reponseFromServer == LOGIN_OUI){
         int choix = -1;
         do{
             choix = menu();
-            const char* packetToSend = gestionChoix(choix);
-            if(!strcmp(packetToSend, EOC)){
+            string packetToSend = gestionChoix(choix);
+            if(packetToSend == EOC){
                 
             }else{
                 client.sendMessage(packetToSend);
-                const char* messageFromServer = fhmp.treatPacketClient(client.receiveMessage());
+                string messageFromServer = fhmp.treatPacketClient(client.receiveMessage());
                 cout << "messageFromServer: " << messageFromServer << endl;
                 gestionMessageFromServer(messageFromServer);
             }
@@ -58,17 +60,18 @@ int main(){
     return 0;
 }
 
-char * gestionLogin(){
-    char* login = new char[255];
-    char* password = new char[255];
+string gestionLogin(){
+    string login, password;
     cout << "Veuillez entrez votre login: ";
-    strcpy(login, "admin");
+    login = "admin";
     //cin >> login;
     cout << "Veuillez entrez votre password: ";
-    strcpy(password, "admin");
+    password = "admin";
     //cin >> password;
-    char* retour = new char[255];
-    sprintf(retour, "%s#%s", login, password);
+    string retour;
+    retour = login;
+    retour += "#";
+    retour += password;
     return retour;
 }
 
@@ -98,24 +101,27 @@ int menuAction(){
     return choix;
 }
 
-void gestionMessageFromServer(const char* messageFromServer){
-    char *type, *message;
-    char* temp = new char[strlen(messageFromServer)];
-    strcpy(temp, messageFromServer);
-    type = strtok_r(temp, ";", &message);
+void gestionMessageFromServer(string messageFromServer){
+    char* bType;
+    char* bMessage;
+    string type, message;
+    char* cstr = new char[messageFromServer.size()+1];
+    strcpy(cstr, messageFromServer.c_str());
+    bType = strtok_r(cstr, ";", &bMessage);
+    type = bType;
+    message = bMessage;
+    delete [] cstr;
     
-    if(!strcmp(type, BMAT_OUI)){
+    if(type == BMAT_OUI){
         cout << "Booking Material OK" << endl;
         cout << "Id action: " << message << endl;
-    }else if(!strcmp(type, BMAT_NON)){
+    }else if(type == BMAT_NON){
        cout << "Booking Material pas OK" << endl;
        cout << "erreur: " << message << endl;
     }
-    delete [] temp;
-    delete [] messageFromServer;
 }
 
-const char* gestionChoix(int choix){
+string gestionChoix(int choix){
     int choixAction = 0;
     switch(choix){
         case 1:
@@ -134,17 +140,18 @@ const char* gestionChoix(int choix){
     }
 }
 
-const char* gestionChoixAction(int choix){
-    char* retour = new char[255];
-    char* chaine = new char[255];
-    char* nomMateriel = new char[255];
+string gestionChoixAction(int choix){
+    string chaine, nomMateriel, retour;
     
     switch(choix){
         case 1:
             cout << "Quel matériel souhaitez-vous la livraison: ";
             cin >> nomMateriel;
-            sprintf(chaine, "LIVRAISON#%s", nomMateriel);
-            strcpy(retour, FHMP::createPacket(BMAT, chaine));
+            chaine = "LIVRAISON#";
+            chaine += nomMateriel;
+            retour = BMAT;
+            retour += ";";
+            retour += chaine;
             break;
         case 2:
             cout << "ok" << endl;
@@ -153,7 +160,5 @@ const char* gestionChoixAction(int choix){
             cout << "ok" << endl;
             break;
     }
-    delete [] chaine;
-    delete [] nomMateriel;
     return retour;
 }

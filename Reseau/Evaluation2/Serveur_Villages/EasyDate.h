@@ -12,18 +12,13 @@
     #include<iostream.h>
     #include<fstream.h>
 #endif
+#include<sstream>
 #include <time.h>
     
 class EasyDate{
 private:
-    time_t timer;
-    struct tm* tm;
-    char* dateFormater;
 public:
-    EasyDate();
-    ~EasyDate();
-    char* getDateJour();
-    static char* now();
+    static string now();
 };
 
 #endif

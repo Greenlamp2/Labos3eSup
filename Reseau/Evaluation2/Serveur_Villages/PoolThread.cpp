@@ -56,11 +56,11 @@ void* PoolThread::fctThread(void* param){
         NetworkServer networkServer(socket);
         FHMP fhmp;
         while(networkServer.isConnected()){
-            const char* messageFromClient = networkServer.receiveMessage();
+            string messageFromClient = networkServer.receiveMessage();
             cout << "["<< networkServer.getSocketClient() <<"]Message reçu: " << messageFromClient << endl;
-            const char* messageToClient = fhmp.treatPacketServer(messageFromClient);
+            string messageToClient = fhmp.treatPacketServer(messageFromClient);
             cout << "["<< networkServer.getSocketClient() <<"]Message à envoyer au client: " << messageToClient << endl;
-            if(!strcmp(messageToClient, EOC)){
+            if(messageToClient == EOC){
                 networkServer.disconnect();
             }else{
                 networkServer.sendMessage(messageToClient);

@@ -17,23 +17,23 @@
 #include "properties.h"
 #include "EasyCSV.h"
 #include "EasyDate.h"
+#include<sstream>
     
 class FHMP{
 private:
 public:
     FHMP();
     ~FHMP();
-    const char* treatPacketServer(const char* packet);
-    const char* treatPacketClient(const char* packet);
-    void parsePacket(char* packet, char* type, char* contenu);
-    const char* actionTypeServer(char* type, char* contenu);
-    const char* actionTypeClient(char* type, char* contenu);
-    static char* createPacket(const char* type, const char* message);
-    static char* createPacket(const char* type, int message);
+    string treatPacketServer(string packet);
+    string treatPacketClient(string packet);
+    string actionTypeServer(string type, string contenu);
+    string actionTypeClient(string type, string contenu);
+    string createPacket(string type, string message);
+    string createPacket(string type, int message);
     
-    const char* actionGestionLogin(char* contenu);
-    const char* actionGestionBmat(char* contenu);
-    int addAction(char* action, char* materiel);
+    string actionGestionLogin(string contenu);
+    string actionGestionBmat(string contenu);
+    int addAction(string action, string materiel);
 };
 
 #endif

@@ -1,8 +1,8 @@
 #include "EasyProp.h"
 
-const char* EasyProp::getValue(const char* nameFile, const char* key){
+string EasyProp::getValue(string nameFile, string key){
     FILE *file;
-    file = fopen(nameFile, "r");
+    file = fopen(nameFile.c_str(), "r");
     char* buffer = new char[255];
     
     char* buff;
@@ -11,7 +11,7 @@ const char* EasyProp::getValue(const char* nameFile, const char* key){
     do{
         fgets(buffer, 255, file);
         gauche = strtok_r(buffer, "=", &buff);
-        if(!strcmp(gauche, key)){
+        if(!strcmp(gauche, key.c_str())){
             buff[strlen(buff)-1] = '\0';
             fclose(file);
             return buff;
@@ -21,9 +21,9 @@ const char* EasyProp::getValue(const char* nameFile, const char* key){
     return NULL;
 }
 
-bool EasyProp::containsKey(const char* nameFile, const char* key){
+bool EasyProp::containsKey(string nameFile, string key){
     FILE *file;
-    file = fopen(nameFile, "r");
+    file = fopen(nameFile.c_str(), "r");
     char* buffer = new char[255];
     
     char* buff;
@@ -33,8 +33,10 @@ bool EasyProp::containsKey(const char* nameFile, const char* key){
         fgets(buffer, 255, file);
         gauche = strtok_r(buffer, "=", &buff);
         if(!strcmp(gauche, key)){
+            fclose(file);
             return true;
         }
     }while(!feof(file));
+    fclose(file);
     return false;
 }

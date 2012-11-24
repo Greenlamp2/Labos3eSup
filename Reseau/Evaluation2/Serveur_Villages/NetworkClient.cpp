@@ -2,11 +2,11 @@
 
 NetworkClient::NetworkClient(){
     this->socketClient = this->createSocket();
-    this->initInfos(EasyProp::getValue("properties.prop", "HOST"), atoi(EasyProp::getValue("properties.prop", "PORT_VILLAGE")));
+    this->initInfos(EasyProp::getValue("properties.prop", "HOST"), atoi((EasyProp::getValue("properties.prop", "PORT_VILLAGE")).c_str()));
     this->connection();
 }
 
-NetworkClient::NetworkClient(const char* adresseIP, int port){
+NetworkClient::NetworkClient(string adresseIP, int port){
     this->socketClient = this->createSocket();
     this->initInfos(adresseIP, port);
     this->connection();
@@ -15,15 +15,9 @@ NetworkClient::NetworkClient(const char* adresseIP, int port){
 NetworkClient::NetworkClient(const NetworkClient& n)
 {
     this->socketClient = n.socketClient;
-    this->setAdresseIp(n.getAdresseIp());
+    this->adresseIp = n.getAdresseIp();
     this->port = n.port;
     this->adresseSocket = n.adresseSocket;
-}
-
-
-NetworkClient::~NetworkClient()
-{
-    delete [] adresseIp;
 }
 
 
@@ -42,16 +36,15 @@ int NetworkClient::createSocket()
     return hSocket;
 }
 
-void NetworkClient::initInfos(const char* adresseIp, int port)
+void NetworkClient::initInfos(string adresseIp, int port)
 {
     struct hostent *infoHost;
     struct in_addr addIp;
 
-    this->adresseIp = new char[strlen(adresseIp) + 1];
-    strcpy(this->adresseIp, adresseIp);
+    this->adresseIp = adresseIp;
     this->port = port;
 
-    infoHost = gethostbyname(adresseIp);
+    infoHost = gethostbyname(adresseIp.c_str());
     if(infoHost == 0){
         cout << "Erreur d'acquisition des infos sur le host: " << errno << endl;
         exit(1);
@@ -82,15 +75,14 @@ void NetworkClient::connection()
     }
 }
 
-void NetworkClient::sendMessage(const char* message)
+void NetworkClient::sendMessage(string message)
 {
-    int taille = strlen(message);
-    char* buffer = new char[taille + 2];
-    strcpy(buffer, message);
-    buffer[taille] = '\r';
-    buffer[taille + 1] = '\n';
-    buffer[taille + 2] = '\0';
-    int ret = send(this->socketClient, buffer, taille + 2, 0);
+    string buffer;
+    buffer = message;
+    buffer += '\r';
+    buffer += '\n';
+    buffer += '\0';
+    int ret = send(this->socketClient, buffer.c_str(), buffer.size(), 0);
     if(ret == -1){
         cout << "Erreur sur le send de la socket: " << errno << endl;
         this->disconnect();
@@ -98,7 +90,7 @@ void NetworkClient::sendMessage(const char* message)
     }
 }
 
-const char* NetworkClient::receiveMessage()
+string NetworkClient::receiveMessage()
 {
     int tailleSegment = 0;
     int nbByteRecu = 0;
@@ -107,6 +99,7 @@ const char* NetworkClient::receiveMessage()
     char *buffer = new char[SIZEMESSAGE];
     char *msg = new char[SIZEMESSAGE];
     bool finDetecte = false;
+    string retour;
     
     int ret = getsockopt(this->socketClient, IPPROTO_TCP, TCP_MAXSEG, &tailleSegment, (socklen_t*)&sizeInt);
     if(ret == -1){
@@ -130,8 +123,9 @@ const char* NetworkClient::receiveMessage()
         tailleMessage += nbByteRecu;
     }while(nbByteRecu != 0 && nbByteRecu != -1 && !finDetecte);
     if(nbByteRecu == 0) return EOC;
-    *(msg + tailleMessage - 2) = '\0'; //-2 pour enlever le \r\n
-    return msg;
+    *(msg + tailleMessage - 3) = '\0'; //-2 pour enlever le \r\n
+    retour = msg;
+    return retour;
 }
 
 bool NetworkClient::verifMarqueur(char* message, int nbByte)
@@ -158,14 +152,9 @@ bool NetworkClient::verifMarqueur(char* message, int nbByte)
 }
 
 //Setters
-void NetworkClient::setAdresseIp(const char* adresseIp)
-{
-    this->adresseIp = new char[strlen(adresseIp) + 1];
-    strcpy(this->adresseIp, adresseIp);
-}
 
 //Getters
-const char* NetworkClient::getAdresseIp() const
+string NetworkClient::getAdresseIp() const
 {
     return this->adresseIp;
 }

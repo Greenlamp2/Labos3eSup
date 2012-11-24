@@ -19,12 +19,12 @@ class EasyCSV{
 private:
 public:
     EasyCSV();
-    static char* getValue(const char* nameFile, const char* key);
-    static void putValue(const char* nameFile, const char* key, const char* value);
-    static void delValue(const char* nameFile, const char* key);
-    static bool containsKey(const char* nameFile, const char* key);
-    static bool containsName(const char* nameFile, const char* key);
-    static char* getLast(const char* nameFile);
+    static string getValue(string nameFile, string key);
+    static void putValue(string nameFile, string key, string value);
+    static void delValue(string nameFile, string key);
+    static bool containsKey(string nameFile, string key);
+    static bool containsName(string nameFile, string key);
+    static char* getLast(string nameFile);
 };
 
 #endif

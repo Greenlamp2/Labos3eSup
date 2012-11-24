@@ -19,23 +19,21 @@
 class NetworkClient{
 private:
     int socketClient;
-    char *adresseIp;
+    string adresseIp;
     int port;
     struct sockaddr_in adresseSocket;
 public:
     NetworkClient();
-    NetworkClient(const char* host, int port);
+    NetworkClient(string host, int port);
     NetworkClient(const NetworkClient &n);
-    ~NetworkClient();
     int createSocket();
-    void initInfos(const char* adresseIP, int port);
+    void initInfos(string adresseIP, int port);
     void disconnect();
     void connection();
-    void sendMessage(const char* message);
-    const char* receiveMessage();
+    void sendMessage(string message);
+    string receiveMessage();
     bool verifMarqueur(char* message, int nbByte);
     
-    void setAdresseIp(const char* adresseIp);
-    const char* getAdresseIp() const;
+    string getAdresseIp() const;
 };
 #endif

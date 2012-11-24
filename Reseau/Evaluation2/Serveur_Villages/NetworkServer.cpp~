@@ -1,18 +1,18 @@
 #include "NetworkServer.h"
 
 NetworkServer::NetworkServer(){
-    this->sizeMessage = atoi(EasyProp::getValue("properties.prop", "SIZEMESSAGE"));
+    this->sizeMessage = atoi((EasyProp::getValue("properties.prop", "SIZEMESSAGE")).c_str());
     this->socketServer = this->createSocket();
     this->socketClient = -1;
-    this->initInfos(EasyProp::getValue("properties.prop", "HOST"), atoi(EasyProp::getValue("properties.prop", "PORT_VILLAGE")));
+    this->initInfos(EasyProp::getValue("properties.prop", "HOST"), atoi((EasyProp::getValue("properties.prop", "PORT_VILLAGE")).c_str()));
     this->injectAdress();
     this->listenSocket();
     this->acceptSocket();
 }
 
-NetworkServer::NetworkServer(const char* host, int port)
+NetworkServer::NetworkServer(string host, int port)
 {
-    this->sizeMessage = atoi(EasyProp::getValue("properties.prop", "SIZEMESSAGE"));
+    this->sizeMessage = atoi((EasyProp::getValue("properties.prop", "SIZEMESSAGE")).c_str());
     this->socketServer = this->createSocket();
     this->socketClient = -1;
     this->initInfos(host, port);
@@ -24,10 +24,9 @@ NetworkServer::NetworkServer(const char* host, int port)
 
 NetworkServer::NetworkServer(int socketClient)
 {
-    this->sizeMessage = atoi(EasyProp::getValue("properties.prop", "SIZEMESSAGE"));
+    this->sizeMessage = atoi((EasyProp::getValue("properties.prop", "SIZEMESSAGE")).c_str());
     this->socketClient = socketClient;
     this->connected = true;
-    this->adresseIp = NULL;
 }
 
 
@@ -35,19 +34,10 @@ NetworkServer::NetworkServer(const NetworkServer& n)
 {
     this->socketServer = n.socketServer;
     this->socketClient = n.socketClient;
-    this->setAdresseIp(n.getAdresseIp());
+    this->adresseIp = n.getAdresseIp();
     this->port = n.port;
     this->adresseSocket = n.adresseSocket;
     this->connected = n.connected;
-}
-
-
-NetworkServer::~NetworkServer()
-{
-    if(adresseIp != NULL){
-        delete [] adresseIp;
-        adresseIp = NULL;
-    }
 }
 
 
@@ -66,16 +56,16 @@ int NetworkServer::createSocket()
     return hSocket;
 }
 
-void NetworkServer::initInfos(const char* adresseIp, int port)
+void NetworkServer::initInfos(string adresseIp, int port)
 {
     struct hostent *infoHost;
     struct in_addr addIp;
 
-    this->setAdresseIp(adresseIp);
+    this->adresseIp = adresseIp;
     this->port = port;
     cout << "Mise à l'écoute sur l'adresse " << this->getAdresseIp() << " et le port " << this->port << endl;
 
-    infoHost = gethostbyname(adresseIp);
+    infoHost = gethostbyname(adresseIp.c_str());
     if(infoHost == 0){
         cout << "Erreur d'acquisition des infos sur le host: " << errno << endl;
         exit(1);
@@ -140,15 +130,14 @@ void NetworkServer::acceptSocket()
     this->socketClient = ret;
 }
 
-void NetworkServer::sendMessage(const char* message)
+void NetworkServer::sendMessage(string message)
 {
-    int taille = strlen(message);
-    char* buffer = new char[taille + 2];
-    strcpy(buffer, message);
-    buffer[taille] = '\r';
-    buffer[taille + 1] = '\n';
-    buffer[taille + 2] = '\0';
-    int ret = send(this->socketClient, buffer, taille + 2, 0);
+    string buffer;
+    buffer = message;
+    buffer += '\r';
+    buffer += '\n';
+    buffer += '\0';
+    int ret = send(this->socketClient, buffer.c_str(), buffer.size(), 0);
     if(ret == -1){
         cout << "Erreur sur le send de la socket: " << errno << endl;
         this->disconnect();
@@ -156,7 +145,7 @@ void NetworkServer::sendMessage(const char* message)
     }
 }
 
-const char* NetworkServer::receiveMessage()
+string NetworkServer::receiveMessage()
 {
     int tailleSegment = 0;
     int nbByteRecu = 0;
@@ -165,6 +154,7 @@ const char* NetworkServer::receiveMessage()
     char *buffer = new char[this->sizeMessage];
     char *msg = new char[this->sizeMessage];
     bool finDetecte = false;
+    string retour;
     
     int ret = getsockopt(this->socketClient, IPPROTO_TCP, TCP_MAXSEG, &tailleSegment, (socklen_t*)&sizeInt);
     if(ret == -1){
@@ -189,8 +179,8 @@ const char* NetworkServer::receiveMessage()
     }while(nbByteRecu != 0 && nbByteRecu != -1 && !finDetecte);
     if(nbByteRecu == 0) return EOC;
     *(msg + tailleMessage - 2) = '\0'; //-2 pour enlever le \r\n
-    delete [] buffer;
-    return msg;
+    retour = msg;
+    return retour;
 }
 
 bool NetworkServer::verifMarqueur(char* message, int nbByte)
@@ -218,14 +208,9 @@ bool NetworkServer::verifMarqueur(char* message, int nbByte)
 
 
 //Setters
-void NetworkServer::setAdresseIp(const char* adresseIp)
-{
-    this->adresseIp = new char[strlen(adresseIp) + 1];
-    strcpy(this->adresseIp, adresseIp);
-}
 
 //Getters
-const char* NetworkServer::getAdresseIp() const
+string NetworkServer::getAdresseIp() const
 {
     return this->adresseIp;
 }

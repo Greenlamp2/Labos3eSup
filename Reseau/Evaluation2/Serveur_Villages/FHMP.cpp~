@@ -9,44 +9,45 @@ FHMP::~FHMP()
 }
 
 
-const char* FHMP::treatPacketServer(const char* packet)
+string FHMP::treatPacketServer(string packet)
 {
-    char* type;
-    char* contenu;
-    char* tempPacket = new char[255];
-    strcpy(tempPacket, packet);
-    type = strtok_r(tempPacket, ";", &contenu);
-    const char* retour = this->actionTypeServer(type, contenu);
-    delete [] tempPacket;
+    string type, contenu;
+    char* bType;
+    char* bContenu;
+    char* cstr = new char[packet.size()+1];
+    strcpy(cstr, packet.c_str());
+    bType = strtok_r(cstr, ";", &bContenu);
+    type = bType;
+    contenu = bContenu;
+    delete [] cstr;
+    string retour = this->actionTypeServer(type, contenu);
     return retour;
 }
 
 
-const char* FHMP::treatPacketClient(const char* packet)
+string FHMP::treatPacketClient(string packet)
 {
-    char *type;
-    char *contenu;
-    char *tempPacket = new char[255];
-    strcpy(tempPacket, packet);
-    type = strtok_r(tempPacket, ";", &contenu);
-    const char* retour = this->actionTypeClient(type, contenu);
-    delete [] tempPacket;
+    string type, contenu;
+    char* bType;
+    char* bContenu;
+    char* cstr = new char[packet.size()+1];
+    strcpy(cstr, packet.c_str());
+    bType = strtok_r(cstr, ";", &bContenu);
+    type = bType;
+    contenu = bContenu;
+    delete [] cstr;
+    string retour = this->actionTypeClient(type, contenu);
     return retour;
 }
 
-void FHMP::parsePacket(char* packet, char* type, char* contenu)
+string FHMP::actionTypeServer(string type, string contenu)
 {
-    type = strtok_r(packet, ";", &contenu);
-}
-
-const char* FHMP::actionTypeServer(char* type, char* contenu)
-{
-    const char* retour;
-    if(!strcmp(type, EOC)){
+    string retour;
+    if(type == EOC){
         return EOC;
-    }else if(!strcmp(type, LOGIN)){
+    }else if(type == LOGIN){
         retour = actionGestionLogin(contenu);
-    }else if(!strcmp(type, BMAT)){
+    }else if(type == BMAT){
         retour = actionGestionBmat(contenu);
     }else{
         retour = CLOSE;
@@ -54,74 +55,93 @@ const char* FHMP::actionTypeServer(char* type, char* contenu)
     return retour;
 }
 
-const char* FHMP::actionTypeClient(char* type, char* contenu){
+string FHMP::actionTypeClient(string type, string contenu){
     cout << "type: " << type << endl;
-    char *retour = new char[255];
-    if(!strcmp(type, LOGIN_OUI)){
-        strcpy(retour, type);
+    string retour;
+    if(type == LOGIN_OUI){
+        retour = type;
         
-    }else if(!strcmp(type, LOGIN_NON)){
-        strcpy(retour, type);
+    }else if(type == LOGIN_NON){
+        retour = type;
         
-    }else if(!strcmp(type, BMAT_OUI)){
-        sprintf(retour, "%s;%s", type, contenu);
+    }else if(type == BMAT_OUI){
+        retour = type;
+        retour += ";";
+        retour += contenu;
         
-    }else if(!strcmp(type, BMAT_NON)){
-        sprintf(retour, "%s;%s", type, contenu);
+    }else if(type == BMAT_NON){
+        retour = type;
+        retour += ";";
+        retour += contenu;
         
     }else{
-        strcpy(retour, type);
+        retour = type;
     }
     return retour;
 }
 
-char* FHMP::createPacket(const char* type, const char* message){
-    char* buffer = new char[255];
-    sprintf(buffer, "%s;%s", type, message);
+string FHMP::createPacket(string type, string message){
+    string buffer;
+    buffer = type;
+    buffer += ";";
+    buffer += message;
     return buffer;
 }
 
-char* FHMP::createPacket(const char* type, int message)
+string FHMP::createPacket(string type, int message)
 {
-    char* buffer = new char[255];
-    sprintf(buffer, "%s;%d", type, message);
-    return buffer;
+    std::ostringstream out;
+    out << type;
+    out << ";";
+    out << message;
+    return out.str();
 }
 
 
 //Actions du protocole
-const char* FHMP::actionGestionLogin(char* contenu){
-    char *login;
-    char *password;
-    const char* retour;
-    login = strtok_r(contenu, "#", &password);
+string FHMP::actionGestionLogin(string contenu){
+    char* bLogin;
+    char* bPassword;
+    string login, password;
+    char* cstr = new char[contenu.size()+1];
+    strcpy(cstr, contenu.c_str());
+    bLogin = strtok_r(cstr, "#", &bPassword);
+    login = bLogin;
+    password = bPassword;
+    delete [] cstr;
     if(!EasyCSV::containsKey("gestionnaires.csv", login)){
         return LOGIN_NON;
     }else{
-        char* ligne = EasyCSV::getValue("gestionnaires.csv", login);
-        char *loginLigne;
-        char *passwordLigne;
-        loginLigne = strtok_r(ligne, ";", &passwordLigne);
-        if(!strcmp(password, passwordLigne)){
-            retour = LOGIN_OUI;
+        string ligne = EasyCSV::getValue("gestionnaires.csv", login);
+        char *bLoginLigne;
+        char *bPasswordLigne;
+        string loginLigne, passwordLigne;
+        char* cstr2 = new char[ligne.size()+1];
+        strcpy(cstr2, ligne.c_str());
+        bLoginLigne = strtok_r(cstr2, ";", &bPasswordLigne);
+        loginLigne = bLoginLigne;
+        passwordLigne = bPasswordLigne;
+        delete [] cstr2;
+        if(password == passwordLigne){
+            return LOGIN_OUI;
         }else{
-            retour = LOGIN_NON;
+            return LOGIN_NON;
         }
-        delete[] ligne;
-        return retour;
     }
 }
 
-const char* FHMP::actionGestionBmat(char* contenu){
-    char *action;
-    char *materiel;
-    action = strtok_r(contenu, "#", &materiel);
+string FHMP::actionGestionBmat(string contenu){
+    char *bAction;
+    char *bMateriel;
+    string action, materiel;
+    char* cstr = new char[contenu.size()+1];
+    strcpy(cstr, contenu.c_str());
+    bAction = strtok_r(contenu, "#", &bMateriel);
+    materiel = bMateriel;
+    action = bAction;
     if(EasyCSV::containsName("materiel.csv", materiel)){
         int id = addAction(action, materiel);
-        //ostringstream out;
-        //out << id;
-        //const char* chaine = out.str().c_str();
-        char* packet = FHMP::createPacket(BMAT_OUI, "test");
+        string packet = FHMP::createPacket(BMAT_OUI, "test");
         //delete [] c;
         return packet;
     }else{
@@ -129,7 +149,7 @@ const char* FHMP::actionGestionBmat(char* contenu){
     }
 }
 
-int FHMP::addAction(char* action, char* materiel){
+int FHMP::addAction(string action, string materiel){
     //char* lastTuple = EasyCSV::getLast("actions.csv");
     //char *idChar, *rest;
     //idChar = strtok_r(lastTuple, ";", &rest);

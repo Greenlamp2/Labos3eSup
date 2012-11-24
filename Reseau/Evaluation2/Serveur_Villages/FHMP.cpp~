@@ -2,70 +2,77 @@
 
 FHMP::FHMP()
 {
-
 }
+
+FHMP::~FHMP()
+{
+}
+
 
 const char* FHMP::treatPacketServer(const char* packet)
 {
-    char* type = new char[SIZEMESSAGE];
-    char* message = new char[SIZEMESSAGE];
-    int nbByte = strlen(packet);
-    FHMP::parsePacket(packet, type, message);
-    return this->actionTypeServer(type, message);
-}
-const char* FHMP::treatPacketClient(const char* packet)
-{
-    char* type = new char[SIZEMESSAGE];
-    char* message = new char[SIZEMESSAGE];
-    int nbByte = strlen(packet);
-    FHMP::parsePacket(packet, type, message);
-    const char* retour = this->actionTypeServer(type, message);
-    cout << "retour: " << retour << endl;
+    char* type;
+    char* contenu;
+    char* tempPacket = new char[255];
+    strcpy(tempPacket, packet);
+    type = strtok_r(tempPacket, ";", &contenu);
+    const char* retour = this->actionTypeServer(type, contenu);
+    delete [] tempPacket;
     return retour;
 }
 
-void FHMP::parsePacket(const char* packet, char* type, char* message)
+
+const char* FHMP::treatPacketClient(const char* packet)
 {
-    char *buffer, *buff;
-    char* temp = new char[strlen(packet)];
-    strcpy(temp, packet);
-    
-    buff = strtok_r(temp, ";", &buffer);
-    strcpy(type, buff);
-    strcpy(message, buffer);
+    char *type;
+    char *contenu;
+    char *tempPacket = new char[255];
+    strcpy(tempPacket, packet);
+    type = strtok_r(tempPacket, ";", &contenu);
+    const char* retour = this->actionTypeClient(type, contenu);
+    delete [] tempPacket;
+    return retour;
 }
 
-const char* FHMP::actionTypeServer(const char* type, const char* message)
+void FHMP::parsePacket(char* packet, char* type, char* contenu)
 {
-    cout << "type: " << type << endl;
+    type = strtok_r(packet, ";", &contenu);
+}
+
+const char* FHMP::actionTypeServer(char* type, char* contenu)
+{
+    const char* retour;
     if(!strcmp(type, EOC)){
         return EOC;
     }else if(!strcmp(type, LOGIN)){
-        return actionGestionLogin(message);
+        retour = actionGestionLogin(contenu);
     }else if(!strcmp(type, BMAT)){
-        return actionGestionBmat(message);
+        retour = actionGestionBmat(contenu);
     }else{
-        return CLOSE;
+        retour = CLOSE;
     }
+    return retour;
 }
 
-const char* FHMP::actionTypeClient(const char* type, const char* message){
+const char* FHMP::actionTypeClient(char* type, char* contenu){
     cout << "type: " << type << endl;
+    char *retour = new char[255];
     if(!strcmp(type, LOGIN_OUI)){
-        cout << "return LOGIN_OUI" << endl;
-        return LOGIN_OUI;
+        strcpy(retour, type);
+        
     }else if(!strcmp(type, LOGIN_NON)){
-        cout << "return LOGIN_NON" << endl;
-        return LOGIN_NON;
+        strcpy(retour, type);
+        
     }else if(!strcmp(type, BMAT_OUI)){
-        cout << "return BMAT_OUI" << endl;
-        char* retour = new char[255];
-        sprintf(retour, "%s;%s", type, message);
-        return retour;
+        sprintf(retour, "%s;%s", type, contenu);
+        
+    }else if(!strcmp(type, BMAT_NON)){
+        sprintf(retour, "%s;%s", type, contenu);
+        
     }else{
-        cout << "return CLOSE" << endl;
-        return CLOSE;
+        strcpy(retour, type);
     }
+    return retour;
 }
 
 char* FHMP::createPacket(const char* type, const char* message){
@@ -74,32 +81,69 @@ char* FHMP::createPacket(const char* type, const char* message){
     return buffer;
 }
 
+char* FHMP::createPacket(const char* type, int message)
+{
+    char* buffer = new char[255];
+    sprintf(buffer, "%s;%d", type, message);
+    return buffer;
+}
+
 
 //Actions du protocole
-const char* FHMP::actionGestionLogin(const char* message){
-    char *login, *password;
-    char* temp = new char[strlen(message)];
-    strcpy(temp, message);
-    
-    login = strtok_r(temp, "#", &password);
+const char* FHMP::actionGestionLogin(char* contenu){
+    char *login;
+    char *password;
+    const char* retour;
+    login = strtok_r(contenu, "#", &password);
     if(!EasyCSV::containsKey("gestionnaires.csv", login)){
         return LOGIN_NON;
     }else{
-        const char* ligne = EasyCSV::getValue("gestionnaires.csv", login);
-        char *buff, *buffer;
-        char* tempCsv = new char[strlen(ligne)];
-        strcpy(tempCsv, ligne);
-        buff = strtok_r(tempCsv, ";", &buffer);
-        if(!strcmp(password, buffer)){
-            return LOGIN_OUI;
+        char* ligne = EasyCSV::getValue("gestionnaires.csv", login);
+        char *loginLigne;
+        char *passwordLigne;
+        loginLigne = strtok_r(ligne, ";", &passwordLigne);
+        if(!strcmp(password, passwordLigne)){
+            retour = LOGIN_OUI;
         }else{
-            return LOGIN_NON;
+            retour = LOGIN_NON;
         }
+        delete[] ligne;
+        return retour;
     }
 }
 
-const char* FHMP::actionGestionBmat(const char* message){
-    cout << "message: " << message << endl;
-    return FHMP::createPacket(BMAT_OUI, "12");
+const char* FHMP::actionGestionBmat(char* contenu){
+    char *action;
+    char *materiel;
+    action = strtok_r(contenu, "#", &materiel);
+    if(EasyCSV::containsName("materiel.csv", materiel)){
+        int id = addAction(action, materiel);
+        //ostringstream out;
+        //out << id;
+        //const char* chaine = out.str().c_str();
+        char* packet = FHMP::createPacket(BMAT_OUI, "test");
+        //delete [] c;
+        return packet;
+    }else{
+        return FHMP::createPacket(BMAT_NON, "Matériel non existant");
+    }
 }
+
+int FHMP::addAction(char* action, char* materiel){
+    //char* lastTuple = EasyCSV::getLast("actions.csv");
+    //char *idChar, *rest;
+    //idChar = strtok_r(lastTuple, ";", &rest);
+    //int id = atoi(idChar);
+    //id++;
+    //char* chaine = new char[255];
+    //char* dateJour = EasyDate::now();
+    //sprintf(chaine, "%d;%s;%s;%s", id, action, materiel, dateJour);
+    //cout << "chaine: " << chaine << endl;
+    //EasyCSV::putValue("materiel.csv", idChar, chaine);
+    //delete [] dateJour;
+    //delete [] lastTuple;
+    //delete [] chaine;
+    return 5;
+}
+
 

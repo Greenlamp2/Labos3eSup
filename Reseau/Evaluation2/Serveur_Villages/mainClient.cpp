@@ -97,6 +97,7 @@ int menuAction(){
     cin >> choix;
     return choix;
 }
+
 void gestionMessageFromServer(const char* messageFromServer){
     char *type, *message;
     char* temp = new char[strlen(messageFromServer)];
@@ -107,8 +108,11 @@ void gestionMessageFromServer(const char* messageFromServer){
         cout << "Booking Material OK" << endl;
         cout << "Id action: " << message << endl;
     }else if(!strcmp(type, BMAT_NON)){
-       
+       cout << "Booking Material pas OK" << endl;
+       cout << "erreur: " << message << endl;
     }
+    delete [] temp;
+    delete [] messageFromServer;
 }
 
 const char* gestionChoix(int choix){
@@ -149,5 +153,7 @@ const char* gestionChoixAction(int choix){
             cout << "ok" << endl;
             break;
     }
+    delete [] chaine;
+    delete [] nomMateriel;
     return retour;
 }

@@ -46,6 +46,7 @@ NetworkServer::~NetworkServer()
 {
     if(adresseIp != NULL){
         delete [] adresseIp;
+        adresseIp = NULL;
     }
 }
 
@@ -128,7 +129,6 @@ void NetworkServer::disconnect()
 
 void NetworkServer::acceptSocket()
 {
-    cout << "En attente d'un client" << endl;
     int tailleStruct = sizeof(struct sockaddr_in);
     int ret = accept(this->socketServer, (struct sockaddr*) &this->adresseSocket, (socklen_t*)&tailleStruct);
     if(ret == -1){
@@ -189,6 +189,7 @@ const char* NetworkServer::receiveMessage()
     }while(nbByteRecu != 0 && nbByteRecu != -1 && !finDetecte);
     if(nbByteRecu == 0) return EOC;
     *(msg + tailleMessage - 2) = '\0'; //-2 pour enlever le \r\n
+    delete [] buffer;
     return msg;
 }
 

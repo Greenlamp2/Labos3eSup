@@ -46,6 +46,7 @@ NetworkServer::~NetworkServer()
 {
     if(adresseIp != NULL){
         delete [] adresseIp;
+        adresseIp = NULL;
     }
 }
 

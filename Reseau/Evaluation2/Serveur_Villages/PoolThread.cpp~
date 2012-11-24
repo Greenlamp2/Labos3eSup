@@ -59,13 +59,16 @@ void* PoolThread::fctThread(void* param){
             const char* messageFromClient = networkServer.receiveMessage();
             cout << "["<< networkServer.getSocketClient() <<"]Message reçu: " << messageFromClient << endl;
             const char* messageToClient = fhmp.treatPacketServer(messageFromClient);
-            cout << "Message à envoyer au client: " << messageToClient << endl;
+            //delete [] messageFromClient;
+            cout << "["<< networkServer.getSocketClient() <<"]Message à envoyer au client: " << messageToClient << endl;
             if(!strcmp(messageToClient, EOC)){
                 networkServer.disconnect();
             }else{
                 networkServer.sendMessage(messageToClient);
             }
         }
+        networkServer.disconnect();
+        
         pthread_mutex_lock(&poolThread->mutexIndiceCourant);
         poolThread->sockets[indice] = -1;
         pthread_mutex_unlock(&poolThread->mutexIndiceCourant);

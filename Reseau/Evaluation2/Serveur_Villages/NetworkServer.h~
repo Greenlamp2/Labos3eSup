@@ -26,7 +26,7 @@ private:
     int sizeMessage;
 public:
     NetworkServer();
-    NetworkServer(const char* host, int port, int sizeMessage);
+    NetworkServer(const char* host, int port);
     NetworkServer(const NetworkServer &n);
     NetworkServer(int socket);
     ~NetworkServer();
@@ -37,7 +37,7 @@ public:
     void disconnect();
     void acceptSocket();
     void sendMessage(const char* message);
-    const char* receiveMessage();
+    char* receiveMessage();
     bool verifMarqueur(char* message, int nbByte);
     void setSocketClient(int socket);
     

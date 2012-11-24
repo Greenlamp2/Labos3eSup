@@ -66,6 +66,8 @@ void* PoolThread::fctThread(void* param){
                 networkServer.sendMessage(messageToClient);
             }
         }
+        networkServer.disconnect();
+        
         pthread_mutex_lock(&poolThread->mutexIndiceCourant);
         poolThread->sockets[indice] = -1;
         pthread_mutex_unlock(&poolThread->mutexIndiceCourant);

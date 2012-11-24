@@ -17,10 +17,9 @@
 #include "EasyCSV.h"
     
 int main(){
-    
-    const char* host = EasyProp::getValue("properties.prop", "HOST");
+    cout << "date: " << EasyDate::now() << endl;
+    /*const char* host = EasyProp::getValue("properties.prop", "HOST");
     int port = atoi(EasyProp::getValue("properties.prop", "PORT_VILLAGE"));
-    int nbMaxClient = atoi(EasyProp::getValue("properties.prop", "NB_MAX_CLIENT"));
     
     PoolThread poolThread;
     NetworkServer server(host, port);
@@ -28,6 +27,6 @@ int main(){
         poolThread.inject(server.getSocketClient());
         server.acceptSocket();
     }
-    server.disconnect();
+    server.disconnect();*/
     return 0;
 }

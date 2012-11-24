@@ -13,6 +13,7 @@
     #include<fstream.h>
 #endif
 #include "properties.h"
+#include "EasyCSV.h"
     
 class FHMP{
 private:
@@ -23,7 +24,10 @@ public:
     void parsePacket(const char* packet, char* type, char* message);
     const char* actionTypeServer(const char* type, const char* message);
     const char* actionTypeClient(const char* type, const char* message);
-    char* createPacket(const char* type, const char* message);
+    static char* createPacket(const char* type, const char* message);
+    
+    const char* actionGestionLogin(const char* message);
+    const char* actionGestionBmat(const char* message);
 };
 
 #endif

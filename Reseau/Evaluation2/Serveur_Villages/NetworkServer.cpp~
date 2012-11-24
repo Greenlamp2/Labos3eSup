@@ -4,7 +4,7 @@ NetworkServer::NetworkServer(){
     this->sizeMessage = atoi(EasyProp::getValue("properties.prop", "SIZEMESSAGE"));
     this->socketServer = this->createSocket();
     this->socketClient = -1;
-    this->initInfos(EasyProp::getValue("properties.prop", "HOST"), atoi(EasyProp::getValue("properties.prop", "PORT_VILLAGE"));
+    this->initInfos(EasyProp::getValue("properties.prop", "HOST"), atoi(EasyProp::getValue("properties.prop", "PORT_VILLAGE")));
     this->injectAdress();
     this->listenSocket();
     this->acceptSocket();
@@ -27,6 +27,7 @@ NetworkServer::NetworkServer(int socketClient)
     this->sizeMessage = atoi(EasyProp::getValue("properties.prop", "SIZEMESSAGE"));
     this->socketClient = socketClient;
     this->connected = true;
+    this->adresseIp = NULL;
 }
 
 
@@ -43,7 +44,9 @@ NetworkServer::NetworkServer(const NetworkServer& n)
 
 NetworkServer::~NetworkServer()
 {
-    delete [] adresseIp;
+    if(adresseIp != NULL){
+        delete [] adresseIp;
+    }
 }
 
 
@@ -57,8 +60,6 @@ int NetworkServer::createSocket()
     if(hSocket == -1){
         cout << "Erreur de création de la socket: " << errno << endl;
         exit(1);
-    }else{
-        cout << "Création de la socket: OK" << endl;
     }
     
     return hSocket;
@@ -77,8 +78,6 @@ void NetworkServer::initInfos(const char* adresseIp, int port)
     if(infoHost == 0){
         cout << "Erreur d'acquisition des infos sur le host: " << errno << endl;
         exit(1);
-    }else{
-        cout << "Acquisition des infos sur le host: OK" << endl;
     }
 
     //infoHost = les infos sur la machine comme par exemple les carte réseau installé etc.

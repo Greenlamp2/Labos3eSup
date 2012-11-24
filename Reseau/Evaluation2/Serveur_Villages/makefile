@@ -41,4 +41,5 @@ EasyCSV.o:		EasyCSV.cpp EasyCSV.h
 clean:
 	rm ./*.o
 	rm ./Serveur_Villages
+	rm ./Applic_Materiel
 	rm ./*.~

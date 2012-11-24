@@ -43,25 +43,22 @@ void* PoolThread::fctThread(void* param){
     PoolThread* poolThread = (PoolThread*) param;
     int indice = 0;
     while(1){
-        cout << "thread en attente" << endl;
         pthread_mutex_lock(&poolThread->mutexIndiceCourant);
         while(poolThread->indiceCourant == -1){
             pthread_cond_wait(&poolThread->condIndiceCourant, &poolThread->mutexIndiceCourant);
         }
         indice = poolThread->indiceCourant;
-        cout << "Traitement de la tâche par le thread " << indice << " ! " << endl;
         poolThread->indiceCourant = -1;
         
         int socket = poolThread->sockets[indice];
-        cout << "socket: " << socket << endl;
         pthread_mutex_unlock(&poolThread->mutexIndiceCourant);
         
         NetworkServer networkServer(socket);
         FHMP fhmp;
         while(networkServer.isConnected()){
             const char* messageFromClient = networkServer.receiveMessage();
-            cout << "Message reçu: " << messageFromClient << endl;
-            const char* messageToClient = fhmp.treatPacket(messageFromClient);
+            cout << "["<< networkServer.getSocketClient() <<"]Message reçu: " << messageFromClient << endl;
+            const char* messageToClient = fhmp.treatPacketServer(messageFromClient);
             cout << "Message à envoyer au client: " << messageToClient << endl;
             if(!strcmp(messageToClient, EOC)){
                 networkServer.disconnect();
@@ -69,12 +66,8 @@ void* PoolThread::fctThread(void* param){
                 networkServer.sendMessage(messageToClient);
             }
         }
-        networkServer.~NetworkServer();
-        cout << "Fin du traitement par le thread" << endl;
         pthread_mutex_lock(&poolThread->mutexIndiceCourant);
         poolThread->sockets[indice] = -1;
         pthread_mutex_unlock(&poolThread->mutexIndiceCourant);
-        
-        
     }
 }

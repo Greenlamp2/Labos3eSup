@@ -37,8 +37,6 @@ int NetworkClient::createSocket()
     if(hSocket == -1){
         cout << "Erreur de création de la socket: " << errno << endl;
         exit(1);
-    }else{
-        cout << "Création de la socket: OK" << endl;
     }
     
     return hSocket;
@@ -52,14 +50,11 @@ void NetworkClient::initInfos(const char* adresseIp, int port)
     this->adresseIp = new char[strlen(adresseIp) + 1];
     strcpy(this->adresseIp, adresseIp);
     this->port = port;
-    cout << "Mise à l'écoute sur l'adresse " << this->adresseIp << " et le port " << this->port << endl;
 
     infoHost = gethostbyname(adresseIp);
     if(infoHost == 0){
         cout << "Erreur d'acquisition des infos sur le host: " << errno << endl;
         exit(1);
-    }else{
-        cout << "Acquisition des infos sur le host: OK" << endl;
     }
 
     //infoHost = les infos sur la machine comme par exemple les carte réseau installé etc.
@@ -84,8 +79,6 @@ void NetworkClient::connection()
     int ret = connect(this->socketClient, (struct sockaddr*) &this->adresseSocket, tailleStruct);
     if(ret == -1){
         cout << "Erreur sur le connect de la socket: " << errno << endl;
-    }else{
-        cout << "Connect de la socket: OK" << endl;
     }
 }
 

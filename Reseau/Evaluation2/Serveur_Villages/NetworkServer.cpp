@@ -27,6 +27,7 @@ NetworkServer::NetworkServer(int socketClient)
     this->sizeMessage = atoi(EasyProp::getValue("properties.prop", "SIZEMESSAGE"));
     this->socketClient = socketClient;
     this->connected = true;
+    this->adresseIp = NULL;
 }
 
 
@@ -43,7 +44,9 @@ NetworkServer::NetworkServer(const NetworkServer& n)
 
 NetworkServer::~NetworkServer()
 {
-    delete [] adresseIp;
+    if(adresseIp != NULL){
+        delete [] adresseIp;
+    }
 }
 
 
@@ -57,8 +60,6 @@ int NetworkServer::createSocket()
     if(hSocket == -1){
         cout << "Erreur de création de la socket: " << errno << endl;
         exit(1);
-    }else{
-        cout << "Création de la socket: OK" << endl;
     }
     
     return hSocket;
@@ -77,8 +78,6 @@ void NetworkServer::initInfos(const char* adresseIp, int port)
     if(infoHost == 0){
         cout << "Erreur d'acquisition des infos sur le host: " << errno << endl;
         exit(1);
-    }else{
-        cout << "Acquisition des infos sur le host: OK" << endl;
     }
 
     //infoHost = les infos sur la machine comme par exemple les carte réseau installé etc.
@@ -129,7 +128,6 @@ void NetworkServer::disconnect()
 
 void NetworkServer::acceptSocket()
 {
-    cout << "En attente d'un client" << endl;
     int tailleStruct = sizeof(struct sockaddr_in);
     int ret = accept(this->socketServer, (struct sockaddr*) &this->adresseSocket, (socklen_t*)&tailleStruct);
     if(ret == -1){

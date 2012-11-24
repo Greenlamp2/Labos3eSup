@@ -8,7 +8,7 @@ NetworkClient::NetworkClient(){
 
 NetworkClient::NetworkClient(const char* adresseIP, int port){
     this->socketClient = this->createSocket();
-    this->initInfos(EasyProp::getValue("properties.prop", "HOST"), atoi(EasyProp::getValue("properties.prop", "PORT_VILLAGE")));
+    this->initInfos(adresseIP, port);
     this->connection();
 }
 

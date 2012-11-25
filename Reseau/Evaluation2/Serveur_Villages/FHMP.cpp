@@ -49,6 +49,8 @@ string FHMP::actionTypeServer(string type, string contenu)
         retour = actionGestionLogin(contenu);
     }else if(type == BMAT){
         retour = actionGestionBmat(contenu);
+    }else if(type == CMAT){
+        retour = actionGestionCmat(contenu);
     }else{
         retour = CLOSE;
     }
@@ -70,6 +72,16 @@ string FHMP::actionTypeClient(string type, string contenu){
         retour += contenu;
         
     }else if(type == BMAT_NON){
+        retour = type;
+        retour += ";";
+        retour += contenu;
+        
+    }else if(type == CMAT_NON){
+        retour = type;
+        retour += ";";
+        retour += contenu;
+        
+    }else if(type == CMAT_OUI){
         retour = type;
         retour += ";";
         retour += contenu;
@@ -139,7 +151,7 @@ string FHMP::actionGestionBmat(string contenu){
     strcpy(cstr, contenu.c_str());
     bAction = strtok_r(cstr, "#", &bMateriel);
     action = bAction;
-    bDate = strtok_r(bMateriel, "#", &bMateriel);
+    bMateriel = strtok_r(bMateriel, "#", &bDate);
     materiel = bMateriel;
     date = bDate;
     delete [] cstr;
@@ -156,6 +168,36 @@ string FHMP::actionGestionBmat(string contenu){
         return FHMP::createPacket(BMAT_NON, "Matériel non existant");
     }
 }
+
+string FHMP::actionGestionCmat(string contenu){
+    if(EasyCSV::containsKey("actions.csv", contenu)){
+        string ligne = EasyCSV::getValue("actions.csv", contenu);
+        cout << "ligne: " << ligne << endl;
+        char *buff, *buffer;
+        string date;
+        char* cstr = new char[ligne.size()+1];
+        strcpy(cstr, ligne.c_str());
+        buff = strtok_r(cstr, ";", &buffer);//buff = id
+        buff = strtok_r(buffer, ";", &buffer);//buff = nom
+        buff = strtok_r(buffer, ";", &buffer);//buff = materiel
+        buff = strtok_r(buffer, ";", &buffer);//buff = date
+        date = buff;
+        delete [] cstr;
+        cout << "date: " << date << endl;
+        int secondsFichier = EasyDate::getSeconds(date);
+        int secondsNow = EasyDate::getSeconds(EasyDate::now());
+        if(secondsFichier < secondsNow){
+            //date expirée
+            return FHMP::createPacket(CMAT_NON, "date dépassée");
+        }else{
+            EasyCSV::delValue("actions.csv", contenu);
+            return FHMP::createPacket(CMAT_OUI, CMAT_OUI);
+        }
+    }else{
+        return FHMP::createPacket(CMAT_NON, "action introuvable");
+    }
+}
+
 
 int FHMP::addAction(string action, string materiel, string date){
     string lastTuple = EasyCSV::getLast("actions.csv");

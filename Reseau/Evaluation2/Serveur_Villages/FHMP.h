@@ -33,6 +33,7 @@ public:
     
     string actionGestionLogin(string contenu);
     string actionGestionBmat(string contenu);
+    string actionGestionCmat(string contenu);
     int addAction(string action, string materiel, string date);
 };
 

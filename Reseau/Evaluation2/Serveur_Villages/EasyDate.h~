@@ -12,13 +12,15 @@
     #include<iostream.h>
     #include<fstream.h>
 #endif
-    #include<sstream>
+#include<sstream>
 #include <time.h>
+#include <string.h>
     
 class EasyDate{
 private:
 public:
     static string now();
+    static int getSeconds(string date);
 };
 
 #endif

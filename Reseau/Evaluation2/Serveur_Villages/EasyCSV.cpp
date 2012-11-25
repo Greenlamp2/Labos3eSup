@@ -19,7 +19,9 @@ string EasyCSV::getValue(string nameFile, string key){
         strcpy(retour, buffer);
         gauche = strtok_r(buffer, ";", &buff);
         if(!strcmp(gauche, key.c_str())){
-            retour[strlen(retour)-1] = '\0';
+            if(retour[strlen(retour)-1] == '\n'){
+                retour[strlen(retour)-1] = '\0';
+            }
             fclose(file);
             delete [] buffer;
             return retour;
@@ -42,7 +44,28 @@ void EasyCSV::putValue(string nameFile, string key, string value){
 }
 
 void EasyCSV::delValue(string nameFile, string key){
-
+    string fichier;
+    FILE *file;
+    file = fopen(nameFile.c_str(), "r");
+    char* buffer = new char[255];
+    char* buff;
+    char* gauche;
+    string tempString;
+    do{
+        fgets(buffer, 255, file);
+        tempString = buffer;
+        gauche = strtok_r(buffer, ";", &buff);
+        if(!strcmp(gauche, key.c_str())){
+        }else{
+            fichier += tempString;
+        }
+    }while(!feof(file));
+    fclose(file);
+    delete [] buffer;
+    
+    ofstream newFile(nameFile.c_str(), ios::out | ios::trunc);
+    newFile << fichier;
+    newFile.close();
 }
 
 bool EasyCSV::containsKey(string nameFile, string key){

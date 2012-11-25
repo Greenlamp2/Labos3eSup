@@ -17,19 +17,16 @@
 #include "EasyCSV.h"
     
 int main(){
+    EasyCSV::delValue("actions.csv", "1");
+    return 0;
     string host = EasyProp::getValue("properties.prop", "HOST");
     int port = atoi((EasyProp::getValue("properties.prop", "PORT_VILLAGE")).c_str());
     PoolThread poolThread;
     NetworkServer server(host, port);
     while(1){
-    string messageFromClient = server.receiveMessage();
-    cout << "messageFromClient: " << messageFromClient << endl;
-    server.acceptSocket();
-    }
-    /*while(1){
         poolThread.inject(server.getSocketClient());
         server.acceptSocket();
-    }*/
+    }
     server.disconnect();
     return 0;
 }

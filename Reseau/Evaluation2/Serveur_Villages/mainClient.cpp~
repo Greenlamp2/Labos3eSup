@@ -42,8 +42,12 @@ int main(){
     if(reponseFromServer == LOGIN_OUI){
         int choix = -1;
         do{
-            choix = menu();
-            string packetToSend = gestionChoix(choix);
+            string packetToSend;
+            do{
+                choix = menu();
+                packetToSend = gestionChoix(choix);
+                cout << "packetToSend: " << packetToSend << endl;
+            }while(packetToSend == "RETOUR");
             if(packetToSend == EOC){
                 
             }else{
@@ -118,19 +122,31 @@ void gestionMessageFromServer(string messageFromServer){
     }else if(type == BMAT_NON){
        cout << "Booking Material pas OK" << endl;
        cout << "erreur: " << message << endl;
+    }else if(type == CMAT_OUI){
+       cout << "Cancel Material OK" << endl;
+    }else if(type == CMAT_NON){
+       cout << "Cancel Material OK" << endl;
+       cout << "erreur: " << message << endl;
     }
 }
 
 string gestionChoix(int choix){
     int choixAction = 0;
+    string chaine;
+    string idAction;
     switch(choix){
         case 1:
             do{
                 choixAction = menuAction();
             }while(choixAction < 0 || choixAction > 3);
-            return gestionChoixAction(choixAction);
+            chaine = gestionChoixAction(choixAction);
             break;
         case 2:
+            cout << "Quel est l'id de l'action que vous souhaitez supprimer: ";
+            cin >> idAction;
+            chaine = CMAT;
+            chaine += ";";
+            chaine += idAction;
             break;
         case 3:
             break;
@@ -138,6 +154,7 @@ string gestionChoix(int choix){
             return EOC;
             break;
     }
+    return chaine;
 }
 
 string gestionChoixAction(int choix){
@@ -147,8 +164,12 @@ string gestionChoixAction(int choix){
         case 1:
             cout << "Quel matériel souhaitez-vous la livraison: ";
             cin >> nomMateriel;
-            chaine = "LIVRAISON#160891#";
+            cout << "A quelle date(JJ/MM/YY): ";
+            cin >> date;
+            chaine = "LIVRAISON#";
             chaine += nomMateriel;
+            chaine += "#";
+            chaine += date;
             retour = BMAT;
             retour += ";";
             retour += chaine;
@@ -156,8 +177,12 @@ string gestionChoixAction(int choix){
         case 2:
             cout << "Quel matériel souhaitez-vous la réparation: ";
             cin >> nomMateriel;
+            cout << "A quelle date(JJ/MM/YYYY): ";
+            cin >> date;
             chaine = "REPARATION#";
             chaine += nomMateriel;
+            chaine += "#";
+            chaine += date;
             retour = BMAT;
             retour += ";";
             retour += chaine;
@@ -165,11 +190,18 @@ string gestionChoixAction(int choix){
         case 3:
             cout << "Quel matériel souhaitez-vous le déclassement: ";
             cin >> nomMateriel;
+            cout << "A quelle date(JJ/MM/YY): ";
+            cin >> date;
             chaine = "DECLASSEMENT#";
             chaine += nomMateriel;
+            chaine += "#";
+            chaine += date;
             retour = BMAT;
             retour += ";";
             retour += chaine;
+            break;
+        default:
+            retour = "RETOUR";
             break;
     }
     return retour;

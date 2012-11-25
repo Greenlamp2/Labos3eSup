@@ -14,11 +14,14 @@
 #endif
 #include<sstream>
 #include <time.h>
+#include <string.h>
+#include <stdlib.h>
     
 class EasyDate{
 private:
 public:
     static string now();
+    static int getSeconds(string date);
 };
 
 #endif

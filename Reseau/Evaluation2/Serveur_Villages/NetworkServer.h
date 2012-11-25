@@ -37,6 +37,7 @@ public:
     void acceptSocket();
     void sendMessage(string message);
     string receiveMessage();
+    bool receiveString(string *line);
     bool verifMarqueur(char* message, int nbByte);
     void setSocketClient(int socket);
     

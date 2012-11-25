@@ -141,23 +141,35 @@ string gestionChoix(int choix){
 }
 
 string gestionChoixAction(int choix){
-    string chaine, nomMateriel, retour;
+    string chaine, nomMateriel, retour, date;
     
     switch(choix){
         case 1:
             cout << "Quel matériel souhaitez-vous la livraison: ";
             cin >> nomMateriel;
-            chaine = "LIVRAISON#";
+            chaine = "LIVRAISON#16-08-91#";
             chaine += nomMateriel;
             retour = BMAT;
             retour += ";";
             retour += chaine;
             break;
         case 2:
-            cout << "ok" << endl;
+            cout << "Quel matériel souhaitez-vous la réparation: ";
+            cin >> nomMateriel;
+            chaine = "REPARATION#";
+            chaine += nomMateriel;
+            retour = BMAT;
+            retour += ";";
+            retour += chaine;
             break;
         case 3:
-            cout << "ok" << endl;
+            cout << "Quel matériel souhaitez-vous le déclassement: ";
+            cin >> nomMateriel;
+            chaine = "DECLASSEMENT#";
+            chaine += nomMateriel;
+            retour = BMAT;
+            retour += ";";
+            retour += chaine;
             break;
     }
     return retour;

@@ -92,7 +92,7 @@ bool EasyCSV::containsName(string nameFile, string key){
 
 char* EasyCSV::getLast(string nameFile){
     FILE *file;
-    file = fopen(nameFile, "r");
+    file = fopen(nameFile.c_str(), "r");
     char* buffer = new char[255];
     
     char* buff;
@@ -104,3 +104,35 @@ char* EasyCSV::getLast(string nameFile){
     fclose(file);
     return buffer;
 }
+
+string EasyCSV::materielIsDispo(string nameFile, string materiel)
+{
+    FILE *file;
+    file = fopen(nameFile.c_str(), "r");
+    char* buffer = new char[255];
+    
+    char* buff;
+    char* gauche;
+    char* retour = new char[255];
+    
+    do{
+        fgets(buffer, 255, file);
+        gauche = strtok_r(buffer, ";", &buff);
+        strcpy(retour, gauche);
+        gauche = strtok_r(buff, ";", &buff);
+        if(!strcmp(gauche, materiel.c_str())){
+            gauche = strtok_r(buff, ";", &buff);
+            gauche = strtok_r(buff, ";", &buff);
+            gauche = strtok_r(buff, ";", &buff);
+            if(!strcmp(gauche, "dispo")){
+                fclose(file);
+                delete [] buffer;
+                return id;
+            }
+        }
+    }while(!feof(file));
+    fclose(file);
+    delete [] buffer;
+    return "NULL";
+}
+

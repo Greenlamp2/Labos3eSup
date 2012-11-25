@@ -33,7 +33,7 @@ public:
     
     string actionGestionLogin(string contenu);
     string actionGestionBmat(string contenu);
-    int addAction(string action, string materiel);
+    int addAction(string action, string materiel, string date);
 };
 
 #endif

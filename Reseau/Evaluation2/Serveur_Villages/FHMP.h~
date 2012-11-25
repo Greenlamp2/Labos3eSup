@@ -17,6 +17,7 @@
 #include "properties.h"
 #include "EasyCSV.h"
 #include "EasyDate.h"
+#include<sstream>
     
 class FHMP{
 private:

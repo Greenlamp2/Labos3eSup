@@ -25,6 +25,7 @@ public:
     static bool containsKey(string nameFile, string key);
     static bool containsName(string nameFile, string key);
     static char* getLast(string nameFile);
+    static string materielIsDispo(string nameFile, string materiel);
 };
 
 #endif

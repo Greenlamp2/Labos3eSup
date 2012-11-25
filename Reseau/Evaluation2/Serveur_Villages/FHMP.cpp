@@ -133,38 +133,55 @@ string FHMP::actionGestionLogin(string contenu){
 string FHMP::actionGestionBmat(string contenu){
     char *bAction;
     char *bMateriel;
-    string action, materiel;
+    char *bDate;
+    string action, materiel, date;
     char* cstr = new char[contenu.size()+1];
     strcpy(cstr, contenu.c_str());
     bAction = strtok_r(cstr, "#", &bMateriel);
-    materiel = bMateriel;
     action = bAction;
+    bDate = strtok_r(bMateriel, "#", &bMateriel);
+    materiel = bMateriel;
+    date = bDate;
     delete [] cstr;
     if(EasyCSV::containsName("materiel.csv", materiel)){
-        int id = addAction(action, materiel);
-        string packet = FHMP::createPacket(BMAT_OUI, "test");
-        //delete [] c;
-        return packet;
+        string dispo = EasyCSV::materielIsDispo("materiel.csv", materiel);
+        cout << "dispo: " << dispo << endl;
+        if(dispo == "NULL"){
+            return FHMP::createPacket(BMAT_NON, "Matériel non disponible pour le moment");
+        }else{
+            int id = addAction(action, dispo, date);
+            return FHMP::createPacket(BMAT_OUI, id);
+        }
     }else{
         return FHMP::createPacket(BMAT_NON, "Matériel non existant");
     }
 }
 
-int FHMP::addAction(string action, string materiel){
-    //char* lastTuple = EasyCSV::getLast("actions.csv");
-    //char *idChar, *rest;
-    //idChar = strtok_r(lastTuple, ";", &rest);
-    //int id = atoi(idChar);
-    //id++;
-    //char* chaine = new char[255];
-    //char* dateJour = EasyDate::now();
-    //sprintf(chaine, "%d;%s;%s;%s", id, action, materiel, dateJour);
-    //cout << "chaine: " << chaine << endl;
-    //EasyCSV::putValue("materiel.csv", idChar, chaine);
-    //delete [] dateJour;
-    //delete [] lastTuple;
-    //delete [] chaine;
-    return 5;
+int FHMP::addAction(string action, string materiel, string date){
+    string lastTuple = EasyCSV::getLast("actions.csv");
+    char *bIdString, *bRest;
+    string idString, rest;
+    char* cstr = new char[lastTuple.size()+1];
+    strcpy(cstr, lastTuple.c_str());
+    bIdString = strtok_r(cstr, ";", &bRest);
+    idString = bIdString;
+    rest = bRest;
+    delete [] cstr;
+    int id = atoi(idString.c_str());
+    id++;
+    std::ostringstream out;
+    out << id;
+    idString = out.str();
+    out << ";";
+    out << action;
+    out << ";";
+    out << materiel;
+    out << ";";
+    out << date;
+    cout << "chaine : " << out.str() << endl;
+    EasyCSV::putValue("actions.csv", idString, out.str());
+    return id;
 }
+
 
 

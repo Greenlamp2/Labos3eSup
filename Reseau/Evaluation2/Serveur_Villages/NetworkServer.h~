@@ -29,7 +29,6 @@ public:
     NetworkServer(string host, int port);
     NetworkServer(const NetworkServer &n);
     NetworkServer(int socket);
-    ~NetworkServer();
     int createSocket();
     void injectAdress();
     void initInfos(string adresseIp, int port);
@@ -38,6 +37,7 @@ public:
     void acceptSocket();
     void sendMessage(string message);
     string receiveMessage();
+    bool receiveString(string& line);
     bool verifMarqueur(char* message, int nbByte);
     void setSocketClient(int socket);
     

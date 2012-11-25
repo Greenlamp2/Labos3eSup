@@ -53,7 +53,6 @@ int main(){
             }else{
                 client.sendMessage(packetToSend);
                 string messageFromServer = fhmp.treatPacketClient(client.receiveMessage());
-                cout << "messageFromServer: " << messageFromServer << endl;
                 gestionMessageFromServer(messageFromServer);
             }
         }while(choix > 0 && choix <= 3);
@@ -127,6 +126,12 @@ void gestionMessageFromServer(string messageFromServer){
     }else if(type == CMAT_NON){
        cout << "Cancel Material pas OK" << endl;
        cout << "erreur: " << message << endl;
+    }else if(type == ASKMAT_NON){
+       cout << "ASKING FOR MATERIAL pas OK" << endl;
+       cout << "erreur: " << message << endl;
+    }else if(type == ASKMAT_OUI){
+       cout << "ASKING FOR MATERIAL OK" << endl;
+       cout << message << endl;
     }
 }
 
@@ -134,6 +139,7 @@ string gestionChoix(int choix){
     int choixAction = 0;
     string chaine;
     string idAction;
+    string nom, marque, prix, accessoire;
     switch(choix){
         case 1:
             do{
@@ -149,6 +155,23 @@ string gestionChoix(int choix){
             chaine += idAction;
             break;
         case 3:
+            cout << "Quel est le nom du matériel: ";
+            cin >> nom;
+            cout << "Quel est la marque: ";
+            cin >> marque;
+            cout << "Quel est le prix: ";
+            cin >> prix;
+            cout << "Quels sont les accesoires (xx,xx,xx): ";
+            cin >> accessoire;
+            chaine = ASKMAT;
+            chaine += ";";
+            chaine += nom;
+            chaine += "#";
+            chaine += marque;
+            chaine += "#";
+            chaine += prix;
+            chaine += "#";
+            chaine += accessoire;
             break;
         default:
             return EOC;

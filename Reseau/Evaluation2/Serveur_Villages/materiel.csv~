@@ -1,5 +1,7 @@
-id;nom;marque;prix;etat;accessoires
-1;pedalo;jaguar;15;commander;jambes,gants,gilet de sauvetage,pedalles,lo,eau
-2;jet-ski;nesquik;687;dispo;jet,ski,mains,corp
-3;barque;boisdur;29;dispo;bois,rames,bras,amis
-4;hors-bord;royalGolden;6984;dispo;champagne,fille à poil,maillots de bains,caviar
+id;nom;marque;prix;etat;delai;accessoires
+1;pedalo;jaguar;15;commander;15;jambes,gants,gilet de sauvetage,pedalles,lo,eau
+2;jet-ski;nesquik;687;dispo;0;jet,ski,mains,corp
+3;barque;boisdur;29;dispo;0;bois,rames,bras,amis
+4;hors-bord;royalGolden;6984;dispo;0;champagne,fille à poil,maillots de bains,caviar
+5;pedalo;jaguar;15;dispo;0;jambes,gants,gilet de sauvetage,pedalles,lo,eau
+6;a;a;1;commander;15;a,a,a

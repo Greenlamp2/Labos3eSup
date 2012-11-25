@@ -51,6 +51,8 @@ string FHMP::actionTypeServer(string type, string contenu)
         retour = actionGestionBmat(contenu);
     }else if(type == CMAT){
         retour = actionGestionCmat(contenu);
+    }else if(type == ASKMAT){
+        retour = actionGestionAskMat(contenu);
     }else{
         retour = CLOSE;
     }
@@ -82,6 +84,16 @@ string FHMP::actionTypeClient(string type, string contenu){
         retour += contenu;
         
     }else if(type == CMAT_OUI){
+        retour = type;
+        retour += ";";
+        retour += contenu;
+        
+    }else if(type == ASKMAT_OUI){
+        retour = type;
+        retour += ";";
+        retour += contenu;
+        
+    }else if(type == ASKMAT_NON){
         retour = type;
         retour += ";";
         retour += contenu;
@@ -172,7 +184,6 @@ string FHMP::actionGestionBmat(string contenu){
 string FHMP::actionGestionCmat(string contenu){
     if(EasyCSV::containsKey("actions.csv", contenu)){
         string ligne = EasyCSV::getValue("actions.csv", contenu);
-        cout << "ligne: " << ligne << endl;
         char *buff, *buffer;
         string date;
         char* cstr = new char[ligne.size()+1];
@@ -183,7 +194,6 @@ string FHMP::actionGestionCmat(string contenu){
         buff = strtok_r(buffer, ";", &buffer);//buff = date
         date = buff;
         delete [] cstr;
-        cout << "date: " << date << endl;
         int secondsFichier = EasyDate::getSeconds(date);
         int secondsNow = EasyDate::getSeconds(EasyDate::now());
         if(secondsFichier < secondsNow){
@@ -191,11 +201,55 @@ string FHMP::actionGestionCmat(string contenu){
             return FHMP::createPacket(CMAT_NON, "date dépassée");
         }else{
             EasyCSV::delValue("actions.csv", contenu);
-            return FHMP::createPacket(CMAT_OUI, "Suppresion réussie");
+            return FHMP::createPacket(CMAT_OUI, CMAT_OUI);
         }
     }else{
         return FHMP::createPacket(CMAT_NON, "action introuvable");
     }
+}
+
+string FHMP::actionGestionAskMat(string contenu)
+{
+    string ligne = EasyCSV::getLast("materiel.csv");
+    char *buff, *buffer;
+    string idString;
+    char* cstr = new char[ligne.size()+1];
+    strcpy(cstr, ligne.c_str());
+    buff = strtok_r(cstr, ";", &buffer);//buff = id
+    idString = buff;
+    delete [] cstr;
+    int id = atoi(idString.c_str());
+    id++;
+    
+    string nom, marque, prix, accessoires;
+    char *bNom, *bMarque, *bPrix, *bAccessoires;
+    cstr = new char[contenu.size()+1];
+    strcpy(cstr, contenu.c_str());
+    bNom = strtok_r(cstr, "#", &buffer);
+    bMarque = strtok_r(buffer, "#", &buffer);
+    bPrix = strtok_r(buffer, "#", &buffer);
+    bAccessoires = strtok_r(buffer, "#", &buffer);
+    nom = bNom;
+    marque = bMarque;
+    prix = bPrix;
+    accessoires = bAccessoires;
+    delete [] cstr;
+    
+    std::ostringstream out;
+    out << id;
+    out << ";";
+    out << nom;
+    out << ";";
+    out << marque;
+    out << ";";
+    out << prix;
+    out << ";commander;15;";
+    out << accessoires;
+    std::ostringstream idConverted;
+    idConverted << id;
+    EasyCSV::putValue("materiel.csv", idConverted.str(), out.str());
+    std::ostringstream out2;
+    return FHMP::createPacket(ASKMAT_OUI, out2.str());
 }
 
 

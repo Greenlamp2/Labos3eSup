@@ -63,7 +63,6 @@ void NetworkServer::initInfos(string adresseIp, int port)
 
     this->adresseIp = adresseIp;
     this->port = port;
-    cout << "Mise à l'écoute sur l'adresse " << this->getAdresseIp() << " et le port " << this->port << endl;
 
     infoHost = gethostbyname(adresseIp.c_str());
     if(infoHost == 0){
@@ -79,12 +78,14 @@ void NetworkServer::initInfos(string adresseIp, int port)
     this->adresseSocket.sin_family = AF_INET;
     //On fait htons pour mettre en big endian si ce n'est pas le cas.
     this->adresseSocket.sin_port = htons(port);
-    memcpy(&this->adresseSocket.sin_addr, infoHost->h_addr, infoHost->h_length);
+    this->adresseSocket.sin_addr.s_addr = htonl(INADDR_ANY);
+    //memcpy(&this->adresseSocket.sin_addr, infoHost->h_addr, infoHost->h_length);
 }
 
 
 void NetworkServer::injectAdress()
 {
+    cout << "bind sur : " << this->adresseIp << " : " << this->port << endl;
     int ret = bind(this->socketServer, (struct sockaddr*) &this->adresseSocket, sizeof(struct sockaddr_in));
     if(ret == -1){
         cout << "Erreur sur le bind de la socket: " << errno << endl;
@@ -119,6 +120,7 @@ void NetworkServer::disconnect()
 
 void NetworkServer::acceptSocket()
 {
+    cout << "Mise à l'écoute sur l'adresse " << this->getAdresseIp() << " et le port " << this->port << endl;
     int tailleStruct = sizeof(struct sockaddr_in);
     int ret = accept(this->socketServer, (struct sockaddr*) &this->adresseSocket, (socklen_t*)&tailleStruct);
     if(ret == -1){
@@ -128,6 +130,7 @@ void NetworkServer::acceptSocket()
     }
     this->connected = true;
     this->socketClient = ret;
+    cout << "Nouveau client !" << endl;
 }
 
 void NetworkServer::sendMessage(string message)
@@ -170,10 +173,13 @@ bool NetworkServer::receiveString(string *line)
             this->disconnect();
             exit(1);
         }
+        if(nbByteRecu == 0){
+                    
+        }
         tempString = buffer;
         term = tempString.find(terminator);
         if(term != -1){
-            buffer[nbByteRecu - term] = '\0';
+            buffer[term] = '\0';
             *line = buffer;
             delete [] buffer;
             return true;

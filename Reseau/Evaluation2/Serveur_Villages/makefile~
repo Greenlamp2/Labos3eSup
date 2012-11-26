@@ -1,5 +1,5 @@
-OBJS=mainServer.cpp NetworkServer.o PoolThread.o FHMP.o EasyProp.o EasyCSV.o EasyDate.o
-OBJC=mainClient.cpp NetworkClient.o FHMP.o EasyProp.o EasyCSV.o
+OBJS=mainServer.cpp NetworkServer.o PoolThread.o FHMP.o EasyProp.o EasyCSV.o EasyDate.o FHMPA.o
+OBJC=mainClient.cpp NetworkClient.o FHMP.o EasyProp.o EasyCSV.o EasyDate.o
 CC=c++ -DLIN -g -lpthread
 DEPRE=-Wno-Deprecated
 

@@ -66,11 +66,11 @@ int main(){
 string gestionLogin(){
     string login, password;
     cout << "Veuillez entrez votre login: ";
-    login = "admin";
-    //cin >> login;
+    //login = "admin";
+    cin >> login;
     cout << "Veuillez entrez votre password: ";
-    password = "admin";
-    //cin >> password;
+    //password = "admin";
+    cin >> password;
     string retour;
     retour = login;
     retour += "#";

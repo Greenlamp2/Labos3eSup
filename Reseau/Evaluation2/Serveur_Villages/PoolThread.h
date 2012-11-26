@@ -17,6 +17,7 @@
 #include "FHMP.h"
 #include "NetworkServer.h"
 #include <pthread.h>
+#include <list>
     
 class PoolThread{
 private:
@@ -25,12 +26,17 @@ private:
     int indiceCourant;
     pthread_mutex_t mutexIndiceCourant;
     pthread_cond_t condIndiceCourant;
+    list<string> listeUtilisateurs;
 public:
     PoolThread();
     ~PoolThread();
     void startThreads();
     void inject(int socket);
     static void* fctThread(void* param);
+    void addUser(string login);
+    void removeUser(string login);
+    void afficherUsers();
+    list<string> getUsers();
 };
 
 #endif

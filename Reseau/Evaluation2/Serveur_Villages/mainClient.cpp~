@@ -131,7 +131,7 @@ void gestionMessageFromServer(string messageFromServer){
        cout << "erreur: " << message << endl;
     }else if(type == ASKMAT_OUI){
        cout << "ASKING FOR MATERIAL OK" << endl;
-       cout << "erreur: " << message << endl;
+       cout << message << endl;
     }
 }
 

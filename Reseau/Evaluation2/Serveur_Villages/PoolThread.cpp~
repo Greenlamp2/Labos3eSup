@@ -20,6 +20,7 @@ void PoolThread::startThreads()
     int i=0;
     for(i = 0; i < NB_MAX_CLIENT; i++){
         pthread_create(&threadHandle[i], NULL, fctThread, (void*)this);
+        pthread_detach(threadHandle[i]);
         sockets[i] = -1;
     }
 }
@@ -43,6 +44,7 @@ void* PoolThread::fctThread(void* param){
     PoolThread* poolThread = (PoolThread*) param;
     int indice = 0;
     while(1){
+        cout << "thread en attente" << endl;
         pthread_mutex_lock(&poolThread->mutexIndiceCourant);
         while(poolThread->indiceCourant == -1){
             pthread_cond_wait(&poolThread->condIndiceCourant, &poolThread->mutexIndiceCourant);
@@ -59,18 +61,44 @@ void* PoolThread::fctThread(void* param){
             string messageFromClient;
             bool ok = networkServer.receiveString(&messageFromClient);
             if(!ok){
+                poolThread->removeUser(fhmp.getLogin());
                 networkServer.disconnect();
             }else{
                 cout << "["<< networkServer.getSocketClient() <<"]Message reçu: " << messageFromClient << endl;
                 string messageToClient = fhmp.treatPacketServer(messageFromClient);
+                if(messageToClient == LOGIN_OUI){
+                    poolThread->addUser(fhmp.getLogin());
+                }
                 cout << "["<< networkServer.getSocketClient() <<"]Message à envoyer au client: " << messageToClient << endl;
                 networkServer.sendMessage(messageToClient);
             }
         }
-                cout << "Client parti" << endl;
+        cout << "Client parti" << endl;
         
         pthread_mutex_lock(&poolThread->mutexIndiceCourant);
         poolThread->sockets[indice] = -1;
         pthread_mutex_unlock(&poolThread->mutexIndiceCourant);
     }
+}
+
+void PoolThread::addUser(string login)
+{
+    this->listeUtilisateurs.push_back(login);
+    this->afficherUsers();
+}
+
+void PoolThread::removeUser(string login)
+{
+    this->listeUtilisateurs.remove(login);
+}
+
+void PoolThread::afficherUsers()
+{
+    list<string>::iterator it;
+    for(it = this->listeUtilisateurs.begin(); it != this->listeUtilisateurs.end(); it++){
+        cout << "user: " << *it << endl;
+    }
+}
+
+list<string> PoolThread::getUsers(){
 }

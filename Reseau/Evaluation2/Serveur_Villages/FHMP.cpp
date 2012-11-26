@@ -147,6 +147,7 @@ string FHMP::actionGestionLogin(string contenu){
         passwordLigne = bPasswordLigne;
         delete [] cstr2;
         if(password == passwordLigne){
+            this->login = login;
             return LOGIN_OUI;
         }else{
             return LOGIN_NON;
@@ -279,6 +280,12 @@ int FHMP::addAction(string action, string materiel, string date){
     EasyCSV::putValue("actions.csv", idString, out.str());
     return id;
 }
+
+string FHMP::getLogin()
+{
+    return this->login;
+}
+
 
 
 

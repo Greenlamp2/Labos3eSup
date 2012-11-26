@@ -249,6 +249,7 @@ string FHMP::actionGestionAskMat(string contenu)
     idConverted << id;
     EasyCSV::putValue("materiel.csv", idConverted.str(), out.str());
     std::ostringstream out2;
+    out2 << "id: " << id << " delai: 15";
     return FHMP::createPacket(ASKMAT_OUI, out2.str());
 }
 
@@ -278,6 +279,12 @@ int FHMP::addAction(string action, string materiel, string date){
     EasyCSV::putValue("actions.csv", idString, out.str());
     return id;
 }
+
+string FHMP::getLogin()
+{
+    return this->login;
+}
+
 
 
 

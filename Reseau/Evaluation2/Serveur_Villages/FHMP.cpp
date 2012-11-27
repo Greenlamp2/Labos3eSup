@@ -9,7 +9,7 @@ FHMP::~FHMP()
 }
 
 
-string FHMP::treatPacketServer(string packet)
+string FHMP::treatPacketServer(int numSocket, string packet)
 {
     string type, contenu;
     char* bType;
@@ -20,7 +20,7 @@ string FHMP::treatPacketServer(string packet)
     type = bType;
     contenu = bContenu;
     delete [] cstr;
-    string retour = this->actionTypeServer(type, contenu);
+    string retour = this->actionTypeServer(type, contenu, numSocket);
     return retour;
 }
 
@@ -40,13 +40,13 @@ string FHMP::treatPacketClient(string packet)
     return retour;
 }
 
-string FHMP::actionTypeServer(string type, string contenu)
+string FHMP::actionTypeServer(string type, string contenu, int numSocket)
 {
     string retour;
     if(type == EOC){
         return EOC;
     }else if(type == LOGIN){
-        retour = actionGestionLogin(contenu);
+        retour = actionGestionLogin(contenu, numSocket);
     }else if(type == BMAT){
         retour = actionGestionBmat(contenu);
     }else if(type == CMAT){
@@ -123,7 +123,7 @@ string FHMP::createPacket(string type, int message)
 
 
 //Actions du protocole
-string FHMP::actionGestionLogin(string contenu){
+string FHMP::actionGestionLogin(string contenu, int numSocket){
     char* bLogin;
     char* bPassword;
     string login, password;
@@ -147,7 +147,7 @@ string FHMP::actionGestionLogin(string contenu){
         passwordLigne = bPasswordLigne;
         delete [] cstr2;
         if(password == passwordLigne){
-            this->login = login;
+            addUser(numSocket, login);
             return LOGIN_OUI;
         }else{
             return LOGIN_NON;
@@ -284,6 +284,31 @@ int FHMP::addAction(string action, string materiel, string date){
 string FHMP::getLogin()
 {
     return this->login;
+}
+
+list< string > FHMP::getUsers()
+{
+    return this->listeUtilisateurs;
+}
+
+void FHMP::addUser(int numSocket, string login)
+{
+    this->liste[numSocket] = login;
+    afficherUsers();
+    cout << "temp" << endl;
+}
+
+void FHMP::removeUser(int numSocket)
+{
+    this->liste.erase(numSocket);
+}
+
+void FHMP::afficherUsers()
+{   
+    map<int, string>::iterator it;
+    for(it = this->liste.begin(); it != this->liste.end(); it++){
+        cout << "user: " << (*it).second << endl;
+    }
 }
 
 

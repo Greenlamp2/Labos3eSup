@@ -1,0 +1,6 @@
+#ifndef PROTOCOLES_H
+#define PROTOCOLES_H
+
+public:
+    virtual string treatPacketServer(string packet) = 0;
+#endif

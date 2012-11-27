@@ -120,10 +120,10 @@ string FHMPA::actionGestionLclients(string contenu)
 
 string FHMPA::actionGestionPause(string contenu)
 {
-
+    return PAUSE_OUI;
 }
 
 string FHMPA::actionGestionStop(string contenu)
 {
-
+    return STOP_OUI;
 }

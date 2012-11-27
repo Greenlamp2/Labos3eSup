@@ -21,13 +21,14 @@
 #include<sstream>
 #include<list>
     
-class FHMPA{
+class FHMPA: public Protocoles{
 private:
     PoolThread *poolThread;
 public:
     FHMPA();
     FHMPA(PoolThread *poolThread);
     string treatPacketServer(string packet);
+    string treatPacketServer(int numSocket, string packet) {}
     string actionTypeServer(string type, string contenu);
     string createPacket(string type, string message);
     string createPacket(string type, int message);
@@ -36,6 +37,9 @@ public:
     string actionGestionLclients(string contenu);
     string actionGestionPause(string contenu);
     string actionGestionStop(string contenu);
+    string getLogin(){}
+    list<string> getUsers() {}
+    void removeUser(int numSocket) {}
 };
 
 #endif

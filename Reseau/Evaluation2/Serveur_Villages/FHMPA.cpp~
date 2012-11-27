@@ -100,26 +100,27 @@ string FHMPA::actionGestionLclients(string contenu)
     list<string> listeUtilisateurs = poolThread->getUsers();
     if(listeUtilisateurs.size() == 0){
         return LCLIENT_EMPTY;
-    }
-    list<string>::iterator it;
-    string retour;
-    retour = LCLIENT_REPONSE;
-    retour += ";";
-    int taille = listeUtilisateurs.size();
-    int i = 0;
-    for(it = listeUtilisateurs.begin(); it != listeUtilisateurs.end(); it++){
-        retour += *it;
-        if(i+1 < taille){
-            retour += "#";
+    }else{
+        list<string>::iterator it;
+        string retour;
+        retour = LCLIENT_REPONSE;
+        retour += ";";
+        int taille = listeUtilisateurs.size();
+        int i = 0;
+        for(it = listeUtilisateurs.begin(); it != listeUtilisateurs.end(); it++){
+            retour += *it;
+            if(i+1 < taille){
+                retour += "#";
+            }
+            i++;
         }
-        i++;
+        return retour;
     }
-    return retour;
 }
 
 string FHMPA::actionGestionPause(string contenu)
 {
-
+    return PAUSE_OUI;
 }
 
 string FHMPA::actionGestionStop(string contenu)

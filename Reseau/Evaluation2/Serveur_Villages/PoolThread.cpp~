@@ -9,6 +9,15 @@ PoolThread::PoolThread()
     this->startThreads();
 }
 
+PoolThread::PoolThread(Protocoles *protocole)
+{
+    this->protocole = protocole;
+    this->indiceCourant = -1;
+    pthread_mutex_init(&this->mutexIndiceCourant, NULL);
+    pthread_cond_init(&this->condIndiceCourant, NULL);
+    this->startThreads();
+}
+
 PoolThread::~PoolThread()
 {
     pthread_mutex_destroy(&this->mutexIndiceCourant);
@@ -44,7 +53,7 @@ void* PoolThread::fctThread(void* param){
     PoolThread* poolThread = (PoolThread*) param;
     int indice = 0;
     while(1){
-        cout << "thread en attente" << endl;
+        //cout << "thread en attente" << endl;
         pthread_mutex_lock(&poolThread->mutexIndiceCourant);
         while(poolThread->indiceCourant == -1){
             pthread_cond_wait(&poolThread->condIndiceCourant, &poolThread->mutexIndiceCourant);
@@ -56,19 +65,16 @@ void* PoolThread::fctThread(void* param){
         pthread_mutex_unlock(&poolThread->mutexIndiceCourant);
         
         NetworkServer networkServer(socket);
-        FHMP fhmp;
+        //FHMP fhmp;
         while(networkServer.isConnected()){
             string messageFromClient;
             bool ok = networkServer.receiveString(&messageFromClient);
             if(!ok){
-                poolThread->removeUser(fhmp.getLogin());
+                poolThread->protocole->removeUser(networkServer.getSocketClient());
                 networkServer.disconnect();
             }else{
                 cout << "["<< networkServer.getSocketClient() <<"]Message reçu: " << messageFromClient << endl;
-                string messageToClient = fhmp.treatPacketServer(messageFromClient);
-                if(messageToClient == LOGIN_OUI){
-                    poolThread->addUser(fhmp.getLogin());
-                }
+                string messageToClient = poolThread->protocole->treatPacketServer(networkServer.getSocketClient(), messageFromClient());
                 cout << "["<< networkServer.getSocketClient() <<"]Message à envoyer au client: " << messageToClient << endl;
                 networkServer.sendMessage(messageToClient);
             }
@@ -81,24 +87,17 @@ void* PoolThread::fctThread(void* param){
     }
 }
 
-void PoolThread::addUser(string login)
-{
-    this->listeUtilisateurs.push_back(login);
-    this->afficherUsers();
-}
-
-void PoolThread::removeUser(string login)
-{
-    this->listeUtilisateurs.remove(login);
-}
-
-void PoolThread::afficherUsers()
-{
-    list<string>::iterator it;
-    for(it = this->listeUtilisateurs.begin(); it != this->listeUtilisateurs.end(); it++){
-        cout << "user: " << *it << endl;
-    }
-}
-
 list<string> PoolThread::getUsers(){
+    return this->protocole->getUsers();
 }
+
+void PoolThread::setPause(bool val)
+{
+    this->paused = val;
+}
+
+void PoolThread::setStop(bool val)
+{
+    this->setStop(val);
+}
+

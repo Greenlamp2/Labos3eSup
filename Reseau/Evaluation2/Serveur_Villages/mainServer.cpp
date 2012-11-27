@@ -24,11 +24,17 @@ pthread_t threadAdmin;
 int main(){
     string host = EasyProp::getValue("properties.prop", "HOST");
     int port = atoi((EasyProp::getValue("properties.prop", "PORT_VILLAGE")).c_str());
+    int portUrgence = atoi((EasyProp::getValue("properties.prop", "PORT_URGENCE")).c_str());
     
-    PoolThread poolThread;
+    FHMP fhmp;
+    //FHMPA fhmpa;
+    PoolThread poolThread(&fhmp);
+    
     pthread_create(&threadAdmin, NULL, fctThreadAdmin, (void*)&poolThread);
     pthread_detach(threadAdmin);
+    
     NetworkServer server(host, port);
+    //NetworkServer urgence(host, portUrgence);
     while(1){
         poolThread.inject(server.getSocketClient());
         server.acceptSocket();

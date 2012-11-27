@@ -27,10 +27,12 @@ void gestionMessageFromServer(string messageFromServer);
 int main(){
     string host = EasyProp::getValue("properties.prop", "HOST");
     int port = atoi((EasyProp::getValue("properties.prop", "PORT_VILLAGE")).c_str());
+    int portUrgence = atoi((EasyProp::getValue("properties.prop", "PORT_URGENCE")).c_str());
     
     string chaine = gestionLogin();
     
     NetworkClient client(host, port);
+    //NetworkClient urgence(host, portUrgence);
     FHMP fhmp;
     string messageToSend = LOGIN;
     messageToSend += ";";

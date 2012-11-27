@@ -21,22 +21,25 @@
     
 class PoolThread{
 private:
+    Protocoles *protocole;
     pthread_t threadHandle[NB_MAX_CLIENT];
     int sockets[NB_MAX_CLIENT];
     int indiceCourant;
     pthread_mutex_t mutexIndiceCourant;
     pthread_cond_t condIndiceCourant;
     list<string> listeUtilisateurs;
+    bool paused;
+    bool stoped;
 public:
     PoolThread();
+    PoolThread(Protocoles *protocole);
     ~PoolThread();
     void startThreads();
     void inject(int socket);
     static void* fctThread(void* param);
-    void addUser(string login);
-    void removeUser(string login);
-    void afficherUsers();
     list<string> getUsers();
+    void setPause(bool val);
+    void setStop(bool val);
 };
 
 #endif

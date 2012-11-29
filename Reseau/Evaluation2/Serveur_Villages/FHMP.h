@@ -25,7 +25,6 @@
 class FHMP: public Protocoles{
 private:
     string login;
-    list<string> listeUtilisateurs;
     map<int, string> liste;
 public:
     FHMP();
@@ -44,7 +43,7 @@ public:
     int addAction(string action, string materiel, string date);
     string getLogin();
     
-    list<string> getUsers();
+    map<int, string> getUsers();
     void addUser(int numSocket, string login);
     void removeUser(int numSocket);
     void afficherUsers();

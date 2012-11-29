@@ -44,9 +44,9 @@ public:
     int addAction(string action, string materiel, string date);
     string getLogin();
     
-    list<string> getUsers();
+    map<int, string> getUsers();
     void addUser(int numSocket, string login);
-    void removeUser(string login);
+    void removeUser(int numSocket);
     void afficherUsers();
 };
 

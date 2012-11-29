@@ -15,9 +15,9 @@
     #include<sstream.h>
 #endif
 #include "properties.h"
+#include "PoolThread.h"
 #include "EasyCSV.h"
 #include "EasyDate.h"
-#include "PoolThread.h"
 #include<sstream>
 #include<list>
     
@@ -37,8 +37,9 @@ public:
     string actionGestionLclients(string contenu);
     string actionGestionPause(string contenu);
     string actionGestionStop(string contenu);
+    string actionGestionResume(string contenu);
     string getLogin(){}
-    list<string> getUsers() {}
+    map<int, string> getUsers() {}
     void removeUser(int numSocket) {}
 };
 

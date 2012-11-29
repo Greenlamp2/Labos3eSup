@@ -85,7 +85,6 @@ void NetworkServer::initInfos(string adresseIp, int port)
 
 void NetworkServer::injectAdress()
 {
-    cout << "bind sur : " << this->adresseIp << " : " << this->port << endl;
     int ret = bind(this->socketServer, (struct sockaddr*) &this->adresseSocket, sizeof(struct sockaddr_in));
     if(ret == -1){
         cout << "Erreur sur le bind de la socket: " << errno << endl;
@@ -130,7 +129,7 @@ void NetworkServer::acceptSocket()
     }
     this->connected = true;
     this->socketClient = ret;
-    cout << "Nouveau client !" << endl;
+    cout << "Nouveau client sur le port: " << this->port <<"!" << endl;
 }
 
 void NetworkServer::sendMessage(string message)
@@ -174,7 +173,7 @@ bool NetworkServer::receiveString(string *line)
             exit(1);
         }
         if(nbByteRecu == 0){
-                    
+            return false;
         }
         tempString = buffer;
         term = tempString.find(terminator);

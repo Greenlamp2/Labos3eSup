@@ -15,7 +15,10 @@
 #include "NetworkServer.h"
 #include "EasyProp.h"
 #include "EasyCSV.h"
+#include<vector>
+#include "FHMP.h"
 #include "FHMPA.h"
+#include "FHMPAC.h"
 
 
 void* fctThreadAdmin(void* param);
@@ -25,18 +28,17 @@ int main(){
     string host = EasyProp::getValue("properties.prop", "HOST");
     int port = atoi((EasyProp::getValue("properties.prop", "PORT_VILLAGE")).c_str());
     int portUrgence = atoi((EasyProp::getValue("properties.prop", "PORT_URGENCE")).c_str());
-    
     FHMP fhmp;
-    //FHMPA fhmpa;
+    FHMPAC fhmpac;
     PoolThread poolThread(&fhmp);
     
     pthread_create(&threadAdmin, NULL, fctThreadAdmin, (void*)&poolThread);
     pthread_detach(threadAdmin);
     
     NetworkServer server(host, port);
-    //NetworkServer urgence(host, portUrgence);
+    NetworkServer urgence(host, portUrgence);
     while(1){
-        poolThread.inject(server.getSocketClient());
+        poolThread.inject(server.getSocketClient(), urgence.getSocketClient());
         server.acceptSocket();
     }
     server.disconnect();
@@ -44,11 +46,9 @@ int main(){
 }
 
 void* fctThreadAdmin(void* param){
-    cout << "thread admin créer" << endl;
     PoolThread *poolThread = (PoolThread*) param;
     string host = EasyProp::getValue("properties.prop", "HOST");
     int portAdmin = atoi((EasyProp::getValue("properties.prop", "PORT_ADMIN")).c_str());
-    cout << "thread Admin en attente" << endl;
     bool done = false;
     NetworkServer admin(host, portAdmin);
     while(1){

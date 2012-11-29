@@ -26,14 +26,15 @@ public:
     NetworkClient();
     NetworkClient(string host, int port);
     NetworkClient(const NetworkClient &n);
-    ~NetworkClient();
     int createSocket();
     void initInfos(string adresseIP, int port);
     void disconnect();
     void connection();
     void sendMessage(string message);
     string receiveMessage();
+    bool receiveString(string *line);
     bool verifMarqueur(char* message, int nbByte);
+    int getSocketClient(int socket);
     
     string getAdresseIp() const;
 };

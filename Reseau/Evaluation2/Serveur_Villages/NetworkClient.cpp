@@ -89,6 +89,47 @@ void NetworkClient::sendMessage(string message)
         exit(1);
     }
 }
+bool NetworkClient::receiveString(string *line)
+{
+    int tailleSegment = 0;
+    int sizeInt = sizeof(int);
+    string terminator = "\r\n";
+    char* buffer = new char[SIZEMESSAGE];
+    int nbByteRecu = 0;
+    string tempString;
+    size_t term = 0;
+    
+    int ret = getsockopt(this->socketClient, IPPROTO_TCP, TCP_MAXSEG, &tailleSegment, (socklen_t*)&sizeInt);
+    if(ret == -1){
+        cout << "Erreur sur le getSockOpt de la socket: " << errno << endl;
+        this->disconnect();
+        exit(1);
+    }
+    
+    memset(buffer, 0, SIZEMESSAGE);
+    
+    do{
+        nbByteRecu = recv(this->socketClient, buffer, tailleSegment, 0);
+        if(nbByteRecu == -1){
+            cout << "Erreur sur le recv de la socket: " << errno << endl;
+            this->disconnect();
+            exit(1);
+        }
+        if(nbByteRecu == 0){
+            return false;
+        }
+        tempString = buffer;
+        term = tempString.find(terminator);
+        if(term != -1){
+            buffer[term] = '\0';
+            *line = buffer;
+            delete [] buffer;
+            return true;
+        }
+    }while(nbByteRecu != 0 && nbByteRecu != -1);
+    return false;
+    
+}
 
 string NetworkClient::receiveMessage()
 {
@@ -157,5 +198,10 @@ bool NetworkClient::verifMarqueur(char* message, int nbByte)
 string NetworkClient::getAdresseIp() const
 {
     return this->adresseIp;
+}
+
+int NetworkClient::getSocketClient()
+{
+    return this->socketClient;
 }
 

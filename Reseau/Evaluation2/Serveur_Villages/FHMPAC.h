@@ -1,5 +1,5 @@
-#ifndef FHMPA_H
-#define FHMPA_h
+#ifndef FHMPAC_H
+#define FHMPAC_h
 
 #ifdef LIN
     using namespace std;
@@ -15,19 +15,18 @@
     #include<sstream.h>
 #endif
 #include "properties.h"
-#include "PoolThread.h"
 #include "EasyCSV.h"
 #include "EasyDate.h"
+#include "PoolThread.h"
 #include<sstream>
 #include<list>
     
-class FHMPA: public Protocoles{
+class FHMPAC: public Protocoles{
 private:
     PoolThread *poolThread;
-    PoolThread *poolThreadUrgence;
 public:
-    FHMPA();
-    FHMPA(PoolThread *poolThread, PoolThread *PoolThreadUrgence);
+    FHMPAC();
+    FHMPAC(PoolThread *poolThread);
     string treatPacketServer(string packet);
     string treatPacketServer(int numSocket, string packet) {}
     string actionTypeServer(string type, string contenu);
@@ -38,7 +37,6 @@ public:
     string actionGestionLclients(string contenu);
     string actionGestionPause(string contenu);
     string actionGestionStop(string contenu);
-    string actionGestionResume(string contenu);
     string getLogin(){}
     map<int, string> getUsers() {}
     void removeUser(int numSocket) {}

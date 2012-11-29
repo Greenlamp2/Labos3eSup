@@ -288,12 +288,13 @@ string FHMP::getLogin()
 
 list< string > FHMP::getUsers()
 {
-    return this->listeUtilisateurs;
+    return this->liste;
 }
 
 void FHMP::addUser(int numSocket, string login)
 {
     this->liste[numSocket] = login;
+    afficherUsers();
     cout << "temp" << endl;
 }
 

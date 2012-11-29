@@ -1,5 +1,5 @@
-OBJS=mainServer.cpp NetworkServer.o PoolThread.o FHMP.o EasyProp.o EasyCSV.o EasyDate.o FHMPA.o
-OBJC=mainClient.cpp NetworkClient.o FHMP.o EasyProp.o EasyCSV.o EasyDate.o
+OBJS=mainServer.cpp NetworkServer.o PoolThread.o FHMP.o EasyProp.o EasyCSV.o EasyDate.o FHMPA.o FHMPAC.o
+OBJC=mainClient.cpp NetworkClient.o FHMP.o EasyProp.o EasyCSV.o EasyDate.o FHMPAC.o
 CC=c++ -DLIN -g -lpthread
 DEPRE=-Wno-Deprecated
 
@@ -44,6 +44,10 @@ EasyDate.o:		EasyDate.cpp EasyDate.h
 FHMPA.o:		FHMPA.cpp FHMPA.h
 			@echo "Creation de FHMPA.o"
 			@$(CC) -c FHMPA.cpp $(DEPRE)
+			
+FHMPAC.o:		FHMPAC.cpp FHMPAC.h
+			@echo "Creation de FHMPAC.o"
+			@$(CC) -c FHMPAC.cpp $(DEPRE)
 			
 
 clean:

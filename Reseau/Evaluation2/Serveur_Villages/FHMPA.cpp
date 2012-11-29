@@ -39,6 +39,8 @@ string FHMPA::actionTypeServer(string type, string contenu)
         retour = actionGestionPause(contenu);
     }else if(type == STOP){
         retour = actionGestionStop(contenu);
+    }else if(type == RESUME){
+        retour = actionGestionResume(contenu);
     }else{
         retour = CLOSE;
     }
@@ -97,18 +99,18 @@ string FHMPA::actionGestionLogina(string contenu)
 
 string FHMPA::actionGestionLclients(string contenu)
 {
-    list<string> listeUtilisateurs = poolThread->getUsers();
+    map<int, string> listeUtilisateurs = poolThread->getUsers();
     if(listeUtilisateurs.size() == 0){
         return LCLIENT_EMPTY;
     }else{
-        list<string>::iterator it;
+        map<int, string>::iterator it;
         string retour;
         retour = LCLIENT_REPONSE;
         retour += ";";
         int taille = listeUtilisateurs.size();
         int i = 0;
         for(it = listeUtilisateurs.begin(); it != listeUtilisateurs.end(); it++){
-            retour += *it;
+            retour += (*it).second;
             if(i+1 < taille){
                 retour += "#";
             }
@@ -120,10 +122,39 @@ string FHMPA::actionGestionLclients(string contenu)
 
 string FHMPA::actionGestionPause(string contenu)
 {
+    this->poolThread->setPause(true);
+    int nbMax = this->poolThread->getNbSockets();
+    for(int i=0; i<nbMax; i++){
+        if(this->poolThread->getSocketUrgence(i) != -1){  
+            NetworkServer urgence(this->poolThread->getSocketUrgence(i));
+            urgence.sendMessage("PAUSE");
+        }
+    }
     return PAUSE_OUI;
 }
 
 string FHMPA::actionGestionStop(string contenu)
 {
+    this->poolThread->setStop(true);
+    int nbMax = this->poolThread->getNbSockets();
+    for(int i=0; i<nbMax; i++){
+        if(this->poolThread->getSocketUrgence(i) != -1){  
+            NetworkServer urgence(this->poolThread->getSocketUrgence(i));
+            urgence.sendMessage("STOP");
+        }
+    }
     return STOP_OUI;
+}
+
+string FHMPA::actionGestionResume(string contenu)
+{
+    this->poolThread->setPause(false);
+    int nbMax = this->poolThread->getNbSockets();
+    for(int i=0; i<nbMax; i++){
+        if(this->poolThread->getSocketUrgence(i) != -1){  
+            NetworkServer urgence(this->poolThread->getSocketUrgence(i));
+            urgence.sendMessage("RESUME");
+        }
+    }
+    return RESUME_OUI;
 }

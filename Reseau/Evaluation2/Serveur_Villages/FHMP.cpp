@@ -286,9 +286,9 @@ string FHMP::getLogin()
     return this->login;
 }
 
-list< string > FHMP::getUsers()
+map<int, string> FHMP::getUsers()
 {
-    return this->listeUtilisateurs;
+    return this->liste;
 }
 
 void FHMP::addUser(int numSocket, string login)

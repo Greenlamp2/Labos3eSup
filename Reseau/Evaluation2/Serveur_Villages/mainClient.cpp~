@@ -15,6 +15,7 @@
 #include "properties.h"
 #include "NetworkClient.h"
 #include "FHMP.h"
+#include "FHMPAC.h"
 
 string gestionLogin();
 int menu();
@@ -23,16 +24,28 @@ string gestionChoix(int choix);
 int menuAction();
 string gestionChoixAction(int choix);
 void gestionMessageFromServer(string messageFromServer);
+void* fctThreadUrgence(void* param);
+pthread_t threadUrgence;
+void gestionMessage(string message);
+void checkPause();
+bool paused = false;
+bool stoped = false;
+pthread_mutex_t mutexPause;
+pthread_cond_t condpause;
+NetworkClient *clientConnected;
     
 int main(){
+    pthread_mutex_init(&mutexPause, NULL);
+    pthread_cond_init(&condpause, NULL);
     string host = EasyProp::getValue("properties.prop", "HOST");
     int port = atoi((EasyProp::getValue("properties.prop", "PORT_VILLAGE")).c_str());
-    int portUrgence = atoi((EasyProp::getValue("properties.prop", "PORT_URGENCE")).c_str());
-    
+ 
+    NetworkClient client(host, port);
+    pthread_create(&threadUrgence, NULL, fctThreadUrgence, (void*)NULL);
+    pthread_detach(threadUrgence);
     string chaine = gestionLogin();
     
-    NetworkClient client(host, port);
-    NetworkClient urgence(host, portUrgence);
+    clientConnected = &client;
     FHMP fhmp;
     string messageToSend = LOGIN;
     messageToSend += ";";
@@ -53,6 +66,7 @@ int main(){
             if(packetToSend == EOC){
                 
             }else{
+                checkPause();
                 client.sendMessage(packetToSend);
                 string messageFromServer = fhmp.treatPacketClient(client.receiveMessage());
                 gestionMessageFromServer(messageFromServer);
@@ -81,6 +95,7 @@ string gestionLogin(){
 }
 
 int menu(){
+    checkPause();
     int choix = 0;
     cout << "========================" << endl;
     cout << "[0] Quitter" << endl;
@@ -94,6 +109,7 @@ int menu(){
 }
 
 int menuAction(){
+    checkPause();
     int choix = 0;
     cout << "========================" << endl;
     cout << "[0] Retour" << endl;
@@ -230,4 +246,48 @@ string gestionChoixAction(int choix){
             break;
     }
     return retour;
+}
+
+void* fctThreadUrgence(void* param){
+    string host = EasyProp::getValue("properties.prop", "HOST");
+    int portUrgence = atoi((EasyProp::getValue("properties.prop", "PORT_URGENCE")).c_str());
+    NetworkClient urgence(host, portUrgence);
+    bool done = false;
+    FHMPAC fhmpac;
+    while(!done){
+        string messageFromServer;
+        bool ok = urgence.receiveString(&messageFromServer);
+        if(!ok || messageFromServer == EOC){
+            cout << "client parti" << endl;
+            done = true;
+        }else{
+            cout << "["<< urgence.getSocketClient() <<"]Message reçu: " << messageFromServer << endl;
+            //gestionMessage(messageFromServer);
+        }
+    }
+    urgence.disconnect();
+}
+void gestionMessage(string message){
+    if((message == "PAUSE")){
+        paused = true;
+        pthread_mutex_lock(&mutexPause);
+    }else if(message == "STOP"){
+        stoped = true;
+    }else if(message == "RESUME"){
+        paused = false;
+        pthread_mutex_unlock(&mutexPause);
+    }
+}
+
+void checkPause()
+{
+    if(paused){
+        cout << "Le serveur est en pause." << endl;
+        pthread_mutex_lock(&mutexPause);
+        pthread_mutex_unlock(&mutexPause);
+    }else if(stoped){
+        cout << "Le server s'est arrêter" << endl;
+        clientConnected->disconnect();
+        exit(1);
+    }
 }

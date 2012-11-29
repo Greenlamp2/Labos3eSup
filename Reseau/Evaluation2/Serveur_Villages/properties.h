@@ -1,3 +1,5 @@
+#ifndef PROPERTIES_H
+#define PROPERTIES_H
 #include<stdio.h>
 #include<stdlib.h> // exit(1)
 #include<sys/types.h>
@@ -6,6 +8,7 @@
 #include<netdb.h> // struct hostent
 #include<string.h> // memcpy
 #include<netinet/tcp.h> // TCP_MAXSEG
+
 
 #define EOC "END_OF_CONNEXION"
 #define DOC "DENY_OF_CONNEXION"
@@ -39,3 +42,12 @@
 #define PAUSE_OUI "PAUSE_OUI"
 #define STOP "STOP"
 #define STOP_OUI "STOP_OUI"
+#define RESUME "RESUME"
+#define RESUME_OUI "RESUME_OUI"
+
+typedef struct{
+    int socketService;
+    int socketUrgence;
+}MySocket;
+
+#endif

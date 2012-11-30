@@ -31,6 +31,7 @@ private:
     list<string> listeUtilisateurs;
     bool paused;
     bool stoped;
+    pthread_mutex_t mutexPause;
 public:
     PoolThread();
     PoolThread(Protocoles *protocole);
@@ -44,6 +45,8 @@ public:
     void setStop(bool val);
     int getNbSockets();
     int getSocket(int num);
+    int getSocketUrgence(int num);
+    bool checkEtat();
 };
 
 #endif

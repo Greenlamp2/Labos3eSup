@@ -11,10 +11,14 @@ PoolThread::PoolThread()
 
 PoolThread::PoolThread(Protocoles *protocole)
 {
+    this->paused = false;
+    this->stoped = false;
     this->protocole = protocole;
     this->indiceCourant = -1;
     pthread_mutex_init(&this->mutexIndiceCourant, NULL);
     pthread_cond_init(&this->condIndiceCourant, NULL);
+    pthread_mutex_init(&this->mutexPause, NULL);
+    pthread_cond_init(&this->condPause, NULL);
     this->startThreads();
 }
 
@@ -57,13 +61,18 @@ void PoolThread::inject(int socket, int socketUrgence)
     while(i < NB_MAX_CLIENT && sockets[i].socketService != -1){
         i++;
     }
-    if(i != NB_MAX_CLIENT){
-        pthread_mutex_lock(&this->mutexIndiceCourant);
-        sockets[i].socketService = socket;
-        sockets[i].socketUrgence = socketUrgence;
-        this->indiceCourant = i;
-        pthread_mutex_unlock(&this->mutexIndiceCourant);
-        pthread_cond_signal(&this->condIndiceCourant);
+    if(!this->paused){
+        if(i != NB_MAX_CLIENT){
+            pthread_mutex_lock(&this->mutexIndiceCourant);
+            sockets[i].socketService = socket;
+            sockets[i].socketUrgence = socketUrgence;
+            this->indiceCourant = i;
+            pthread_mutex_unlock(&this->mutexIndiceCourant);
+            pthread_cond_signal(&this->condIndiceCourant);
+        }
+    }else{
+        NetworkServer connec(socket);
+        connec.disconnect();
     }
 }
 
@@ -88,6 +97,11 @@ void* PoolThread::fctThread(void* param){
         //FHMP fhmp;
         while(networkServer.isConnected()){
             string messageFromClient;
+            pthread_mutex_lock(&poolThread->mutexPause);
+            while(poolThread->paused == true){
+                pthread_cond_wait(&poolThread->condPause, &poolThread->mutexPause);
+            }
+            pthread_mutex_unlock(&poolThread->mutexPause);
             bool ok = networkServer.receiveString(&messageFromClient);
             if(!ok){
                 poolThread->protocole->removeUser(networkServer.getSocketClient());
@@ -100,10 +114,10 @@ void* PoolThread::fctThread(void* param){
                 networkServer.sendMessage(messageToClient);
             }
         }
-        cout << "Client parti" << endl;
         
         pthread_mutex_lock(&poolThread->mutexIndiceCourant);
         poolThread->sockets[indice].socketService = -1;
+        poolThread->sockets[indice].socketUrgence = -1;
         pthread_mutex_unlock(&poolThread->mutexIndiceCourant);
     }
 }
@@ -114,12 +128,21 @@ map<int, string> PoolThread::getUsers(){
 
 void PoolThread::setPause(bool val)
 {
+    pthread_mutex_lock(&this->mutexPause);
     this->paused = val;
+    pthread_mutex_unlock(&this->mutexPause);
+    pthread_cond_signal(&this->condPause);
 }
 
 void PoolThread::setStop(bool val)
 {
     this->setStop(val);
+    for(int i=0; i<NB_MAX_CLIENT; i++){
+        if(sockets[i].socketService != -1){
+            NetworkServer ns(sockets[i].socketService);
+        }
+    }
+    exit(1);
 }
 
 int PoolThread::getNbSockets()
@@ -137,3 +160,13 @@ int PoolThread::getSocketUrgence(int num)
 }
 
 
+bool PoolThread::checkEtat()
+{
+    if(paused){
+        cout << "Le serveur est en pause." << endl;
+        return false;
+    }else if(stoped){
+        cout << "Le server s'est arrêter" << endl;
+        return true;
+    }
+}

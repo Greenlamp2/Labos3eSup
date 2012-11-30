@@ -33,6 +33,7 @@ bool stoped = false;
 pthread_mutex_t mutexPause;
 pthread_cond_t condpause;
 NetworkClient *clientConnected;
+NetworkClient *clientUrgence;
     
 int main(){
     pthread_mutex_init(&mutexPause, NULL);
@@ -252,6 +253,7 @@ void* fctThreadUrgence(void* param){
     string host = EasyProp::getValue("properties.prop", "HOST");
     int portUrgence = atoi((EasyProp::getValue("properties.prop", "PORT_URGENCE")).c_str());
     NetworkClient urgence(host, portUrgence);
+    clientUrgence = &urgence;
     bool done = false;
     FHMPAC fhmpac;
     while(!done){
@@ -262,7 +264,7 @@ void* fctThreadUrgence(void* param){
             done = true;
         }else{
             cout << endl << "["<< urgence.getSocketClient() <<"]Message reçu: " << messageFromServer << endl;
-            //gestionMessage(messageFromServer);
+            gestionMessage(messageFromServer);
         }
     }
     urgence.disconnect();
@@ -273,6 +275,8 @@ void gestionMessage(string message){
         pthread_mutex_lock(&mutexPause);
     }else if(message == "STOP"){
         stoped = true;
+        clientConnected->disconnect();
+        exit(1);
     }else if(message == "RESUME"){
         paused = false;
         pthread_mutex_unlock(&mutexPause);
@@ -288,6 +292,7 @@ void checkPause()
     }else if(stoped){
         cout << "Le server s'est arrêter" << endl;
         clientConnected->disconnect();
+        clientUrgence->disconnect();
         exit(1);
     }
 }

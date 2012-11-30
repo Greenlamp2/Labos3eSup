@@ -122,7 +122,6 @@ string FHMPA::actionGestionLclients(string contenu)
 
 string FHMPA::actionGestionPause(string contenu)
 {
-    this->poolThread->setPause(true);
     int nbMax = this->poolThread->getNbSockets();
     for(int i=0; i<nbMax; i++){
         if(this->poolThread->getSocketUrgence(i) != -1){  
@@ -130,12 +129,12 @@ string FHMPA::actionGestionPause(string contenu)
             urgence.sendMessage("PAUSE");
         }
     }
+    this->poolThread->setPause(true);
     return PAUSE_OUI;
 }
 
 string FHMPA::actionGestionStop(string contenu)
 {
-    this->poolThread->setStop(true);
     int nbMax = this->poolThread->getNbSockets();
     for(int i=0; i<nbMax; i++){
         if(this->poolThread->getSocketUrgence(i) != -1){  
@@ -143,6 +142,7 @@ string FHMPA::actionGestionStop(string contenu)
             urgence.sendMessage("STOP");
         }
     }
+    this->poolThread->setStop(true);
     return STOP_OUI;
 }
 

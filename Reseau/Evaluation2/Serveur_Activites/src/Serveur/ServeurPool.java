@@ -19,6 +19,7 @@ public class ServeurPool implements Runnable{
         port = Integer.parseInt(EasyFile.getConfig("Configs_Serveur_Activites", "PORT_ACTIVITES"));
         System.out.println("Mise à l'écoute sur le port: " + port);
         reseau = new NetworkServer(port);
+        poolThread = new PoolThread(3);
     }
 
     @Override

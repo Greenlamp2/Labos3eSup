@@ -3,6 +3,8 @@ trigger cmdEcoles
 for insert on projection
 compound trigger
 
+type copies_t is table of copies%rowtype;
+listCopies copies_t := copies_t();
 type proj_t is table of projection%rowtype;
 v_listProj proj_t := proj_t();
 

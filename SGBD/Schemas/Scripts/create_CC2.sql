@@ -21,14 +21,21 @@ DROP TABLE Salle CASCADE CONSTRAINTS;
 DROP TABLE Ecole CASCADE CONSTRAINTS;
 DROP TABLE PasserCommande CASCADE CONSTRAINTS;
 
+DROP TABLE my_constraints CASCADE CONSTRAINTS;
+
 --Création des tables De la base de Donnée CC2.
 create table Erreur(
-	dateErreur date default sysdate
-		constraints pk_erreur primary key,
+	dateErreur date default sysdate,
 	errcode integer default 0,
 	errmessage varchar2(600),
 	namePackage varchar2(100),
-	nameMethod varchar2(100)
+	nameMethod varchar2(100),
+	username varchar2(100)
+);
+
+create table my_constraints (
+	name varchar2(100) constraint my_constraints_pk primary key,
+	message varchar2(512)
 );
 
 create table Movies(
@@ -51,13 +58,16 @@ create table Movies(
 );
 
 create table Copies(
-	idCopie number(6)
-		constraints pk_copies primary key,
+	idCopie number(6),
 	physique number(1)
 		constraint nn_copies_physique check(physique is not null)
 		constraints ck_copies_physique check(physique in ('0', '1')),
 	idMovie number(6)
-		constraints fk_copies_idMovie references Movies
+		constraints fk_copies_idMovie references Movies,
+    deleted number(1) default '0'
+		constraints CK_COPIES_deleted check(deleted in ('0', '1')),
+        
+	constraints pk_copies primary key(idCopie, deleted)
 );
 
 create table Studios(

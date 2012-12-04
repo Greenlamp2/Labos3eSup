@@ -6,6 +6,7 @@ package ejb;
 
 import ant.Pions;
 import ant.Plateaux;
+import java.awt.Point;
 import java.util.List;
 import javax.ejb.Remote;
 
@@ -36,4 +37,6 @@ public interface SessionBeanRemote {
     int getIdJoueur(String nomPlateau, int couleur);
 
     void deletePlateau(String nomPlateau);
+
+    List<Point> getDeplacementPossible(int x, int y, int couleur, String nom);
 }

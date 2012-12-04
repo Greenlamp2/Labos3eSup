@@ -11,6 +11,7 @@ import Facades.PlateauxFacadeLocal;
 import ant.Joueurs;
 import ant.Pions;
 import ant.Plateaux;
+import java.awt.Point;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateful;
@@ -188,5 +189,10 @@ public class SessionBean implements SessionBeanRemote {
             pionsFacade.remove(pion);
         }
         plateauxFacade.remove(plateau);
+    }
+
+    @Override
+    public List<Point> getDeplacementPossible(int x, int y, int couleur, String nom){
+        return null;
     }
 }

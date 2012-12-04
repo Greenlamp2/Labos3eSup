@@ -238,7 +238,9 @@ public class Main extends javax.swing.JFrame implements MessageListener{
         }*/
 
         if(selected == null){
-            deplacementsPossible = pion.getDeplacementPossible(this.plateau);
+
+            //deplacementsPossible = pion.getDeplacementPossible(this.plateau);
+            deplacementsPossible = sessionBean.getDeplacementPossible(pion.getX(), pion.getY(), (pion.getCouleur() == Couleur.BLANC ? 0 : 1), pion.getNom());
             for(Point point : deplacementsPossible){
                 plateau[point.x][point.y].selectionneCase(false);
             }

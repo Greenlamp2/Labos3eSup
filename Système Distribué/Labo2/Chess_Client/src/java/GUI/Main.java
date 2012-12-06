@@ -238,7 +238,9 @@ public class Main extends javax.swing.JFrame implements MessageListener{
         }*/
 
         if(selected == null){
-            deplacementsPossible = pion.getDeplacementPossible(this.plateau);
+
+            //deplacementsPossible = pion.getDeplacementPossible(this.plateau);
+            deplacementsPossible = sessionBean.getDeplacementPossible(pion.getX(), pion.getY(), (pion.getCouleur() == Couleur.BLANC ? 0 : 1), pion.getNom());
             for(Point point : deplacementsPossible){
                 plateau[point.x][point.y].selectionneCase(false);
             }
@@ -257,59 +259,16 @@ public class Main extends javax.swing.JFrame implements MessageListener{
                 selected = null;
             }
         }
-
-
-        /*if(!waitAdversaire){
-            System.out.println("idJoueur: " + this.idMessage);
-            System.out.println("idAversaire: " + this.idMessageAdversaire);
-        }else{
-            System.out.println("en attente d'un adversaire !");
-        }*/
-        /*boolean moved = false;
-        if(this.selected != null){
-            if(plateau[caseClicked.getPositionX()][caseClicked.getPositionY()].isSelectionne()){
-                for(Point point : deplacementsPossible){
-                    plateau[point.x][point.y].selectionneCase((this.selected == null ? false : true));
-                }
-                bouger(caseClicked);
-                this.selected = null;
-                moved = true;
-            }else{
-                for(Point point : deplacementsPossible){
-                    plateau[point.x][point.y].selectionneCase((this.selected == null ? false : true));
-                }
-                this.selected = null;
-            }
-        }
-
-        if(caseClicked.getPion() == null){
-            return;
-        }
-        if(!moved){
-            if(caseClicked.getPion().getCouleur() == couleurJoueur){
-                deplacementsPossible = caseClicked.getPion().getDeplacementPossible(this.plateau);
-                for(Point point : deplacementsPossible){
-                    plateau[point.x][point.y].selectionneCase((this.selected == null ? false : true));
-                }
-                this.selected = caseClicked;
-            }
-        }*/
     }
 
     private void bouger(Plateau caseClicked) {
         Piece pion = selected.getPion();
         boolean autoriser = sessionBean.bougerPion(pion.getNom(), (pion.getCouleur() == Piece.Couleur.BLANC ? 0 : 1), nomPlateau, selected.getPositionX(), selected.getPositionY(), caseClicked.getPositionX(), caseClicked.getPositionY());
-        //clearPlateau();
-        //initBoard();
-        clearPlateau();
-        refreshPlateau();
-        /*if(autoriser){
-            pion.setX(caseClicked.getPositionX());
-            pion.setY(caseClicked.getPositionY());
-            plateau[caseClicked.getPositionX()][caseClicked.getPositionY()].addPion(pion);
-            selected = new Plateau(this, selected.getPositionX(), selected.getPositionY(), selected.getBackground());
+        if(autoriser){
+            clearPlateau();
             refreshPlateau();
-        }*/
+            producer.sendMessage(idMessageAdverse, MSG.DEPLACEMENT.getValue());
+        }
     }
 
     @Override
@@ -339,6 +298,7 @@ public class Main extends javax.swing.JFrame implements MessageListener{
                 System.exit(0);
             }
         }else if(msg.equalsIgnoreCase(MSG.DEPLACEMENT.getValue())){
+            clearPlateau();
             refreshPlateau();
         }else if(msg.equalsIgnoreCase(MSG.ECHEC.getValue())){
             refreshPlateau();

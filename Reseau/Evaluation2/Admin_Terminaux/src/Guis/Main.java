@@ -139,7 +139,11 @@ public class Main extends javax.swing.JFrame {
 
         jLabel3.setText("login: ");
 
+        Glogin.setText("admin");
+
         jLabel4.setText("password:");
+
+        Gpassword.setText("admin");
 
         Bconnect.setText("se connecter");
         Bconnect.addActionListener(new java.awt.event.ActionListener() {
@@ -328,11 +332,21 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_BpauseActionPerformed
 
     private void BreprendreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BreprendreActionPerformed
-        sendMessage("RESUME");
+        if(paused){
+            sendMessage("RESUME");
+            String retour = receiveMessage();
+            if(retour.equals("RESUME_OUI")){
+                paused = true;
+                addLog("Le serveur n'est plus en pause");
+            }
+            paused=false;
+        }
     }//GEN-LAST:event_BreprendreActionPerformed
 
     private void BstopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BstopActionPerformed
         sendMessage("STOP");
+        disconnect();
+        refreshFields();
     }//GEN-LAST:event_BstopActionPerformed
 
     private void BrafraichirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BrafraichirActionPerformed
@@ -468,6 +482,7 @@ public class Main extends javax.swing.JFrame {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
         addLog("Socket closed");
+        connected = false;
     }
 
     private void sendMessage(String message) {

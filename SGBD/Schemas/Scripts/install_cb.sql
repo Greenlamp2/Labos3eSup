@@ -8,5 +8,6 @@
 @Package_CB
 @trigger_replic_amelio
 @create_procedure
+@trigger_Alim_CC2
 --@create_job
 commit;

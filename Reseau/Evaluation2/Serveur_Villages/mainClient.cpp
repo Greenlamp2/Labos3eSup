@@ -54,6 +54,11 @@ int main(){
     cout << "messageToSend: " << messageToSend << endl;
     client.sendMessage(messageToSend);
     string reponseFromServer = fhmp.treatPacketClient(client.receiveMessage());
+    if(reponseFromServer == PAUSED){
+        cout << "Le serveur est en pause." << endl;
+        client.disconnect();
+        exit(1);
+    }
     if(reponseFromServer == EOC){
         cout << "Le serveur n'est pas disponible. soit pause, soit nombre max atteint." << endl;
     }
@@ -75,7 +80,7 @@ int main(){
                 string messageFromServer = fhmp.treatPacketClient(client.receiveMessage());
                 gestionMessageFromServer(messageFromServer);
             }
-        }while(choix > 0 && choix <= 3);
+        }while(choix > 0 && choix <= 3 && paused);
     }else{
         cout << "Login ou password incorrect." << endl;
     }

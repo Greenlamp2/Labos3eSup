@@ -44,6 +44,7 @@
 #define STOP_OUI "STOP_OUI"
 #define RESUME "RESUME"
 #define RESUME_OUI "RESUME_OUI"
+#define PAUSED "PAUSED"
 
 typedef struct{
     int socketService;

@@ -72,6 +72,10 @@ void PoolThread::inject(int socket, int socketUrgence)
             pthread_mutex_unlock(&this->mutexIndiceCourant);
             pthread_cond_signal(&this->condIndiceCourant);
         }
+    }else{
+        NetworkServer ns(socket);
+        ns.sendMessage(PAUSED);
+        ns.disconnect();
     }
 }
 

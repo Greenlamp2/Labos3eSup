@@ -51,7 +51,7 @@ FHMPAC.o:		FHMPAC.cpp FHMPAC.h
 			
 
 clean:
+	rm ./*.~
 	rm ./*.o
 	rm ./Serveur_Villages
 	rm ./Applic_Materiel
-	rm ./*.~

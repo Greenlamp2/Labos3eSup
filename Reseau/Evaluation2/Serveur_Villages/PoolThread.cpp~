@@ -72,6 +72,9 @@ void PoolThread::inject(int socket, int socketUrgence)
             pthread_mutex_unlock(&this->mutexIndiceCourant);
             pthread_cond_signal(&this->condIndiceCourant);
         }
+    }else{
+        NetworkServer ns(socket);
+        ns.disconnect();
     }
 }
 
@@ -112,6 +115,7 @@ void* PoolThread::fctThread(void* param){
             }
         }
         networkServer.disconnect();
+        networkServerUrgence.disconnect();
         
         pthread_mutex_lock(&poolThread->mutexIndiceCourant);
         poolThread->sockets[indice].socketService = -1;

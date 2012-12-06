@@ -148,7 +148,6 @@ string FHMPA::actionGestionStop(string contenu)
 
 string FHMPA::actionGestionResume(string contenu)
 {
-    this->poolThread->setPause(false);
     int nbMax = this->poolThread->getNbSockets();
     for(int i=0; i<nbMax; i++){
         if(this->poolThread->getSocketUrgence(i) != -1){  
@@ -156,5 +155,6 @@ string FHMPA::actionGestionResume(string contenu)
             urgence.sendMessage("RESUME");
         }
     }
+    this->poolThread->setPause(false);
     return RESUME_OUI;
 }

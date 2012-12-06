@@ -46,7 +46,8 @@
 #define RESUME_OUI "RESUME_OUI"
 
 typedef struct{
-    
+    int socketService;
+    int socketUrgence;
 }MySocket;
 
 #endif

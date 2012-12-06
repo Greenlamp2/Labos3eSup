@@ -57,6 +57,7 @@ int main(){
     if(reponseFromServer == PAUSED){
         cout << "Le serveur est en pause." << endl;
         client.disconnect();
+        exit(1);
     }
     if(reponseFromServer == EOC){
         cout << "Le serveur n'est pas disponible. soit pause, soit nombre max atteint." << endl;
@@ -281,6 +282,7 @@ void gestionMessage(string message){
         pthread_mutex_lock(&mutexPause);
     }else if(message == "STOP"){
         stoped = true;
+	clientConnected->disconnect();
         exit(1);
     }else if(message == "RESUME"){
         paused = false;

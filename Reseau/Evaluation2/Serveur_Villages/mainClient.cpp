@@ -282,6 +282,8 @@ void gestionMessage(string message){
         pthread_mutex_lock(&mutexPause);
     }else if(message == "STOP"){
         stoped = true;
+	clientConnected->disconnect();
+	clientUrgence->disconnect();
         exit(1);
     }else if(message == "RESUME"){
         paused = false;

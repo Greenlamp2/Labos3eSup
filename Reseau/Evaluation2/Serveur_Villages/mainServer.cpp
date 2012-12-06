@@ -23,6 +23,7 @@
 
 void* fctThreadAdmin(void* param);
 pthread_t threadAdmin;
+NetworkServer *sockServer, *sockUrgence;
     
 int main(){
     string host = EasyProp::getValue("properties.prop", "HOST");
@@ -37,9 +38,12 @@ int main(){
     
     NetworkServer server(host, port);
     NetworkServer urgence(host, portUrgence);
+    sockServer = &server;
+    sockUrgence = &urgence;
     while(1){
         poolThread.inject(server.getSocketClient(), urgence.getSocketClient());
         server.acceptSocket();
+	urgence.acceptSocket();
     }
     return 0;
 }
@@ -75,4 +79,7 @@ void* fctThreadAdmin(void* param){
         done = false;
     }
     admin.disconnect();
+    sockUrgence->disconnect();
+    sockServer->disconnect();
+    exit(1);
 }

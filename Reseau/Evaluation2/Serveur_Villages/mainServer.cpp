@@ -41,7 +41,6 @@ int main(){
         poolThread.inject(server.getSocketClient(), urgence.getSocketClient());
         server.acceptSocket();
     }
-    server.disconnect();
     return 0;
 }
 
@@ -51,7 +50,8 @@ void* fctThreadAdmin(void* param){
     int portAdmin = atoi((EasyProp::getValue("properties.prop", "PORT_ADMIN")).c_str());
     bool done = false;
     NetworkServer admin(host, portAdmin);
-    while(1){
+    bool stopped = false;
+    while(!stopped){
         FHMPA fhmpa(poolThread);
         while(!done){
             string messageFromClient;
@@ -65,8 +65,14 @@ void* fctThreadAdmin(void* param){
                 cout << "["<< admin.getSocketClient() <<"]Message à envoyer au client: " << messageToClient << endl;
                 admin.sendMessage(messageToClient);
             }
+            if(messageFromClient == STOP){
+                stopped = true;
+            }
         }
-        admin.acceptSocket();
+        if(!stopped){
+            admin.acceptSocket();
+        }
         done = false;
     }
+    admin.disconnect();
 }

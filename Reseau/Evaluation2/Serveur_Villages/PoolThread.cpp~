@@ -45,13 +45,15 @@ void PoolThread::inject(int socket)
     while(i < NB_MAX_CLIENT && sockets[i].socketService != -1){
         i++;
     }
-    if(i != NB_MAX_CLIENT){
-        pthread_mutex_lock(&this->mutexIndiceCourant);
-        sockets[i].socketService = socket;
-        sockets[i].socketUrgence = -1;
-        this->indiceCourant = i;
-        pthread_mutex_unlock(&this->mutexIndiceCourant);
-        pthread_cond_signal(&this->condIndiceCourant);
+    if(!this->paused){
+        if(i != NB_MAX_CLIENT){
+            pthread_mutex_lock(&this->mutexIndiceCourant);
+            sockets[i].socketService = socket;
+            sockets[i].socketUrgence = -1;
+            this->indiceCourant = i;
+            pthread_mutex_unlock(&this->mutexIndiceCourant);
+            pthread_cond_signal(&this->condIndiceCourant);
+        }
     }
 }
 
@@ -70,9 +72,6 @@ void PoolThread::inject(int socket, int socketUrgence)
             pthread_mutex_unlock(&this->mutexIndiceCourant);
             pthread_cond_signal(&this->condIndiceCourant);
         }
-    }else{
-        NetworkServer connec(socket);
-        connec.disconnect();
     }
 }
 
@@ -105,8 +104,6 @@ void* PoolThread::fctThread(void* param){
             bool ok = networkServer.receiveString(&messageFromClient);
             if(!ok){
                 poolThread->protocole->removeUser(networkServer.getSocketClient());
-                networkServer.disconnect();
-                networkServerUrgence.disconnect();
             }else{
                 cout << "["<< networkServer.getSocketClient() <<"]Message reçu: " << messageFromClient << endl;
                 string messageToClient = poolThread->protocole->treatPacketServer(networkServer.getSocketClient(), messageFromClient);
@@ -114,6 +111,7 @@ void* PoolThread::fctThread(void* param){
                 networkServer.sendMessage(messageToClient);
             }
         }
+        networkServer.disconnect();
         
         pthread_mutex_lock(&poolThread->mutexIndiceCourant);
         poolThread->sockets[indice].socketService = -1;
@@ -136,13 +134,18 @@ void PoolThread::setPause(bool val)
 
 void PoolThread::setStop(bool val)
 {
-    this->setStop(val);
+    //this->setStop(val);
+    this->stoped = val;
     for(int i=0; i<NB_MAX_CLIENT; i++){
         if(sockets[i].socketService != -1){
             NetworkServer ns(sockets[i].socketService);
+            ns.disconnect();
+        }
+        if(sockets[i].socketUrgence != -1){
+            NetworkServer nss(sockets[i].socketUrgence);
+            nss.disconnect();
         }
     }
-    exit(1);
 }
 
 int PoolThread::getNbSockets()

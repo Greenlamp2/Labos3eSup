@@ -54,6 +54,9 @@ int main(){
     cout << "messageToSend: " << messageToSend << endl;
     client.sendMessage(messageToSend);
     string reponseFromServer = fhmp.treatPacketClient(client.receiveMessage());
+    if(reponseFromServer == EOC){
+        cout << "Le serveur n'est pas disponible. soit pause, soit nombre max atteint." << endl;
+    }
     cout << "reponseFromServer: " << reponseFromServer << endl;
     if(reponseFromServer == LOGIN_OUI){
         int choix = -1;
@@ -76,7 +79,8 @@ int main(){
     }else{
         cout << "Login ou password incorrect." << endl;
     }
-    client.disconnect();
+    clientConnected->disconnect();
+    clientUrgence->disconnect();
     return 0;
 }
 
@@ -260,14 +264,12 @@ void* fctThreadUrgence(void* param){
         string messageFromServer;
         bool ok = urgence.receiveString(&messageFromServer);
         if(!ok || messageFromServer == EOC){
-            cout << "client parti" << endl;
             done = true;
         }else{
             cout << endl << "["<< urgence.getSocketClient() <<"]Message reçu: " << messageFromServer << endl;
             gestionMessage(messageFromServer);
         }
     }
-    urgence.disconnect();
 }
 void gestionMessage(string message){
     if((message == "PAUSE")){
@@ -275,7 +277,6 @@ void gestionMessage(string message){
         pthread_mutex_lock(&mutexPause);
     }else if(message == "STOP"){
         stoped = true;
-        clientConnected->disconnect();
         exit(1);
     }else if(message == "RESUME"){
         paused = false;
@@ -291,8 +292,6 @@ void checkPause()
         pthread_mutex_unlock(&mutexPause);
     }else if(stoped){
         cout << "Le server s'est arrêter" << endl;
-        clientConnected->disconnect();
-        clientUrgence->disconnect();
         exit(1);
     }
 }

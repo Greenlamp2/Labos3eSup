@@ -15,19 +15,19 @@ import javax.ejb.Local;
 @Local
 public interface PlateauFacadeLocal {
 
-    void create(Plateau plateau);
+    void create(Plateau plateau) throws Exception;
 
-    void edit(Plateau plateau);
+    void edit(Plateau plateau) throws Exception;
 
-    void remove(Plateau plateau);
+    void remove(Plateau plateau) throws Exception;
 
-    Plateau find(Object id);
+    Plateau find(Object id) throws Exception;
 
-    List<Plateau> findAll();
+    List<Plateau> findAll() throws Exception;
 
     List<Plateau> findRange(int[] range);
 
-    int count();
+    int count() throws Exception;
 
     Plateau getByNom(String nom) throws Exception;
 

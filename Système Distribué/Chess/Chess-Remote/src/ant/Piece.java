@@ -5,8 +5,12 @@
 
 package ant;
 
+import Others.EchiquierE;
 import java.awt.Color;
+import java.awt.Point;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -20,12 +24,13 @@ public class Piece implements Serializable{
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    private int x;
-    private int y;
+    protected Long id;
+    protected int x;
+    protected int y;
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    private Plateau plateau;
+    protected Plateau plateau;
     protected Color color;
+    public enum Direction{HAUT, BAS, DIAGO};
 
 
     public Piece(){}
@@ -37,7 +42,14 @@ public class Piece implements Serializable{
     }
 
     public boolean isAt(int x, int y){
+        System.out.println("x: " + x + " y: " + y);
+        System.out.println("is at: piece " + getPosX() + " / " + getPosY());
         return (x == getPosX() && y == getPosX());
+    }
+
+    public List<Point> getDeplacementPossible(EchiquierE[][] plateau){
+        List<Point> listePoint = new ArrayList<>();
+        return listePoint;
     }
 
     public Long getId(){
@@ -70,6 +82,10 @@ public class Piece implements Serializable{
 
     public void setId(Long id){
         this.id = id;
+    }
+
+    public Color getColor(){
+        return this.color;
     }
 
     @Override

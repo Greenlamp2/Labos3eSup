@@ -8,6 +8,7 @@ import Helpers.SwingUtils;
 import JMS.JmsConsumerMulti;
 import JMS.JmsConsumerMulti.Types;
 import JMS.JmsProducerMulti;
+import ant.Joueur;
 import ant.Plateau;
 import ejb.SessionBeanRemote;
 import java.util.List;
@@ -19,6 +20,9 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.swing.JOptionPane;
 
 
@@ -37,7 +41,9 @@ public class Lobby extends javax.swing.JFrame implements MessageListener{
     JmsConsumerMulti consumer;
     public Lobby() {
         initComponents();
-        sessionBean.getPlateaux();
+        if(sessionBean == null){
+            sessionBean = lookupSession();
+        }
         initTable();
         producer = new JmsProducerMulti();
         consumer = new JmsConsumerMulti(Types.ASYNC, "lobby");
@@ -61,7 +67,6 @@ public class Lobby extends javax.swing.JFrame implements MessageListener{
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -134,25 +139,16 @@ public class Lobby extends javax.swing.JFrame implements MessageListener{
             }
         });
 
-        jButton5.setText("test");
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jButton5))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -164,9 +160,7 @@ public class Lobby extends javax.swing.JFrame implements MessageListener{
                 .addComponent(jButton3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton5)
-                .addContainerGap(165, Short.MAX_VALUE))
+                .addContainerGap(194, Short.MAX_VALUE))
         );
 
         jMenu1.setText("File");
@@ -214,31 +208,24 @@ public class Lobby extends javax.swing.JFrame implements MessageListener{
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        /*int row = Gparties.getSelectedRow();
+        int row = Gparties.getSelectedRow();
         String nomPlateau = (String)Gparties.getValueAt(row, 0);
-        int couleur = sessionBean.rejoindrePartie(nomPlateau);
-        producer.sendMessage("nouveauJoueur", "lobby");
-        if(couleur != -1){
-            producer.close();
-            consumer.close();
-            Main main = new Main(sessionBean, nomPlateau, couleur, this);
-            this.dispose();
-            main.setVisible(true);
-        }else{
-            JOptionPane.showMessageDialog(this, "La salle est complète.");
-        }*/
-    }//GEN-LAST:event_jButton3ActionPerformed
-
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        Plateau plateau = null;
-        try {
-            plateau = sessionBean.getByNom("b");
+        try{
+            Joueur joueur = sessionBean.rejoindrePartie(nomPlateau);
+            producer.sendMessage("nouveauJoueur", "lobby");
+            if(joueur != null){
+                producer.close();
+                consumer.close();
+                Main main = new Main(sessionBean, nomPlateau, joueur, this);
+                this.dispose();
+                main.setVisible(true);
+            }else{
+                JOptionPane.showMessageDialog(this, "La salle est complète.");
+            }
         } catch (Exception ex) {
-            //Logger.getLogger(Lobby.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Message: " + ex.getMessage());
+            Logger.getLogger(Lobby.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //System.out.println("plateau: " + plateau.getNom());
-    }//GEN-LAST:event_jButton5ActionPerformed
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -280,7 +267,6 @@ public class Lobby extends javax.swing.JFrame implements MessageListener{
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
@@ -291,7 +277,12 @@ public class Lobby extends javax.swing.JFrame implements MessageListener{
 
     private void initTable() {
         SwingUtils.emptyTable(Gparties);
-        List<Plateau> plateaux = sessionBean.getPlateaux();
+        List<Plateau> plateaux = null;
+        try {
+            plateaux = sessionBean.getPlateaux();
+        } catch (Exception ex) {
+            Logger.getLogger(Lobby.class.getName()).log(Level.SEVERE, null, ex);
+        }
         for(Plateau plateau : plateaux){
             Vector vec = new Vector();
             vec.add(plateau.getNom());
@@ -308,6 +299,16 @@ public class Lobby extends javax.swing.JFrame implements MessageListener{
             System.out.println("Message reçu: " + textMessage.getText());
         } catch (JMSException ex) {
             Logger.getLogger(Lobby.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private SessionBeanRemote lookupSession() {
+        try {
+            Context c = new InitialContext();
+            return (SessionBeanRemote) c.lookup("java:global/Chess_EntrepriseApplication/Chess-ejb/SessionBean");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
         }
     }
 }

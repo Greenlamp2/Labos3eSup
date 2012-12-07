@@ -9,16 +9,15 @@ import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 @Entity
 @NamedQueries({
@@ -32,7 +31,11 @@ public class Plateau implements Serializable{
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     private Collection<Piece> listePiece = new ArrayList<>();
 
-    private Joueur[] listeJoueur = new Joueur[2];
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    private Joueur joueur1;
+
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    private Joueur joueur2;
 
     public void Plateau(){
 
@@ -43,41 +46,52 @@ public class Plateau implements Serializable{
         setJoueur1(null);
         setJoueur2(null);
 
-        listePiece.add(new Tour(0, 0, Color.BLACK));
-        listePiece.add(new Cavalier(1, 0, Color.BLACK));
-        listePiece.add(new Fou(2, 0, Color.BLACK));
-        listePiece.add(new Roi(3, 0, Color.BLACK));
-        listePiece.add(new Reine(4, 0, Color.BLACK));
-        listePiece.add(new Fou(5, 0, Color.BLACK));
-        listePiece.add(new Cavalier(6, 0, Color.BLACK));
-        listePiece.add(new Tour(7, 0, Color.BLACK));
-
-        listePiece.add(new Pion(0, 1, Color.BLACK));
-        listePiece.add(new Pion(1, 1, Color.BLACK));
-        listePiece.add(new Pion(2, 1, Color.BLACK));
-        listePiece.add(new Pion(3, 1, Color.BLACK));
-        listePiece.add(new Pion(4, 1, Color.BLACK));
-        listePiece.add(new Pion(5, 1, Color.BLACK));
-        listePiece.add(new Pion(6, 1, Color.BLACK));
-        listePiece.add(new Pion(7, 1, Color.BLACK));
-
-        listePiece.add(new Tour(0, 7, Color.WHITE));
-        listePiece.add(new Cavalier(1, 7, Color.WHITE));
-        listePiece.add(new Fou(2, 7, Color.WHITE));
-        listePiece.add(new Roi(3, 7, Color.WHITE));
-        listePiece.add(new Reine(4, 7, Color.WHITE));
-        listePiece.add(new Fou(5, 7, Color.WHITE));
-        listePiece.add(new Cavalier(6, 7, Color.WHITE));
+        listePiece.add(new Tour(7, 0, Color.WHITE));
+        listePiece.add(new Cavalier(7, 1, Color.WHITE));
+        listePiece.add(new Fou(7, 2, Color.WHITE));
+        listePiece.add(new Roi(7, 3, Color.WHITE));
+        listePiece.add(new Reine(7, 4, Color.WHITE));
+        listePiece.add(new Fou(7, 5, Color.WHITE));
+        listePiece.add(new Cavalier(7, 6, Color.WHITE));
         listePiece.add(new Tour(7, 7, Color.WHITE));
 
-        listePiece.add(new Pion(0, 6, Color.WHITE));
-        listePiece.add(new Pion(1, 6, Color.WHITE));
-        listePiece.add(new Pion(2, 6, Color.WHITE));
-        listePiece.add(new Pion(3, 6, Color.WHITE));
-        listePiece.add(new Pion(4, 6, Color.WHITE));
-        listePiece.add(new Pion(5, 6, Color.WHITE));
+        listePiece.add(new Pion(6, 0, Color.WHITE));
+        listePiece.add(new Pion(6, 1, Color.WHITE));
+        listePiece.add(new Pion(6, 2, Color.WHITE));
+        listePiece.add(new Pion(6, 3, Color.WHITE));
+        listePiece.add(new Pion(6, 4, Color.WHITE));
+        listePiece.add(new Pion(6, 5, Color.WHITE));
         listePiece.add(new Pion(6, 6, Color.WHITE));
-        listePiece.add(new Pion(7, 6, Color.WHITE));
+        listePiece.add(new Pion(6, 7, Color.WHITE));
+
+        listePiece.add(new Tour(0, 0, Color.BLACK));
+        listePiece.add(new Cavalier(0, 1, Color.BLACK));
+        listePiece.add(new Fou(0, 2, Color.BLACK));
+        listePiece.add(new Roi(0, 3, Color.BLACK));
+        listePiece.add(new Reine(0, 4, Color.BLACK));
+        listePiece.add(new Fou(0, 5, Color.BLACK));
+        listePiece.add(new Cavalier(0, 6, Color.BLACK));
+        listePiece.add(new Tour(0, 7, Color.BLACK));
+
+        listePiece.add(new Pion(1, 0, Color.BLACK));
+        listePiece.add(new Pion(1, 1, Color.BLACK));
+        listePiece.add(new Pion(1, 2, Color.BLACK));
+        listePiece.add(new Pion(1, 3, Color.BLACK));
+        listePiece.add(new Pion(1, 4, Color.BLACK));
+        listePiece.add(new Pion(1, 5, Color.BLACK));
+        listePiece.add(new Pion(1, 6, Color.BLACK));
+        listePiece.add(new Pion(1, 7, Color.BLACK));
+    }
+
+    public void removePiece(int x, int y){
+        System.out.println("removePiece");
+        for(Piece piece : listePiece){
+            if(piece.isAt(x, y)){
+                System.err.println("removed");
+                listePiece.remove(piece);
+                break;
+            }
+        }
     }
 
     public Collection<Piece> getListePiece(){
@@ -89,19 +103,19 @@ public class Plateau implements Serializable{
     }
 
     public void setJoueur1(Joueur joueur) {
-        listeJoueur[0] = joueur;
+        joueur1 = joueur;
     }
 
     public void setJoueur2(Joueur joueur) {
-        listeJoueur[1] = joueur;
+        joueur2 = joueur;
     }
 
     public Joueur getJoueur1(){
-        return listeJoueur[0];
+        return joueur1;
     }
 
     public Joueur getJoueur2(){
-        return listeJoueur[1];
+        return joueur2;
     }
 
     public String getNom(){
@@ -117,6 +131,39 @@ public class Plateau implements Serializable{
             cpt++;
         }
         return cpt;
+    }
+
+    public Joueur getJoueurByCouleur(Color color){
+        if(getJoueur1().getColor().getRGB() == color.getRGB()){
+            return getJoueur1();
+        }else{
+            return getJoueur2();
+        }
+    }
+
+    public Joueur quitterPlateau(Color color){
+        Joueur joueur = null;
+        if(getJoueur1().getColor().getRGB() == color.getRGB()){
+            joueur = getJoueur1();
+            setJoueur1(null);
+        }else{
+            joueur = getJoueur2();
+            setJoueur2(null);
+        }
+        return joueur;
+    }
+
+    public Piece getPiece(int x, int y){
+        for(Piece piece : listePiece){
+            if(piece.isAt(x, y)){
+                return piece;
+            }
+        }
+        return null;
+    }
+
+    public void clearPiece(){
+        this.listePiece.clear();
     }
 
 }

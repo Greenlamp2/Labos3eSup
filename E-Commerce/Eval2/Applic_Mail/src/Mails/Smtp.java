@@ -6,6 +6,7 @@
 package Mails;
 
 import Helpers.EasyFile;
+import java.io.File;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,7 +23,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import javax.swing.JOptionPane;
 
 
 public class Smtp {
@@ -54,6 +54,7 @@ public class Smtp {
     public void init(){
         Properties prop = System.getProperties();
         prop.put("mail.smtp.host", host);
+        prop.put("mail.smtp.port", port);
         session = Session.getDefaultInstance(prop, null);
     }
 
@@ -112,6 +113,7 @@ public class Smtp {
     public void addPartMessage(String message){
         if(messageMultipart == null){
             messageMultipart = new MimeMultipart();
+            multipart = true;
         }
         MimeBodyPart mimeBodyPart = new MimeBodyPart();
         try {
@@ -126,12 +128,30 @@ public class Smtp {
     public void addPartFichier(String path){
         if(messageMultipart == null){
             messageMultipart = new MimeMultipart();
+            multipart = true;
         }
         MimeBodyPart mimeBodyPart = new MimeBodyPart();
         DataSource dataSource = new FileDataSource(path);
         try {
             mimeBodyPart.setDataHandler(new DataHandler(dataSource));
             mimeBodyPart.setFileName(path);
+            messageMultipart.addBodyPart(mimeBodyPart);
+        } catch (MessagingException ex) {
+            Logger.getLogger(Smtp.class.getName()).log(Level.SEVERE, null, ex);
+            correct = false;
+        }
+    }
+
+    public void addPartFichier(File file){
+        if(messageMultipart == null){
+            messageMultipart = new MimeMultipart();
+            multipart = true;
+        }
+        MimeBodyPart mimeBodyPart = new MimeBodyPart();
+        DataSource dataSource = new FileDataSource(file);
+        try {
+            mimeBodyPart.setDataHandler(new DataHandler(dataSource));
+            mimeBodyPart.setFileName(file.getName());
             messageMultipart.addBodyPart(mimeBodyPart);
         } catch (MessagingException ex) {
             Logger.getLogger(Smtp.class.getName()).log(Level.SEVERE, null, ex);

@@ -4,6 +4,8 @@
  */
 package GUI;
 
+import Mails.Message;
+import Mails.Middle;
 import Mails.Smtp;
 import java.io.File;
 import javax.swing.JFileChooser;
@@ -21,15 +23,17 @@ public class Envoi extends javax.swing.JDialog {
     Smtp smtp;
     boolean multipart;
     int count;
+    Message message;
     public Envoi(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        message = new Message();
         multipart = false;
         count = 0;
 
-        smtp = new Smtp();
+        /*smtp = new Smtp();
         smtp.init();
-        smtp.newMessage();
+        smtp.newMessage();*/
     }
 
     /**
@@ -242,7 +246,7 @@ public class Envoi extends javax.swing.JDialog {
         String from = Gfrom.getText();
         String to = Gto.getText();
         String sujet = Gsujet.getText();
-        String message = Gmessage.getText();
+        String msg = Gmessage.getText();
         if(from.isEmpty()){
             JOptionPane.showMessageDialog(this, "Le destinateur n'est pas valide");
         }
@@ -252,7 +256,12 @@ public class Envoi extends javax.swing.JDialog {
         if(sujet.isEmpty()){
             JOptionPane.showMessageDialog(this, "Le sujet n'est pas valide");
         }
-        smtp.setDestinateur(from);
+        message.setFrom(from);
+        message.setTo(to);
+        message.setSujet(sujet);
+        message.setMessage(msg);
+
+        /*smtp.setDestinateur(from);
         smtp.setDestinataire(to);
         smtp.setObjet(sujet);
         if(multipart){
@@ -260,7 +269,8 @@ public class Envoi extends javax.swing.JDialog {
         }else{
             smtp.setMessage(message);
         }
-        smtp.sendIt();
+        smtp.sendIt();*/
+        Middle.sendMessage(message);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -268,10 +278,11 @@ public class Envoi extends javax.swing.JDialog {
         int retour = fileChooser.showOpenDialog(this);
         if(retour == JFileChooser.APPROVE_OPTION){
             File file = fileChooser.getSelectedFile();
-            smtp.addPartFichier(file);
+            message.addPiecesJointes(file);
+            /*smtp.addPartFichier(file);
             multipart = true;
-            count++;
-            GpieceJointe.setText(String.valueOf(count));
+            count++;*/
+            GpieceJointe.setText(String.valueOf(message.getNbPiecesJointes()));
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 

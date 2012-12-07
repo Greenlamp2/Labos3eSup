@@ -9,14 +9,14 @@ import java.io.File;
 import java.util.LinkedList;
 
 
-public class Message {
+public class Messages {
     private String from;
     private String to;
     private String sujet;
     private String message;
     private LinkedList<File> piecesJointes;
 
-    public Message(){
+    public Messages(){
         from = null;
         to = null;
         sujet = null;

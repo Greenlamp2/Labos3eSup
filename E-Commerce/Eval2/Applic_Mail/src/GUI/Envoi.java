@@ -4,7 +4,7 @@
  */
 package GUI;
 
-import Mails.Message;
+import Mails.Messages;
 import Mails.Middle;
 import Mails.Smtp;
 import java.io.File;
@@ -23,11 +23,11 @@ public class Envoi extends javax.swing.JDialog {
     Smtp smtp;
     boolean multipart;
     int count;
-    Message message;
+    Messages message;
     public Envoi(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        message = new Message();
+        message = new Messages();
         multipart = false;
         count = 0;
 

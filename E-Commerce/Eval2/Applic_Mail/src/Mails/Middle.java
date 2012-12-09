@@ -7,9 +7,9 @@ package Mails;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,12 +31,16 @@ public class Middle {
         smtp.setDestinateur(message.getFrom());
         smtp.setDestinataire(message.getTo());
         smtp.setObjet(message.getSujet());
-        if(message.getNbPiecesJointes() == 0){
+        if(message.getNbPieceJointes() == 0){
             smtp.setMessage(message.getMessage());
         }else{
             smtp.addPartMessage(message.getMessage());
-            for(File file : message.getPiecesJointes()){
-                smtp.addPartFichier(file);
+            for(PieceJointes piece : message.getPiecesJointes()){
+                if(piece.isByte()){
+                    smtp.addPartFichier(piece.getBytes(), piece.getName());
+                }else{
+                    smtp.addPartFichier(piece.getFile());
+                }
             }
         }
         smtp.sendIt();
@@ -53,9 +57,14 @@ public class Middle {
     }
 
     private static void buildListe(Message[] messages, LinkedList<Messages> listeMessage) {
-        Messages nouveauMessage = new Messages();
+
         try {
             for(Message message : messages){
+                Messages nouveauMessage = new Messages();
+                nouveauMessage.setFrom(""+message.getFrom()[0]);
+                nouveauMessage.setSujet(message.getSubject());
+                nouveauMessage.setSentDate(new SimpleDateFormat("dd/MM/yyyy hh:mm").format(message.getSentDate()));
+
                 if(message.getContentType().contains("multipart")){
                     Multipart multipart = (Multipart)message.getContent();
                     int nbPart = multipart.getCount();
@@ -75,12 +84,14 @@ public class Middle {
                             }
                             baos.flush();
                             String nameFile = part.getFileName();
-                            File file = File.createTempFile("Binary", nameFile);
-                            file
-                            nouveauMessage.addPiecesJointes(file);
-
+                            nouveauMessage.addPieceJointes(nameFile, baos.toByteArray());
+                            listeMessage.add(nouveauMessage);
+                            baos.close();
                         }
                     }
+                }else{
+                    nouveauMessage.setMessage((String)message.getContent());
+                    listeMessage.add(nouveauMessage);
                 }
             }
         } catch (MessagingException ex) {

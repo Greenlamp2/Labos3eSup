@@ -23,6 +23,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
 
 
 public class Smtp {
@@ -152,6 +153,23 @@ public class Smtp {
         try {
             mimeBodyPart.setDataHandler(new DataHandler(dataSource));
             mimeBodyPart.setFileName(file.getName());
+            messageMultipart.addBodyPart(mimeBodyPart);
+        } catch (MessagingException ex) {
+            Logger.getLogger(Smtp.class.getName()).log(Level.SEVERE, null, ex);
+            correct = false;
+        }
+    }
+
+    public void addPartFichier(byte[] file, String name){
+        if(messageMultipart == null){
+            messageMultipart = new MimeMultipart();
+            multipart = true;
+        }
+        MimeBodyPart mimeBodyPart = new MimeBodyPart();
+        DataSource dataSource = new ByteArrayDataSource(file, "application/octet-stream");
+        try {
+            mimeBodyPart.setDataHandler(new DataHandler(dataSource));
+            mimeBodyPart.setFileName(name);
             messageMultipart.addBodyPart(mimeBodyPart);
         } catch (MessagingException ex) {
             Logger.getLogger(Smtp.class.getName()).log(Level.SEVERE, null, ex);

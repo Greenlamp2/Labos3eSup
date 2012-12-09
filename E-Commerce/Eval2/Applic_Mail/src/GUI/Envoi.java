@@ -6,6 +6,7 @@ package GUI;
 
 import Mails.Messages;
 import Mails.Middle;
+import Mails.PieceJointes;
 import Mails.Smtp;
 import java.io.File;
 import javax.swing.JFileChooser;
@@ -21,19 +22,13 @@ public class Envoi extends javax.swing.JDialog {
      * Creates new form Envoi
      */
     Smtp smtp;
-    boolean multipart;
-    int count;
     Messages message;
+    Main parent;
     public Envoi(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         message = new Messages();
-        multipart = false;
-        count = 0;
-
-        /*smtp = new Smtp();
-        smtp.init();
-        smtp.newMessage();*/
+        this.parent = (Main)parent;
     }
 
     /**
@@ -63,6 +58,7 @@ public class Envoi extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         Gmessage = new javax.swing.JTextArea();
         jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -200,6 +196,13 @@ public class Envoi extends javax.swing.JDialog {
             }
         });
 
+        jButton3.setText("test");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -215,7 +218,11 @@ public class Envoi extends javax.swing.JDialog {
                         .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(20, 20, 20)
-                        .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jButton3)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -233,7 +240,9 @@ public class Envoi extends javax.swing.JDialog {
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton2)
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton3)
+                .addContainerGap(22, Short.MAX_VALUE))
         );
 
         pack();
@@ -261,15 +270,6 @@ public class Envoi extends javax.swing.JDialog {
         message.setSujet(sujet);
         message.setMessage(msg);
 
-        /*smtp.setDestinateur(from);
-        smtp.setDestinataire(to);
-        smtp.setObjet(sujet);
-        if(multipart){
-            smtp.addPartMessage(message);
-        }else{
-            smtp.setMessage(message);
-        }
-        smtp.sendIt();*/
         Middle.sendMessage(message);
     }//GEN-LAST:event_jButton2ActionPerformed
 
@@ -278,13 +278,32 @@ public class Envoi extends javax.swing.JDialog {
         int retour = fileChooser.showOpenDialog(this);
         if(retour == JFileChooser.APPROVE_OPTION){
             File file = fileChooser.getSelectedFile();
-            message.addPiecesJointes(file);
-            /*smtp.addPartFichier(file);
-            multipart = true;
-            count++;*/
-            GpieceJointe.setText(String.valueOf(message.getNbPiecesJointes()));
+            message.addPieceJointes(file.getName(), file);
+            GpieceJointe.setText(String.valueOf(message.getNbPieceJointes()));
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        String from = Gfrom.getText();
+        String to = Gto.getText();
+        String sujet = Gsujet.getText();
+        String msg = Gmessage.getText();
+        if(from.isEmpty()){
+            JOptionPane.showMessageDialog(this, "Le destinateur n'est pas valide");
+        }
+        if(to.isEmpty()){
+            JOptionPane.showMessageDialog(this, "Le destinataire n'est pas valide");
+        }
+        if(sujet.isEmpty()){
+            JOptionPane.showMessageDialog(this, "Le sujet n'est pas valide");
+        }
+        message.setFrom(from);
+        message.setTo(to);
+        message.setSujet(sujet);
+        message.setMessage(msg);
+        Reception reception = new Reception(parent, true, message);
+        reception.setVisible(true);
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -335,6 +354,7 @@ public class Envoi extends javax.swing.JDialog {
     private javax.swing.JTextField Gto;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

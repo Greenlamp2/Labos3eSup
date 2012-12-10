@@ -6,6 +6,8 @@ package GUI;
 
 import Helpers.SwingUtils;
 import Mails.Messages;
+import Mails.Middle;
+import Threads.ThreadNouveauMessages;
 import java.util.LinkedList;
 import java.util.Vector;
 
@@ -20,9 +22,15 @@ public class Reception extends javax.swing.JDialog {
      */
     LinkedList<Messages> listeMessages;
     Main parent;
+    ThreadNouveauMessages thread;
     public Reception(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        parent = (Main)parent;
+        listeMessages = new LinkedList<>();
+        thread = new ThreadNouveauMessages(this, listeMessages.size());
+        Thread myThread = new Thread(thread);
+        myThread.start();
     }
 
     Reception(java.awt.Frame parent, boolean modal, Messages message) {
@@ -130,7 +138,11 @@ public class Reception extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        listeMessages.clear();
+        LinkedList<Messages> messages = Middle.receiveMessages();
+        //System.out.println("nb message: " + messages.size());
+        listeMessages.addAll(messages);
+        refreshListe();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed

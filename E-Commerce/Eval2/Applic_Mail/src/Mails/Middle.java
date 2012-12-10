@@ -63,7 +63,9 @@ public class Middle {
                 Messages nouveauMessage = new Messages();
                 nouveauMessage.setFrom(""+message.getFrom()[0]);
                 nouveauMessage.setSujet(message.getSubject());
-                nouveauMessage.setSentDate(new SimpleDateFormat("dd/MM/yyyy hh:mm").format(message.getSentDate()));
+                if(message.getSentDate() != null){
+                    nouveauMessage.setSentDate(new SimpleDateFormat("dd/MM/yyyy hh:mm").format(message.getSentDate()));
+                }
 
                 if(message.getContentType().contains("multipart")){
                     Multipart multipart = (Multipart)message.getContent();
@@ -71,7 +73,7 @@ public class Middle {
 
                     for(int i=0; i<nbPart; i++){
                         Part part = multipart.getBodyPart(i);
-                        String attachment = part.getDescription();
+                        String attachment = part.getDisposition();
                         if(part.isMimeType("text/plain")){
                             nouveauMessage.setMessage((String)part.getContent());
                         }
@@ -85,14 +87,13 @@ public class Middle {
                             baos.flush();
                             String nameFile = part.getFileName();
                             nouveauMessage.addPieceJointes(nameFile, baos.toByteArray());
-                            listeMessage.add(nouveauMessage);
                             baos.close();
                         }
                     }
                 }else{
                     nouveauMessage.setMessage((String)message.getContent());
-                    listeMessage.add(nouveauMessage);
                 }
+                listeMessage.add(nouveauMessage);
             }
         } catch (MessagingException ex) {
             Logger.getLogger(Middle.class.getName()).log(Level.SEVERE, null, ex);

@@ -6,23 +6,23 @@
 package Serveur;
 
 import Helpers.EasyFile;
-import Protocole.NetworkServer;
-import Protocole.TraitementPacket;
+import ProtocoleHIDP.NetworkServer;
+import ProtocoleHIDP.TraitementPacket;
 
 
-public class ServeurPool implements Runnable{
+public class ServeurPoolStat implements Runnable{
     NetworkServer reseau;
     int port;
     PoolThread poolThread;
 
-    ServeurPool() {
+    ServeurPoolStat() {
         port = Integer.parseInt(EasyFile.getConfig("Configs_Serveur_Activites", "PORT_ACTIVITES"));
         System.out.println("Mise à l'écoute sur le port: " + port);
         reseau = new NetworkServer(port);
         poolThread = new PoolThread(3);
     }
 
-    ServeurPool(int port) {
+    ServeurPoolStat(int port) {
         System.out.println("Mise à l'écoute sur le port: " + port);
         reseau = new NetworkServer(port);
         poolThread = new PoolThread(3);

@@ -10,6 +10,12 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.math.stat.descriptive.moment.StandardDeviation;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.general.DefaultPieDataset;
 
 
 public class HIDP {
@@ -67,7 +73,7 @@ public class HIDP {
 
             if(activiteExiste(activite, annee)){
                 Object[] infos = new Object[15];
-                nbreInscription = getNbreInscription(annee, activite);
+                nbreInscription = getNbresInscription(annee, activite);
                 infos[0] = (String) "Oui";
                 for(int i=0; i<12; i++){
                     infos[i+1] = nbreInscription[i];
@@ -80,6 +86,63 @@ public class HIDP {
                 return packetRetour;
             }
             return new PacketCom(HIDP.ERROR, "ERROR");
+        }else if(type.equals(HIDP.GET_GR_ACTIV_COMP)){
+            String[] chaine = (String[]) contenu;
+            String annee = chaine[0];
+            String diagramme = chaine[1];
+            Object[] resultat = new Object[2];
+            int nbreInscriptionCra;
+            int nbreInscriptionExt;
+            int nbreInscriptionOrg;
+            int nbreInscriptionTotal;
+            nbreInscriptionCra = getNbreInscription(annee, "cracra-hontah");
+            nbreInscriptionExt = getNbreInscription(annee, "extreme trek");
+            nbreInscriptionOrg = getNbreInscription(annee, "orgiac island");
+
+            if(diagramme.equals("Sectoriel")){
+                resultat[0]=(String) "Sectoriel";
+                nbreInscriptionTotal = nbreInscriptionCra + nbreInscriptionOrg + nbreInscriptionExt;
+                double pourcentCra = (double)nbreInscriptionCra / nbreInscriptionTotal * 100;
+                double pourcentExt = (double)nbreInscriptionExt / nbreInscriptionTotal * 100;
+                double pourcentOrg = (double)nbreInscriptionOrg / nbreInscriptionTotal * 100;
+                DefaultPieDataset dpd = new DefaultPieDataset();
+                dpd.setValue("cracra-hontah", pourcentCra);
+                dpd.setValue("extreme trek", pourcentExt);
+                dpd.setValue("orgiac island", pourcentOrg);
+                JFreeChart jfc = ChartFactory.createPieChart ("Nombre d'inscriptions aux activités", dpd, true, true, true);
+                ChartPanel cp = new ChartPanel(jfc);
+                resultat[1]= cp;
+            }else{
+                resultat[0]=(String) "Histogramme";
+                DefaultCategoryDataset dpd = new DefaultCategoryDataset();
+                dpd.addValue(nbreInscriptionCra, annee, "cracra-hontah");
+                dpd.addValue(nbreInscriptionExt, annee, "extreme trek");
+                dpd.addValue(nbreInscriptionOrg, annee, "orgiac island");
+                JFreeChart jfc = ChartFactory.createBarChart("Nombre d'inscriptions aux activités", "Année", "Nombre d'inscription", dpd, PlotOrientation.VERTICAL, true, true, true);
+                ChartPanel cp = new ChartPanel(jfc);
+                resultat[1]= cp;
+            }
+            PacketCom packetRetour = new PacketCom(HIDP.GET_GR_ACTIV_COMP_OUI, resultat);
+            return packetRetour;
+        }else if(type.equals(HIDP.GET_GR_ACTIV_EVOL)){
+            String[] infos = (String[]) contenu;
+            Object resultat=null;
+            String annee = infos[0];
+            String activite = infos[1];
+            int[] nbreInscription = new int[12];
+
+            nbreInscription = getNbresInscription(annee, activite);
+            DefaultCategoryDataset dcd = new DefaultCategoryDataset();
+            String[] colonne = {"1 Mai", "15 Mai", "1 Juin", "15 Juin", "1 Juil", "15 juil", "1 Aout", "15 Aout", "1 Sept", "15 Sept", "1 Oct", "15 Oct"};
+            for(int i=0; i<12; i++){
+                dcd.addValue((double)nbreInscription[i], annee, colonne[i]);
+            }
+            JFreeChart jfc = ChartFactory.createLineChart("Nombre d'inscriptions aux activités", "Quinzaine", "Nombre d'inscription", dcd, PlotOrientation.VERTICAL, true, true, true);
+            ChartPanel cp = new ChartPanel(jfc);
+            resultat = cp;
+
+            PacketCom packetRetour = new PacketCom(HIDP.GET_GR_ACTIV_EVOL_OUI, resultat);
+            return packetRetour;
         }else{
             return new PacketCom(HIDP.ERROR, "ERROR");
         }
@@ -94,6 +157,10 @@ public class HIDP {
         }else if (type.equals(HIDP.LOGIN_NON)) {
             return packet;
         }else if (type.equals(HIDP.GET_STAT_DESCR_ACTIV_OUI)) {
+            return packet;
+        }else if (type.equals(HIDP.GET_GR_ACTIV_COMP_OUI)) {
+            return packet;
+        }else if (type.equals(HIDP.GET_GR_ACTIV_EVOL_OUI)) {
             return packet;
         }else {
             PacketCom packetReponse = new PacketCom(HIDP.ERROR, "ERROR");
@@ -140,7 +207,7 @@ public class HIDP {
         return found;
     }
 
-    private int[] getNbreInscription(String annee, String activite) {
+    private int[] getNbresInscription(String annee, String activite) {
         boolean found = false;
         int[] nbreInscription = new int[12];
         int mois = 0;
@@ -195,6 +262,31 @@ public class HIDP {
         StandardDeviation sd = new StandardDeviation();
         resultat = sd.evaluate(liste);
         return resultat;
+    }
+
+    private int getNbreInscription(String annee, String type) {
+        int retour = 0;
+
+        String request = null;
+        request ="SELECT count(*) as cpt FROM `reservation_activites` WHERE type ='"+type+"' and date(date) >= '"+annee+"-05-01' and date(date) < '"+annee+"-11-01'";
+
+        try {
+            Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
+            dbsql.init();
+            Object tuples = dbsql.select(request);
+            String nb = dbsql.extract(tuples, 1, "cpt");
+            if(nb != null){
+                retour = Integer.parseInt(nb);
+            }else{
+                retour = 0;
+            }
+            dbsql.endExtract();
+            dbsql.Disconnect();
+        } catch (Exception ex) {
+            Logger.getLogger(HIDP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return retour;
     }
 
 }

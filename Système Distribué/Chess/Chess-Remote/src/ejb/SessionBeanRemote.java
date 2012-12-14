@@ -44,4 +44,8 @@ public interface SessionBeanRemote {
     Long getIdJoueur(String nomPlateau, Color color) throws Exception;
     void quitterPartie(String nomPlateau, Color color) throws Exception;
 
+    boolean onEchec(String nomPlateau, Color color) throws Exception;
+
+    boolean onEchecEtMat(String nomPlateau, Color color) throws Exception;
+
 }

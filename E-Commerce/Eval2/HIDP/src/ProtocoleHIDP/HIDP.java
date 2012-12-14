@@ -16,6 +16,9 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.data.statistics.Statistics;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 
 public class HIDP {
@@ -71,10 +74,15 @@ public class HIDP {
             double moyenne;
             double ecartType;
 
+            //Verification si l'activité existe bien
             if(activiteExiste(activite, annee)){
+                //Tableau de 15, car 2 * 6 mois + verification + moyenne + ecart type
                 Object[] infos = new Object[15];
+                //On récupere le nombre d'inscriptions par mois de mais à octobre
                 nbreInscription = getNbresInscription(annee, activite);
+                //Oui c'est pour la verification coté client.
                 infos[0] = (String) "Oui";
+
                 for(int i=0; i<12; i++){
                     infos[i+1] = nbreInscription[i];
                 }
@@ -99,9 +107,11 @@ public class HIDP {
             nbreInscriptionExt = getNbreInscription(annee, "extreme trek");
             nbreInscriptionOrg = getNbreInscription(annee, "orgiac island");
 
+            //Soit sectoriel soit histogramme en fonction du choix du client.
             if(diagramme.equals("Sectoriel")){
                 resultat[0]=(String) "Sectoriel";
                 nbreInscriptionTotal = nbreInscriptionCra + nbreInscriptionOrg + nbreInscriptionExt;
+                //On calcule les pourcentage à chaque inscription par rapport au total.
                 double pourcentCra = (double)nbreInscriptionCra / nbreInscriptionTotal * 100;
                 double pourcentExt = (double)nbreInscriptionExt / nbreInscriptionTotal * 100;
                 double pourcentOrg = (double)nbreInscriptionOrg / nbreInscriptionTotal * 100;
@@ -143,6 +153,17 @@ public class HIDP {
 
             PacketCom packetRetour = new PacketCom(HIDP.GET_GR_ACTIV_EVOL_OUI, resultat);
             return packetRetour;
+        }else if(type.equals(HIDP.GET_STAT_INFER_ACTIV)){
+            String[] infos = (String[]) contenu;
+            Object[] resultat=new Object[3];
+            int age = 0;
+            String activite = infos[0];
+            String annee = infos[1];
+            resultat[0] = getAgeMoyen(activite, annee);
+            resultat[1] = getAgeMin(activite, annee);
+            resultat[2] = getAgeMax(activite, annee);
+            PacketCom packetRetour = new PacketCom(HIDP.GET_STAT_INFER_ACTIV_OUI, resultat);
+            return packetRetour;
         }else{
             return new PacketCom(HIDP.ERROR, "ERROR");
         }
@@ -161,6 +182,8 @@ public class HIDP {
         }else if (type.equals(HIDP.GET_GR_ACTIV_COMP_OUI)) {
             return packet;
         }else if (type.equals(HIDP.GET_GR_ACTIV_EVOL_OUI)) {
+            return packet;
+        }else if (type.equals(HIDP.GET_STAT_INFER_ACTIV_OUI)) {
             return packet;
         }else {
             PacketCom packetReponse = new PacketCom(HIDP.ERROR, "ERROR");
@@ -285,7 +308,78 @@ public class HIDP {
         } catch (Exception ex) {
             Logger.getLogger(HIDP.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return retour;
+    }
 
+    private double getAgeMoyen(String activite, String annee) {
+        double retour = 0;
+
+        String request = null;
+        request ="SELECT avg(age) as age FROM `reservation_activites`, `voyageurs` WHERE type ='"+activite+"' and date(date) >= '"+annee+"-05-01' and date(date) < '"+annee+"-11-01' and voyageurs.id=reservation_activites.client";
+
+        try {
+            Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
+            dbsql.init();
+            Object tuples = dbsql.select(request);
+            String nb = dbsql.extract(tuples, 1, "age");
+            if(nb != null){
+                retour = Double.parseDouble(nb);
+            }else{
+                retour = 0;
+            }
+            dbsql.endExtract();
+            dbsql.Disconnect();
+        } catch (Exception ex) {
+            Logger.getLogger(HIDP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return retour;
+    }
+
+    private Object getAgeMin(String activite, String annee) {
+        int retour = 0;
+
+        String request = null;
+        request ="SELECT min(age) as age FROM `reservation_activites`, `voyageurs` WHERE type ='"+activite+"' and date(date) >= '"+annee+"-05-01' and date(date) < '"+annee+"-11-01' and voyageurs.id=reservation_activites.client";
+
+        try {
+            Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
+            dbsql.init();
+            Object tuples = dbsql.select(request);
+            String nb = dbsql.extract(tuples, 1, "age");
+            if(nb != null){
+                retour = Integer.parseInt(nb);
+            }else{
+                retour = 0;
+            }
+            dbsql.endExtract();
+            dbsql.Disconnect();
+        } catch (Exception ex) {
+            Logger.getLogger(HIDP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return retour;
+    }
+
+    private Object getAgeMax(String activite, String annee) {
+        int retour = 0;
+
+        String request = null;
+        request ="SELECT max(age) as age FROM `reservation_activites`, `voyageurs` WHERE type ='"+activite+"' and date(date) >= '"+annee+"-05-01' and date(date) < '"+annee+"-11-01' and voyageurs.id=reservation_activites.client";
+
+        try {
+            Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
+            dbsql.init();
+            Object tuples = dbsql.select(request);
+            String nb = dbsql.extract(tuples, 1, "age");
+            if(nb != null){
+                retour = Integer.parseInt(nb);
+            }else{
+                retour = 0;
+            }
+            dbsql.endExtract();
+            dbsql.Disconnect();
+        } catch (Exception ex) {
+            Logger.getLogger(HIDP.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return retour;
     }
 

@@ -12,6 +12,7 @@ import Others.EchiquierE;
 import ant.Joueur;
 import ant.Piece;
 import ant.Plateau;
+import ant.Roi;
 import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
@@ -214,5 +215,86 @@ public class SessionBean implements SessionBeanRemote {
                 deletePlateau(nomPlateau);
             }
         }
+    }
+
+    public boolean onEchec(String nomPlateau, Color color) throws Exception{
+        boolean retour = false;
+        Plateau plateau = plateauFacade.getByNom(nomPlateau);
+        if(plateau == null) return false;
+        System.err.println("plateau ok");
+
+        Collection<Piece> listePiece = plateau.getListePiece();
+        EchiquierE[][] cases = new EchiquierE[8][8];
+        for(int x = 0; x < 8; x++){
+            for(int y = 0; y < 8; y++){
+                cases[x][y] = new EchiquierE();
+            }
+        }
+        for(Piece piece : listePiece){
+            cases[piece.getPosX()][piece.getPosY()].setPiece(piece);
+        }
+        System.err.println("init case ok");
+
+        for(Piece piece : plateau.getListePiece()){
+            if(piece.getNom().equalsIgnoreCase("Roi") && piece.getColor().getRGB() == color.getRGB()){
+                System.err.println("on a trouvé le roi");
+                Roi roi = (Roi)piece;
+                retour = roi.isOnEchec(cases, color);
+            }
+        }
+        return retour;
+    }
+
+    public boolean onEchecEtMat(String nomPlateau, Color color) throws Exception{
+        boolean retour = false;
+        Plateau plateau = plateauFacade.getByNom(nomPlateau);
+        if(plateau == null) return false;
+        Collection<Piece> listePiece = plateau.getListePiece();
+        EchiquierE[][] cases = new EchiquierE[8][8];
+        for(int x = 0; x < 8; x++){
+            for(int y = 0; y < 8; y++){
+                cases[x][y] = new EchiquierE();
+            }
+        }
+        for(Piece piece : listePiece){
+            cases[piece.getPosX()][piece.getPosY()].setPiece(piece);
+        }
+
+        for(Piece piece : plateau.getListePiece()){
+            if(piece.getNom().equalsIgnoreCase("Roi") && piece.getColor().getRGB() == color.getRGB()){
+                System.err.println("on a trouvé le roi");
+                Roi roi = (Roi)piece;
+                Roi roiTemp = new Roi(roi.getPosX()-1, roi.getPosY()-1, roi.getColor());
+                if(roiTemp.isOnEchecEtMat(cases, color)){
+                    roiTemp = new Roi(roi.getPosX(), roi.getPosY()-1, roi.getColor());
+                    if(roiTemp.isOnEchecEtMat(cases, color)){
+                        roiTemp = new Roi(roi.getPosX()+1, roi.getPosY()-1, roi.getColor());
+                        if(roiTemp.isOnEchecEtMat(cases, color)){
+                            roiTemp = new Roi(roi.getPosX()-1, roi.getPosY(), roi.getColor());
+                            if(roiTemp.isOnEchecEtMat(cases, color)){
+                                roiTemp = new Roi(roi.getPosX(), roi.getPosY(), roi.getColor());
+                                if(roiTemp.isOnEchecEtMat(cases, color)){
+                                    roiTemp = new Roi(roi.getPosX()+1, roi.getPosY(), roi.getColor());
+                                    if(roiTemp.isOnEchecEtMat(cases, color)){
+                                        roiTemp = new Roi(roi.getPosX()-1, roi.getPosY()+1, roi.getColor());
+                                        if(roiTemp.isOnEchecEtMat(cases, color)){
+                                            roiTemp = new Roi(roi.getPosX(), roi.getPosY()+1, roi.getColor());
+                                            if(roiTemp.isOnEchecEtMat(cases, color)){
+                                                roiTemp = new Roi(roi.getPosX()+1, roi.getPosY()+1, roi.getColor());
+                                                if(roiTemp.isOnEchecEtMat(cases, color)){
+                                                    return true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return retour;
+
     }
 }

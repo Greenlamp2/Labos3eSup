@@ -3,8 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
         <file>file:/C:/Users/Greenlamp/Documents/GitHub/Labos3eSup/E-Commerce/Eval2/Applic_Mail/src/GUI/Reception.java</file>
+        <file>file:/C:/Users/Greenlamp/Documents/GitHub/Labos3eSup/E-Commerce/Eval2/Applic_Mail/src/Mails/Messages.java</file>
         <file>file:/C:/Users/Greenlamp/Documents/GitHub/Labos3eSup/E-Commerce/Eval2/Applic_Mail/src/Mails/Middle.java</file>
         <file>file:/C:/Users/Greenlamp/Documents/GitHub/Labos3eSup/E-Commerce/Eval2/Applic_Mail/src/Threads/ThreadNouveauMessages.java</file>
-        <file>file:/C:/Users/Greenlamp/Documents/GitHub/Labos3eSup/E-Commerce/Eval2/Applic_Mail/src/GUI/Envoi.java</file>
+        <file>file:/C:/Users/Greenlamp/Documents/GitHub/Labos3eSup/E-Commerce/Eval2/Applic_Mail/src/Mails/PieceJointes.java</file>
+        <file>file:/C:/Users/Greenlamp/Documents/GitHub/Labos3eSup/E-Commerce/Eval2/Applic_Mail/src/Mails/Smtp.java</file>
     </open-files>
 </project-private>

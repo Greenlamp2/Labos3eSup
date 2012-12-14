@@ -53,6 +53,7 @@ public class Main extends javax.swing.JFrame implements MessageListener{
     List<Point> deplacementsPossible;
     Piece selected;
     boolean myTurn;
+    boolean onEchec;
 
 
     public enum MSG{
@@ -80,6 +81,7 @@ public class Main extends javax.swing.JFrame implements MessageListener{
         this.selected = null;
         this.parent = parent;
         this.joueur = joueur;
+        onEchec = false;
         this.setTitle("Plateau: " + this.nomPlateau +" Couleur: " + (joueur.getColor().getRGB() == Color.WHITE.getRGB() ? "Blanc" : "Noir"));
         this.addWindowListener(new WindowAdapter() {
             @Override
@@ -221,6 +223,10 @@ public class Main extends javax.swing.JFrame implements MessageListener{
 
 
     public void onMouseClick(Echiquier caseSelected) {
+        if(waitAdversaire){
+            JOptionPane.showMessageDialog(this, "Veuillez attendre un adversaire");
+            return;
+        }
         if(myTurn){
             int posX = caseSelected.getPosX();
             int posY = caseSelected.getPosY();
@@ -301,6 +307,7 @@ public class Main extends javax.swing.JFrame implements MessageListener{
                     Long idAdversaire = sessionBean.getIdJoueur(nomPlateau, Color.BLACK);
                     this.idMessageAdverse = nomPlateau + "-" + "j:" + idAdversaire;
                     waitAdversaire = false;
+                    JOptionPane.showMessageDialog(this, "Un adversaire a rejoint la partie");
                 } catch (Exception ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -321,8 +328,21 @@ public class Main extends javax.swing.JFrame implements MessageListener{
             myTurn = true;
             clearPlateau();
             refreshPlateau();
-        }else if(msg.equalsIgnoreCase(MSG.ECHEC.getValue())){
-            refreshPlateau();
+            /*try {
+                if(sessionBean.onEchecEtMat(nomPlateau, joueur.getColor())){
+                    JOptionPane.showMessageDialog(this, "Echec et mat !");
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }*/
+            try {
+                onEchec = sessionBean.onEchec(nomPlateau, joueur.getColor());
+            } catch (Exception ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if(onEchec){
+                JOptionPane.showMessageDialog(this, "Echec");
+            }
         }else if(msg.equalsIgnoreCase(MSG.ECHECETMAT.getValue())){
             refreshPlateau();
         }

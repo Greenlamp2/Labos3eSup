@@ -5,7 +5,10 @@
 package Protocole;
 
 import Bean.Jdbc_MySQL;
+import Mails.Messages;
+import Mails.Middle;
 import java.beans.Beans;
+import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -171,6 +174,14 @@ public class FOAMP {
         }
         boolean ok = validerInscription(idActivite, idClient, date);
         if(ok){
+            Messages msg = new Messages();
+            String mail = getMail(nom, prenom);
+            String sujet = "Recapitulatif";
+            msg.setSujet(sujet);
+            msg.setTo(mail);
+            String messageTexte = "nom: " + nom + "\nprenom: " + prenom + "\nnumero inscription: " + numInscription;
+            msg.setMessage(messageTexte);
+            Middle.sendMessage(msg);
             return new PacketCom(FOAMP.ACKACTFUN_OUI, (Object)numInscription);
         }else{
             return new PacketCom(FOAMP.ACKACTFUN_NON, "Aucunes inscriptions à cette date pour ce client pour cette activitée");
@@ -330,6 +341,22 @@ public class FOAMP {
             dateRetour = "0" + dateRetour;
         }
         return dateRetour;
+    }
+
+    private String getMail(String nom, String prenom) {
+        String mail = null;
+        try {
+            Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
+            dbsql.init();
+            String request = "SELECT email as mail from voyageurs where nom='"+nom+"' and prenom='"+prenom+"'";
+            Object tuples = dbsql.select(request);
+            mail = dbsql.extract(tuples, 1, "mail");
+            dbsql.endExtract();
+            dbsql.Disconnect();
+        } catch (Exception ex) {
+            Logger.getLogger(FOAMP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return mail;
     }
 
 }

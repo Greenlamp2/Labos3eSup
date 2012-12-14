@@ -208,7 +208,11 @@ public class Reception extends javax.swing.JDialog {
             Vector vector = new Vector();
             vector.add(message.getSentDate());
             vector.add(message.getSujet());
-            vector.add(message.getFrom());
+            if(message.getFrom() == null){
+                vector.add(null);
+            }else{
+                vector.add(message.getFrom());
+            }
             vector.add((message.isMultipart() == true ? message.getNbPieceJointes() : "Aucunes"));
             SwingUtils.addToTable(GtableReception, vector);
         }

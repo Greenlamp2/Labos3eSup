@@ -28,7 +28,10 @@ public class Middle {
         Smtp smtp = new Smtp();
         smtp.init();
         smtp.newMessage();
-        smtp.setDestinateur(message.getFrom());
+        String from = message.getFrom();
+        if(from != null){
+            smtp.setDestinateur(message.getFrom());
+        }
         smtp.setDestinataire(message.getTo());
         smtp.setObjet(message.getSujet());
         if(message.getNbPieceJointes() == 0){
@@ -61,7 +64,10 @@ public class Middle {
         try {
             for(Message message : messages){
                 Messages nouveauMessage = new Messages();
-                nouveauMessage.setFrom(""+message.getFrom()[0]);
+                Object temp = message.getFrom();
+                if(temp != null){
+                    nouveauMessage.setFrom(""+message.getFrom()[0]);
+                }
                 nouveauMessage.setSujet(message.getSubject());
                 if(message.getSentDate() != null){
                     nouveauMessage.setSentDate(new SimpleDateFormat("dd/MM/yyyy hh:mm").format(message.getSentDate()));

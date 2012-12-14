@@ -42,14 +42,16 @@ public class Piece implements Serializable{
     }
 
     public boolean isAt(int x, int y){
-        System.out.println("x: " + x + " y: " + y);
-        System.out.println("is at: piece " + getPosX() + " / " + getPosY());
         return (x == getPosX() && y == getPosX());
     }
 
     public List<Point> getDeplacementPossible(EchiquierE[][] plateau){
         List<Point> listePoint = new ArrayList<>();
         return listePoint;
+    }
+
+    public boolean doEchec(EchiquierE[][] plateau, Color color){
+        return false;
     }
 
     public Long getId(){

@@ -12,7 +12,8 @@ as
 begin
     --Récupération de la liste des commandes à éffectuer
     select * bulk collect into v_commander
-    from commander;
+    from commander
+    where deleted = 0;
     
     package_error.report_and_go('Nombre de commandes: ' || v_commander.count, -20001);
     --On parcourt cette liste de commandes
@@ -65,7 +66,8 @@ begin
               end loop;
               --package_error.report_and_go('v_count: '||v_count, -20001);
               if(v_count = v_commander(i).nbCopie) then
-                delete from commander where idMovie = v_commander(i).idMovie and physique = v_commander(i).physique;
+                --delete from commander where idMovie = v_commander(i).idMovie and physique = v_commander(i).physique;
+                update commander set deleted = 1 where idMovie = v_commander(i).idMovie and physique = v_commander(i).physique;
               else
                 v_nb := v_commander(i).nbCopie - v_count;
                 update commander set nbCopie = v_nb where idMovie = v_commander(i).idMovie and physique = v_commander(i).physique;  

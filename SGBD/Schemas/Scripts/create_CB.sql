@@ -160,6 +160,9 @@ create table Commander(
     physique number(1) default '1'
 		constraint nn_commander_physique check(physique is not null)
 		constraints ck_commander_physique check(physique in ('0', '1')),
+    deleted number(1) default '0'
+		constraints CK_COMMANDER_deleted check(deleted in ('0', '1')),
+        
 		
 	constraints pk_commander primary key(idMovie, idComplexe, physique)
 );

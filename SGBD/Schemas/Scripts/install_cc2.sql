@@ -1,4 +1,5 @@
 @create_CC2
+@Create_Types_CC2
 @Create_Sequences_CC2
 @insert_salle_CC2
 @create_dblink_CC2

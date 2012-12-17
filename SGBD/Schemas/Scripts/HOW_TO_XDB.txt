@@ -1,0 +1,41 @@
+Sur sys:
+DECLARE
+v_resultat boolean;
+BEGIN
+v_resultat := DBMS_XDB.CREATERESOURCE(
+  '/home/MK/xsd/MKXDB.xsd', 
+  BFILENAME('GREENLAMP', 'MKXDB.xsd'),
+  NLS_CHARSET_ID('AL32UTF8')
+);
+END;
+
+Sur MK:
+DECLARE
+v_resultat boolean;
+BEGIN
+DBMS_XMLSCHEMA.REGISTERSCHEMA(
+  SCHEMAURL => 'http://greenlamp/MKXDB.xsd',
+  SCHEMADOC => XDBURITYPE('/home/MK/xsd/MKXDB.xsd').GETCLOB(),
+  LOCAL => TRUE,
+  GENTYPES => TRUE,
+  GENTABLES => TRUE,
+  FORCE => FALSE
+);
+END;
+
+Pour delete:
+sur sys:
+SET SERVEROUTPUT ON
+DECLARE
+v_resultat boolean;
+BEGIN
+DBMS_XDB.DELETERESOURCE('/home/MK/xsd/MKXDB.xsd',4);
+
+END;
+
+pour test:
+SELECT EXTRACT(OBJECT_VALUE, 'Movies/Movie/name')
+FROM XDBMOVIE;
+
+INSERT INTO XDBMOVIE
+VALUES (XMLType(BFILENAME('GREENLAMP','MKXDB.xml'),NLS_CHARSET_ID('AL32UTF8')));

@@ -2,6 +2,7 @@
 @create_dblink_CC1
 @Create_Types_CC1
 @Create_Sequences_CC1
+@create_synonym_CC1
 @Package_ERROR
 @Package_CB_Exceptions
 @Package_RECHERCHE

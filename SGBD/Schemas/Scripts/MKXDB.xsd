@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	xmlns:xdb="http://xmlns.oracle.com/xdb" 
+    xdb:storeVarrayAsTable="true"
+	xdb:schemaURL="http://greenlamp/MKXDB.xsd">
+<xsd:element name="Movies" type="MoviesType" xdb:defaultTable="XDBMOVIES"/>
+
+    <xsd:complexType name="MoviesType" xdb:SQLType="MOVIES_TYPE" >
+        <xsd:sequence>
+            <xsd:element name="Movie" type="movieType" minOccurs="1" maxOccurs="unbounded" xdb:SQLName="NAME" xdb:defaultTable=""/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+
+	<xsd:complexType name="movieType" xdb:SQLType="MOVIE_TYPE"  >
+		<xsd:sequence>
+            <xsd:element name="name" type="nameType" minOccurs="1" maxOccurs="unbounded" xdb:SQLName="NAME" xdb:defaultTable=""/>
+            <xsd:element name="Countries" type="CountriesType" minOccurs="1" maxOccurs="unbounded" xdb:SQLName="COUNTRIES" xdb:defaultTable=""/>
+            <xsd:element name="Acteurs" type="ActeursType" minOccurs="1" maxOccurs="unbounded" xdb:SQLName="ACTEURS" xdb:defaultTable=""/>
+            <xsd:element name="Genres" type="GenresType" minOccurs="1" maxOccurs="unbounded" xdb:SQLName="GENRES" xdb:defaultTable=""/>
+            <xsd:element name="Copies" type="CopiesType" minOccurs="1" maxOccurs="unbounded" xdb:SQLName="COPIES" xdb:defaultTable=""/>
+            <xsd:element name="Commandes" type="CommandesType" minOccurs="1" maxOccurs="unbounded" xdb:SQLName="COMMANDES" xdb:defaultTable=""/>
+		</xsd:sequence>
+        <xsd:attribute name="idMovie" type="xsd:integer" xdb:SQLName="IDMOVIE" xdb:SQLType="NUMBER"/>
+	</xsd:complexType>
+	
+            <xsd:simpleType name="nameType">
+                <xsd:restriction base="xsd:string">
+                    <xsd:minLength value="1"/>
+                    <xsd:maxLength value="500"/> 
+                </xsd:restriction>
+            </xsd:simpleType>
+        
+    <xsd:complexType name="CountriesType" xdb:SQLType="COUNTRIES_TYPE">
+        <xsd:sequence>
+            <xsd:element name="nameCountry" type="nameCountryType" minOccurs="1" maxOccurs="unbounded" xdb:SQLName="NAMECOUNTRY" xdb:defaultTable=""/>
+        </xsd:sequence>
+    </xsd:complexType>
+	
+            <xsd:simpleType name="nameCountryType">
+                <xsd:restriction base="xsd:string">
+                    <xsd:minLength value="1"/>
+                    <xsd:maxLength value="500"/> 
+                </xsd:restriction>
+            </xsd:simpleType>
+        
+    <xsd:complexType name="ActeursType" xdb:SQLType="ACTEURS_TYPE">
+        <xsd:sequence>
+            <xsd:element name="nameCast" type="nameCastType" minOccurs="1" maxOccurs="unbounded" xdb:SQLName="NAMECAST" xdb:defaultTable=""/>
+        </xsd:sequence>
+    </xsd:complexType>
+        
+            <xsd:simpleType name="nameCastType">
+                <xsd:restriction base="xsd:string">
+                    <xsd:minLength value="1"/>
+                    <xsd:maxLength value="500"/> 
+                </xsd:restriction>
+            </xsd:simpleType>
+        
+    <xsd:complexType name="GenresType" xdb:SQLType="GENRES_TYPE">
+    <xsd:sequence>
+        <xsd:element name="nameGenre" type="nameGenreType" minOccurs="1" maxOccurs="unbounded" xdb:SQLName="NAMEGENRE" xdb:defaultTable=""/>
+    </xsd:sequence>
+    </xsd:complexType>
+
+            <xsd:simpleType name="nameGenreType">
+                <xsd:restriction base="xsd:string">
+                    <xsd:minLength value="1"/>
+                    <xsd:maxLength value="500"/> 
+                </xsd:restriction>
+            </xsd:simpleType>
+        
+    <xsd:complexType name="CopiesType" xdb:SQLType="COPIES_TYPE">
+        <xsd:sequence>
+            <xsd:element name="Projections" type="ProjectionsType" minOccurs="1" maxOccurs="unbounded" xdb:SQLName="PROJECTIONS" xdb:defaultTable=""/>
+        </xsd:sequence>
+        <xsd:attribute name="Complexe" type="xsd:string" xdb:SQLName="COMPLEXE" xdb:SQLType="VARCHAR2"/>
+        <xsd:attribute name="idCopie" type="xsd:integer" xdb:SQLName="IDCOPIE" xdb:SQLType="NUMBER"/>
+    </xsd:complexType>
+        
+    <xsd:complexType name="ProjectionsType" xdb:SQLType="PROJECTIONS_TYPE">
+        <xsd:sequence>
+            <xsd:element name="dateHeureProjection" type="dateHeureProjectionType" minOccurs="1" maxOccurs="unbounded" xdb:SQLName="DATEHEUREPROJECTION" xdb:defaultTable=""/>
+            <xsd:element name="numeroSalle" type="numeroSalleType" minOccurs="1" maxOccurs="unbounded" xdb:SQLName="NUMEROSALLE" xdb:defaultTable=""/>
+            <xsd:element name="TicketsAchete" type="TicketsAcheteType" minOccurs="1" maxOccurs="unbounded" xdb:SQLName="TICKETSACHETE" xdb:defaultTable=""/>
+            <xsd:element name="Capacite" type="CapaciteType" minOccurs="1" maxOccurs="unbounded" xdb:SQLName="CAPACITE" xdb:defaultTable=""/>
+        </xsd:sequence>
+    </xsd:complexType>
+	
+            <xsd:simpleType name="dateHeureProjectionType">
+                <xsd:restriction base="xsd:string">
+                    <xsd:minLength value="1"/>
+                    <xsd:maxLength value="500"/> 
+                </xsd:restriction>
+            </xsd:simpleType>
+            
+            <xsd:simpleType name="numeroSalleType">
+                <xsd:restriction base="xsd:string">
+                    <xsd:minLength value="1"/>
+                    <xsd:maxLength value="14"/> 
+                </xsd:restriction>
+            </xsd:simpleType>
+            
+            <xsd:simpleType name="TicketsAcheteType">
+                <xsd:restriction base="xsd:string">
+                    <xsd:minLength value="1"/>
+                    <xsd:maxLength value="14"/> 
+                </xsd:restriction>
+            </xsd:simpleType>
+            
+            <xsd:simpleType name="CapaciteType">
+                <xsd:restriction base="xsd:string">
+                    <xsd:minLength value="1"/>
+                    <xsd:maxLength value="14"/> 
+                </xsd:restriction>
+            </xsd:simpleType>
+        
+    <xsd:complexType name="CommandesType" xdb:SQLType="COMMANDES_TYPE">
+        <xsd:sequence>
+            <xsd:element name="dateHeure" type="dateHeureType" minOccurs="1" maxOccurs="unbounded" xdb:SQLName="DATEHEURE" xdb:defaultTable=""/>
+            <xsd:element name="nbCopie" type="nbCopieType" minOccurs="1" maxOccurs="unbounded" xdb:SQLName="NBCOPIE" xdb:defaultTable=""/>
+        </xsd:sequence>
+    </xsd:complexType>
+        
+        <xsd:simpleType name="dateHeureType">
+            <xsd:restriction base="xsd:string">
+                <xsd:minLength value="1"/>
+                <xsd:maxLength value="500"/> 
+            </xsd:restriction>
+        </xsd:simpleType>
+        
+        <xsd:simpleType name="nbCopieType">
+            <xsd:restriction base="xsd:string">
+                <xsd:minLength value="1"/>
+                <xsd:maxLength value="14"/> 
+            </xsd:restriction>
+        </xsd:simpleType>
+
+</xsd:schema>

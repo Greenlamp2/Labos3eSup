@@ -72,6 +72,7 @@ PACKAGE BODY PACKAGE_CB AS
 	AS
 	BEGIN
     
+        --On insere le film dans la table film, si il est déja présent, on ne traite pas l'exception et on passe à la suite.
         BEGIN
             insert into MOVIES values(p_idMovie, p_imdb_id, p_name,p_overview, p_rating, p_released, p_trailer, p_translated,p_votes, p_runtime, 0);
         EXCEPTION

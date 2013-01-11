@@ -44,7 +44,7 @@
             <div class="clean"></div>
             <div class="foot">
                 <span>
-                    Codé par Gabriel Knuts 2302
+                    Codé par Gabriel Knuts 2302 - <status:date-heure langue="Français">
                 </span>
             </div>
         </div>

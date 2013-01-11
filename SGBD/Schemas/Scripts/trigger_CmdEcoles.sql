@@ -24,6 +24,7 @@ begin
     for i in v_listProj.first .. v_listProj.last
     loop
         v_proj := v_listProj(i);
+        --On compte le nombre de film familiale et qui se déroule avant 18h
         select count(*) into v_count
         from dual
         where (v_proj.idCopie, v_proj.numeroSalle, v_proj.dateHeureProjection) in(
@@ -50,6 +51,7 @@ begin
               < TO_DATE('18:00', 'HH24:mi')
         );
     
+        --On regarde si il y a assez de place pour la réplication
         if(v_count > 0) then
             v_nbLibre := PACKAGE_CMDTICKET.nbPlaceLibre(To_char(v_proj.dateHeureProjection, 'DD/MM/YYYY HH24:MI'), v_proj.numeroSalle);
             if(v_nbLibre >= 20) then

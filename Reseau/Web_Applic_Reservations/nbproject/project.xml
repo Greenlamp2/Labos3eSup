@@ -22,10 +22,18 @@
                     <file>${file.reference.ojdbc6.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
+                <library dirs="200">
+                    <file>${reference.Helpers_Green.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
             </web-module-libraries>
             <web-module-additional-libraries>
                 <library dirs="200">
                     <file>${reference.AppletConnexionServlet.jar}</file>
+                    <path-in-war>/</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${reference.AppletLangue.jar}</file>
                     <path-in-war>/</path-in-war>
                 </library>
             </web-module-additional-libraries>
@@ -46,7 +54,23 @@
                 <id>jar</id>
             </reference>
             <reference>
+                <foreign-project>AppletLangue</foreign-project>
+                <artifact-type>jar</artifact-type>
+                <script>build.xml</script>
+                <target>jar</target>
+                <clean-target>clean</clean-target>
+                <id>jar</id>
+            </reference>
+            <reference>
                 <foreign-project>DbBean</foreign-project>
+                <artifact-type>jar</artifact-type>
+                <script>build.xml</script>
+                <target>jar</target>
+                <clean-target>clean</clean-target>
+                <id>jar</id>
+            </reference>
+            <reference>
+                <foreign-project>Helpers_Green</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
                 <target>jar</target>

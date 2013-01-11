@@ -26,13 +26,16 @@ AS
         v_projection_t v_projection_type;
         v_movie Movies%rowtype;
     BEGIN
+        --On récupere toutes les projection trié par date
         select *  bulk collect into v_projection_t from PROJECTION order by dateHeureProjection;
         PACKAGE_ERROR.report_and_go('v_projection_t.count: ' || v_projection_t.count, -20001);
         
+        --On parcourt la liste des projections
         for i in v_projection_t.first .. v_projection_t.last
         loop
             v_projection.extend;
             PACKAGE_ERROR.report_and_go('i: ' || i || ' (' || v_projection_t(i).idCopie || ')', -20001);
+            --On récupere les informations sur le film concerné par la projection
             select * into v_movie from movies
             where idMovie = (
                 select idMovie from copies
@@ -40,6 +43,7 @@ AS
             order by idMovie;
             PACKAGE_ERROR.report_and_go('i: ' || i || ' OK', -20001);
             
+            --On complete la liste du type personalisée
             v_projection(v_projection.last) := PROJECTION_SPEC(
                 TO_DATE(TO_CHAR(v_projection_t(i).dateHeureProjection, 'DD/MM/YYYY HH24:mi'), 'DD/MM/YYYY HH24:mi'),
                 v_projection_t(i).numeroSalle, 
@@ -204,6 +208,7 @@ AS
         v_movies movies_t;
         v_salles integer_t;
     BEGIN
+        --On récupere les films qui possède une copie dans le complexe
         select * bulk collect into v_movies
         from movies
         where idMovie in(

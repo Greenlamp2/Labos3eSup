@@ -69,7 +69,7 @@ public class TestBean {
             Logger.getLogger(TestBean.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        try {
+        /*try {
             System.out.println("=====================[Csv]======================");
             Jdbc_CSV dbCsv = null;
             dbCsv = (Jdbc_CSV) Beans.instantiate(null, "Bean.Jdbc_CSV");
@@ -89,6 +89,6 @@ public class TestBean {
             dbCsv.Disconnect();
         } catch (Exception ex) {
             Logger.getLogger(TestBean.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
     }
 }

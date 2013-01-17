@@ -29,7 +29,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 public class NetworkServer {
     private SSLServerSocket socketServeur;
-    private Socket socketClient;
+    private SSLSocket socketClient;
     RLP protocole;
     boolean connected;
     MyCertificate myCertificate_no_ssl;
@@ -69,16 +69,16 @@ public class NetworkServer {
         }
     }
 
-    public NetworkServer(Socket socket, MyCertificate myCertificate_no_ssl, MyCertificate myCertificate_ssl){
+    public NetworkServer(SSLSocket socket, MyCertificate myCertificate_no_ssl, MyCertificate myCertificate_ssl){
         protocole = new RLP(this.myCertificate_no_ssl, this.myCertificate_ssl, 123);
-        this.setSocketClient(socketClient);
+        this.setSocketClient(socket);
         this.connected = true;
     }
 
     public boolean accept(){
         try {
             System.out.println("En attente d'un client");
-            this.setSocketClient(socketServeur.accept());
+            socketClient = (SSLSocket) socketServeur.accept();
             System.out.println("client connecté");
             return true;
         } catch (IOException ex) {
@@ -140,11 +140,11 @@ public class NetworkServer {
         }
     }
 
-    public Socket getSocketClient() {
+    public SSLSocket getSocketClient() {
         return socketClient;
     }
 
-    public void setSocketClient(Socket socketClient) {
+    public void setSocketClient(SSLSocket socketClient) {
         this.socketClient = socketClient;
     }
 

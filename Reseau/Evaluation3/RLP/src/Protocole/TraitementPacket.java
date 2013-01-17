@@ -5,6 +5,9 @@
 
 package Protocole;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 public class TraitementPacket implements Runnable{
     private NetworkServer socket;
@@ -22,6 +25,7 @@ public class TraitementPacket implements Runnable{
                     socket.send(MessageToClient);
                 }
             }catch(Exception ex){
+                Logger.getLogger(TraitementPacket.class.getName()).log(Level.SEVERE, null, ex);
                 return;
             }
         }

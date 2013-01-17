@@ -39,7 +39,7 @@ public class Main {
             myCertificate.setCertificate((X509Certificate) ks.getCertificate("server"));
             myCertificate.getCertificate().checkValidity();
             String passKeyStore = "lolilol";
-            myCertificate.setPrivateKey((PrivateKey) ks.getKey("client", passKeyStore.toCharArray()));
+            myCertificate.setPrivateKey((PrivateKey) ks.getKey("server", passKeyStore.toCharArray()));
         } catch (KeyStoreException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchAlgorithmException ex) {

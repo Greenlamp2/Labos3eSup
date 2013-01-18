@@ -5,7 +5,6 @@
 
 package Protocole;
 
-import Securite.MyCertificate;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -15,38 +14,17 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManagerFactory;
 
 
 public class NetworkClient {
-    private SSLSocket socketClient;
-    RLP protocole;
-    MyCertificate myCertificate;
-    MyCertificate myCertificateSsl;
+    private Socket socketClient;
+    FECOP protocole;
 
-    public NetworkClient(String host, int port, MyCertificate myCertificate, MyCertificate myCertificateSsl){
-        this.myCertificate = myCertificate;
-        this.myCertificateSsl = myCertificateSsl;
-        protocole = new RLP(myCertificate, myCertificateSsl);
+    public NetworkClient(String host, int port){
+        protocole = new FECOP();
         try {
             InetAddress ip = InetAddress.getByName(host);
-
-            SSLContext context = SSLContext.getInstance("SSLv3");
-
-            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
-            keyManagerFactory.init(myCertificateSsl.getKeystore(), myCertificateSsl.getPassword().toCharArray());
-
-            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("SunX509");
-            trustManagerFactory.init(myCertificateSsl.getKeystore());
-
-            context.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
-
-            SSLSocketFactory sslSocketFactory = context.getSocketFactory();
-            this.socketClient = (SSLSocket)sslSocketFactory.createSocket(ip, port);
+            socketClient = new Socket(ip, port);
         } catch (Exception ex) {
             Logger.getLogger(NetworkClient.class.getName()).log(Level.SEVERE, null, ex);
         }

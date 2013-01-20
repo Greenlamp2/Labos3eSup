@@ -5,23 +5,30 @@
 
 package Serveur;
 
+import Helpers.EasyFile;
 import Protocole.NetworkServer;
 import Protocole.TraitementPacket;
 import Securite.MyCertificate;
+import java.security.KeyStore;
 
 
 public class ServeurPool implements Runnable{
     NetworkServer reseau;
     int port;
     PoolThread poolThread;
-    MyCertificate myCertificate_no_ssl;
-    MyCertificate myCertificate_ssl;
+    MyCertificate myCertificate;
 
-    ServeurPool(int port, MyCertificate myCertificate_no_ssl, MyCertificate myCertificate_ssl) {
+    /*ServeurPool() {
+        port = Integer.parseInt(EasyFile.getConfig("Configs_Serveur_Reservations", "PORT_VOYAGEURS"));
         System.out.println("Mise à l'écoute sur le port: " + port);
-        this.myCertificate_no_ssl = myCertificate_no_ssl;
-        this.myCertificate_ssl = myCertificate_ssl;
-        reseau = new NetworkServer(port, this.myCertificate_no_ssl, this.myCertificate_ssl);
+        reseau = new NetworkServer(port);
+        poolThread = new PoolThread(3);
+    }*/
+
+    ServeurPool(int port, MyCertificate myCertificate) {
+        System.out.println("Mise à l'écoute sur le port: " + port);
+        this.myCertificate = myCertificate;
+        reseau = new NetworkServer(port, myCertificate);
         poolThread = new PoolThread(3);
     }
 
@@ -33,7 +40,7 @@ public class ServeurPool implements Runnable{
             while(goOn){
                 goOn = reseau.accept();
                 System.out.println("Nouveau client !");
-                TraitementPacket traitement = new TraitementPacket(new NetworkServer(reseau.getSocketClient(), this.myCertificate_no_ssl, this.myCertificate_ssl));
+                TraitementPacket traitement = new TraitementPacket(new NetworkServer(reseau.getSocketClient(), myCertificate));
                 poolThread.assign(traitement);
                 nbClient++;
             }

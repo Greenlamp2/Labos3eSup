@@ -10,14 +10,41 @@ import Bean.BeanMagasin;
 import Bean.BeanReservation;
 import Bean.BeanUser;
 import Bean.Jdbc_MySQL;
+import Helpers.EasyFile;
+import Protocole.NetworkClient;
+import Protocole.PacketCom;
+import Protocole.RMP;
+import Securite.KeyExchange;
+import Securite.MyCertificate;
+import Securite.MyKeys;
+import Securite.SignatureWithCertificate;
 import Thread.TimeOutReservations;
+import Utils.Cryptage;
+import java.awt.Color;
 import java.beans.Beans;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.Signature;
+import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.crypto.SecretKey;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -26,6 +53,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.swing.JOptionPane;
 /**
  *
  * @author Greenlamp
@@ -76,6 +104,27 @@ public class Servlet_Controle extends HttpServlet {
             rediriger(request, response, sc, "/caddy.jsp");
         }else if(action.equals("payement")){
             rediriger(request, response, sc, "/payement.jsp");
+        }else if(action.equals("motelVillage")){
+            if(initKeyExchange(request, response, sc)){
+                rediriger(request, response, sc, "/motelVillage.jsp");
+            }else{
+                rediriger(request, response, sc, "/error.jsp?message=\"Erreur lors de l'échange de clé\"");
+            }
+        }else if(action.equals("broom")){
+            rediriger(request, response, sc, "/broom.jsp");
+        }else if(action.equals("proom")){
+            rediriger(request, response, sc, "/proom.jsp");
+        }else if(action.equals("croom")){
+            rediriger(request, response, sc, "/croom.jsp");
+        }else if(action.equals("broom_infos")){
+            actionBroomInfos(request, response, sc);
+            rediriger(request, response, sc, "/motelVillage.jsp");
+        }else if(action.equals("proom_infos")){
+            actionProomInfos(request, response, sc);
+            rediriger(request, response, sc, "/motelVillage.jsp");
+        }else if(action.equals("croom_infos")){
+            actionCroomInfos(request, response, sc);
+            rediriger(request, response, sc, "/motelVillage.jsp");
         }else if(action.equals("payer")){
             actionPayer(request, response, sc, beanUser.getId());
             rediriger(request, response, sc, "/accueil.jsp");
@@ -372,5 +421,310 @@ public class Servlet_Controle extends HttpServlet {
         Thread threadTimeOut = new Thread(timeOutReservations);
         threadTimeOut.start();
         return true;
+    }
+
+    private boolean initKeyExchange(HttpServletRequest request, HttpServletResponse response, ServletContext sc) {
+        NetworkClient socketClient = (NetworkClient) getVariableSession(request, "socketClient");
+        if(socketClient != null){
+            return true;
+        }
+
+        /***************************/
+        //Récupération du keystore
+        /***************************/
+        String path = EasyFile.getConfig("Configs_Serveur_Reservations", "ADRESSE_KS_NOSSL");
+        File fichierKeyStore = new File(path);
+        KeyStore ks = null;
+
+        try {
+            ks = KeyStore.getInstance("PKCS12", "BC");
+            String passKs = "lolilol";
+            ks.load(new FileInputStream(fichierKeyStore), passKs.toCharArray());
+        } catch (KeyStoreException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchProviderException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CertificateException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        /***************************/
+        //Récupération du certificat
+        /***************************/
+        MyCertificate myCertificate = new MyCertificate();
+        try {
+            myCertificate.setCertificate((X509Certificate) ks.getCertificate("client"));
+            myCertificate.getCertificate().checkValidity();
+            String passKs = "lolilol";
+            myCertificate.setPrivateKey((PrivateKey) ks.getKey("client", passKs.toCharArray()));
+        } catch (KeyStoreException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnrecoverableKeyException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CertificateExpiredException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CertificateNotYetValidException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        String host = EasyFile.getConfig("Configs_Serveur_Reservations", "HOST");
+        int port = Integer.parseInt(EasyFile.getConfig("Configs_Serveur_Reservations", "PORT_VOYAGEURS"));
+        socketClient = new NetworkClient(host, port, myCertificate);
+        addVariableSession(request, "socketClient", socketClient);
+
+        SignatureWithCertificate swc = new SignatureWithCertificate();
+        try {
+            Signature signature = Signature.getInstance("SHA1withRSA", "BC");
+            swc.setCertificate(myCertificate.getCertificate());
+            signature.initSign(myCertificate.getPrivateKey());
+            swc.setSignature(signature.sign());
+            socketClient.send(new PacketCom(RMP.KEY_EXCHANGE, (Object) swc));
+            PacketCom packetRetour;
+            try {
+                packetRetour = socketClient.receive();
+                return traitementPacket(request, response, sc, myCertificate, packetRetour);
+            } catch (Exception ex) {
+                Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchProviderException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeyException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SignatureException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    private boolean traitementPacket(HttpServletRequest request, HttpServletResponse response, ServletContext sc, MyCertificate myCertificate, PacketCom packetReponse) {
+        String type = packetReponse.getType();
+        Object contenu = packetReponse.getObjet();
+        if(type.equalsIgnoreCase(RMP.SESSION_KEY)){
+            Cryptage cryptage = new Cryptage();
+            SecretKey cleSession = null;
+            KeyExchange keyExchange = (KeyExchange) contenu;
+            byte[] cleSessionCrypted = keyExchange.getCleSession();
+            byte[] cleSessionDecrypted = cryptage.decrypt(Cryptage.RSA, cleSessionCrypted, myCertificate.getPrivateKey());
+            cleSession = cryptage.byteToCleSession(cleSessionDecrypted);
+            MyKeys myKeys = new MyKeys(myCertificate.getPrivateKey(), myCertificate.getCertificate().getPublicKey(), cleSession, myCertificate.getCertificate());
+            addVariableSession(request, "myKeys", myKeys);
+            return true;
+        }else if(type.equalsIgnoreCase(RMP.BROOM_OUI)){
+            Object[] infos = (Object[]) contenu;
+            int numeroChambre = (Integer) infos[0];
+            int prix = (Integer) infos[1];
+            String msgConfirmation = "Chambre n°" + numeroChambre + " au prix de " + prix;
+            addVariableSession(request, "msgConfirmation", msgConfirmation);
+            return true;
+        }else if(type.equalsIgnoreCase(RMP.BROOM_NON)){
+            String msgConfirmation = (String) contenu;
+            addVariableSession(request, "msgConfirmation", msgConfirmation);
+            return true;
+        }else if(type.equalsIgnoreCase(RMP.PROOM_OUI)){
+            String msgConfirmation = "Le payement de la chambre a été éffectué.";
+            addVariableSession(request, "msgConfirmation", msgConfirmation);
+            return true;
+        }else if(type.equalsIgnoreCase(RMP.PROOM_NON)){
+            String msgConfirmation = (String) contenu;
+            addVariableSession(request, "msgConfirmation", msgConfirmation);
+            return true;
+        }else if(type.equalsIgnoreCase(RMP.CROOM_OUI)){
+            String msgConfirmation = "Suppression de la réservation éffectuée.";
+            addVariableSession(request, "msgConfirmation", msgConfirmation);
+            return true;
+        }else if(type.equalsIgnoreCase(RMP.CROOM_NON)){
+            String msgConfirmation = (String) contenu;
+            addVariableSession(request, "msgConfirmation", msgConfirmation);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    private boolean actionBroomInfos(HttpServletRequest request, HttpServletResponse response, ServletContext sc) {
+        String categorie = request.getParameter("categorie");
+        String type = request.getParameter("type");
+        String nbNuit = request.getParameter("nbNuit");
+        String date = request.getParameter("date");
+
+        NetworkClient socketClient = (NetworkClient) getVariableSession(request, "socketClient");
+        MyKeys myKeys = (MyKeys) getVariableSession(request, "myKeys");
+        BeanUser beanUser = (BeanUser)  getVariableSession(request, "beanUser");
+        Cryptage cryptage = new Cryptage();
+        String nomClient = beanUser.getNom();
+
+        byte[] categorieCrypted =cryptage.crypt(Cryptage.DES, categorie.getBytes(), myKeys.getCleSession());
+        byte[] typeCrypted =cryptage.crypt(Cryptage.DES, type.getBytes(), myKeys.getCleSession());
+        byte[] nbNuitCrypted =cryptage.crypt(Cryptage.DES, nbNuit.getBytes(), myKeys.getCleSession());
+        byte[] dateCrypted =cryptage.crypt(Cryptage.DES, date.getBytes(), myKeys.getCleSession());
+        byte[] nomClientCrypted = cryptage.crypt(Cryptage.DES, nomClient.getBytes(), myKeys.getCleSession());
+
+        Signature signature;
+        byte[] signatureResponsable = null;
+        try {
+            signature = Signature.getInstance("SHA1withRSA", "BC");
+            signature.initSign(myKeys.getClePrivee());
+            signatureResponsable = signature.sign();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchProviderException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeyException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SignatureException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        MessageDigest md;
+        byte[] digest = null;
+        try {
+            md = MessageDigest.getInstance("SHA1");
+            md.update(categorieCrypted);
+            md.update(typeCrypted);
+            md.update(dateCrypted);
+            md.update(nbNuitCrypted);
+            md.update(nomClientCrypted);
+            md.update(signatureResponsable);
+            digest = md.digest();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        Object[] infos = {categorieCrypted, typeCrypted, dateCrypted, nbNuitCrypted, nomClientCrypted, signatureResponsable, digest};
+        socketClient.send(new PacketCom(RMP.BROOM, (Object)infos));
+        PacketCom packetRetour;
+        try {
+            packetRetour = socketClient.receive();
+            MyCertificate myCertificate = new MyCertificate();
+            myCertificate.setCertificate(myKeys.getCertificate());
+            myCertificate.setPrivateKey(myKeys.getClePrivee());
+            return traitementPacket(request, response, sc, myCertificate, packetRetour);
+        } catch (Exception ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    private boolean actionProomInfos(HttpServletRequest request, HttpServletResponse response, ServletContext sc) {
+        String numChambre = request.getParameter("numChambre");
+        String carteCredit = request.getParameter("carteCredit");
+        String date = request.getParameter("date");
+
+        NetworkClient socketClient = (NetworkClient) getVariableSession(request, "socketClient");
+        MyKeys myKeys = (MyKeys) getVariableSession(request, "myKeys");
+        BeanUser beanUser = (BeanUser)  getVariableSession(request, "beanUser");
+        Cryptage cryptage = new Cryptage();
+        String nomClient = beanUser.getNom();
+
+        byte[] numChambreCrypted =cryptage.crypt(Cryptage.DES, numChambre.getBytes(), myKeys.getCleSession());
+        byte[] carteCreditCrypted =cryptage.crypt(Cryptage.DES, carteCredit.getBytes(), myKeys.getCleSession());
+        byte[] dateCrypted =cryptage.crypt(Cryptage.DES, date.getBytes(), myKeys.getCleSession());
+        byte[] nomClientCrypted = cryptage.crypt(Cryptage.DES, nomClient.getBytes(), myKeys.getCleSession());
+
+        Signature signature;
+        byte[] signatureResponsable = null;
+        try {
+            signature = Signature.getInstance("SHA1withRSA", "BC");
+            signature.initSign(myKeys.getClePrivee());
+            signatureResponsable = signature.sign();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchProviderException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeyException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SignatureException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        MessageDigest md;
+        byte[] digest = null;
+        try {
+            md = MessageDigest.getInstance("SHA1");
+            md.update(numChambreCrypted);
+            md.update(nomClientCrypted);
+            md.update(carteCreditCrypted);
+            md.update(dateCrypted);
+            md.update(signatureResponsable);
+            digest = md.digest();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        Object[] infos = {numChambreCrypted, nomClientCrypted, carteCreditCrypted, dateCrypted, signatureResponsable, digest};
+        socketClient.send(new PacketCom(RMP.PROOM, (Object)infos));
+        PacketCom packetRetour;
+        try {
+            packetRetour = socketClient.receive();
+            MyCertificate myCertificate = new MyCertificate();
+            myCertificate.setCertificate(myKeys.getCertificate());
+            myCertificate.setPrivateKey(myKeys.getClePrivee());
+            return traitementPacket(request, response, sc, myCertificate, packetRetour);
+        } catch (Exception ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    private boolean actionCroomInfos(HttpServletRequest request, HttpServletResponse response, ServletContext sc) {
+        String numChambre = request.getParameter("numChambre");
+        String date = request.getParameter("date");
+
+        NetworkClient socketClient = (NetworkClient) getVariableSession(request, "socketClient");
+        MyKeys myKeys = (MyKeys) getVariableSession(request, "myKeys");
+        BeanUser beanUser = (BeanUser)  getVariableSession(request, "beanUser");
+        Cryptage cryptage = new Cryptage();
+        String nomClient = beanUser.getNom();
+
+        Signature signature;
+        byte[] signatureResponsable = null;
+        try {
+            signature = Signature.getInstance("SHA1withRSA", "BC");
+            signature.initSign(myKeys.getClePrivee());
+            signatureResponsable = signature.sign();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchProviderException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeyException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SignatureException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        MessageDigest md;
+        byte[] digest = null;
+        try {
+            md = MessageDigest.getInstance("SHA1");
+            md.update(numChambre.getBytes());
+            md.update(nomClient.getBytes());
+            md.update(date.getBytes());
+            md.update(signatureResponsable);
+            digest = md.digest();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        Object[] infos = {numChambre, nomClient, date, signatureResponsable, digest};
+        socketClient.send(new PacketCom(RMP.CROOM, (Object)infos));
+        PacketCom packetRetour;
+        try {
+            packetRetour = socketClient.receive();
+            MyCertificate myCertificate = new MyCertificate();
+            myCertificate.setCertificate(myKeys.getCertificate());
+            myCertificate.setPrivateKey(myKeys.getClePrivee());
+            return traitementPacket(request, response, sc, myCertificate, packetRetour);
+        } catch (Exception ex) {
+            Logger.getLogger(Servlet_Controle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
     }
 }

@@ -172,6 +172,83 @@ public class RMP {
 
             return reservationChambre(categorieDecrypted, typeDecrypted, dateDecrypted, nbNuitDecrypted, nomClientDecrypted);
 
+        }else if(type.equals(RMP.PROOM)){
+            Object[] infos = (Object[]) contenu;
+            byte[] numChambreCrypted = (byte[])infos[0];
+            byte[] nomClientCrypted = (byte[])infos[1];
+            byte[] numCarteCreditCrypted = (byte[])infos[2];
+            byte[] dateCrypted = (byte[])infos[3];
+            byte[] signatureResponsable = (byte[]) infos[4];
+            byte[] digest = (byte[]) infos[5];
+
+            MessageDigest md;
+            byte[] digestVerif = null;
+            try {
+                md = MessageDigest.getInstance("SHA1");
+                md.update(numChambreCrypted);
+                md.update(nomClientCrypted);
+                md.update(numCarteCreditCrypted);
+                md.update(dateCrypted);
+                md.update(signatureResponsable);
+                digestVerif = md.digest();
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            boolean verification = MessageDigest.isEqual(digest, digestVerif);
+            if(!verification){
+                return new PacketCom(RMP.PROOM_NON, "L'intégrité des données n'est pas intacte.");
+            }
+
+            if(!signatureCorrect(new SignatureWithCertificate(myCertificateClient.getCertificate(), signatureResponsable))){
+                return new PacketCom(RMP.PROOM_NON, "La signature du responsable est incorecte");
+            }
+
+            String numChambreDecrypted = new String(cryptageServer.decrypt(Cryptage.DES, numChambreCrypted, cleSession));
+            String nomClientDecrypted = new String(cryptageServer.decrypt(Cryptage.DES, nomClientCrypted, cleSession));
+            String numCarteCreditDecrypted = new String(cryptageServer.decrypt(Cryptage.DES, numCarteCreditCrypted, cleSession));
+            String dateDecrypted = new String(cryptageServer.decrypt(Cryptage.DES, dateCrypted, cleSession));
+
+            return payementReservation(numChambreDecrypted, nomClientDecrypted, numCarteCreditDecrypted, dateDecrypted);
+        }else if(type.equals(RMP.CROOM)){
+            Object[] infos = (Object[]) contenu;
+            String numChambre = (String)infos[0];
+            String nomClient = (String)infos[1];
+            String dateReservaton = (String)infos[2];
+            byte[] signatureResponsable = (byte[]) infos[3];
+            byte[] digest = (byte[]) infos[4];
+
+            MessageDigest md;
+            byte[] digestVerif = null;
+            try {
+                md = MessageDigest.getInstance("SHA1");
+                md.update(numChambre.getBytes());
+                md.update(nomClient.getBytes());
+                md.update(dateReservaton.getBytes());
+                md.update(signatureResponsable);
+                digestVerif = md.digest();
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            boolean verification = MessageDigest.isEqual(digest, digestVerif);
+            if(!verification){
+                return new PacketCom(RMP.PROOM_NON, "L'intégrité des données n'est pas intacte.");
+            }
+
+            if(!signatureCorrect(new SignatureWithCertificate(myCertificateClient.getCertificate(), signatureResponsable))){
+                return new PacketCom(RMP.CROOM_NON, "La signature du responsable est incorecte");
+            }
+
+            return supprimerReservation(numChambre, nomClient, dateReservaton);
+        }else if(type.equals(RMP.LROOM)){
+            //Récupérer les réservations
+            LinkedList<String> listeReservation = getAllReservations();
+            //Crypter les tuples
+            LinkedList<byte[]> listeReservationCrypted = cryptListeReservation(listeReservation);
+            //envoyer tuple
+            return new PacketCom(RMP.LROOM_OUI, (Object)listeReservationCrypted);
+
         }else{
             return new PacketCom(RMP.ERROR, "ERROR");
         }
@@ -192,6 +269,18 @@ public class RMP {
         }else if (type.equals(RMP.BROOM_OUI)) {
             return packet;
         }else if (type.equals(RMP.BROOM_NON)) {
+            return packet;
+        }else if (type.equals(RMP.PROOM_OUI)) {
+            return packet;
+        }else if (type.equals(RMP.PROOM_NON)) {
+            return packet;
+        }else if (type.equals(RMP.CROOM_OUI)) {
+            return packet;
+        }else if (type.equals(RMP.CROOM_NON)) {
+            return packet;
+        }else if (type.equals(RMP.LROOM_OUI)) {
+            return packet;
+        }else if (type.equals(RMP.LROOM_NON)) {
             return packet;
         }else {
             PacketCom packetReponse = new PacketCom(RMP.ERROR, "ERROR");
@@ -265,7 +354,7 @@ public class RMP {
         return verif;
     }
 
-    private PacketCom reservationChambre(String categorie, String type, String date, String nbNuit, String nomClient) {
+    private synchronized PacketCom reservationChambre(String categorie, String type, String date, String nbNuit, String nomClient) {
         /**************************************************************************************************************/
         //Verification de l'existence du client
         /**************************************************************************************************************/
@@ -310,6 +399,92 @@ public class RMP {
 
         Object[] infos = {numeroChambre, prixChambre};
         return new PacketCom(RMP.BROOM_OUI, (Object)infos);
+    }
+
+    private synchronized PacketCom payementReservation(String numChambre, String nomClient, String numCarteCredit, String date) {
+        /**************************************************************************************************************/
+        //Verification de l'existence du client
+        /**************************************************************************************************************/
+        int numeroClient = -1;
+        numeroClient = getNumeroClient(nomClient);
+        if(numeroClient == -1){
+            return new PacketCom(RMP.PROOM_NON, "Le client n'existe pas.");
+        }
+        /**************************************************************************************************************/
+        //Verifier si la reservation existe
+        /**************************************************************************************************************/
+        int idReservation = -1;
+        idReservation = getIdReservationWithDate(numChambre, numeroClient, date);
+        if(idReservation == -1){
+            return new PacketCom(RMP.PROOM_NON, "la réservation n'existe pas.");
+        }
+
+        /**************************************************************************************************************/
+        //Verifier si la reservation a pas déja été payé
+        /**************************************************************************************************************/
+        if(reservationDejaPayee(idReservation)){
+            return new PacketCom(RMP.PROOM_NON, "la réservation a déja été payée.");
+        }
+
+        /**************************************************************************************************************/
+        //Enregistrer numero carte credit
+        /**************************************************************************************************************/
+        if(!enregistrerNumeroCarte(numeroClient, numCarteCredit)){
+            return new PacketCom(RMP.PROOM_NON, "Erreur au niveau de la carte de crédit");
+        }
+
+        /**************************************************************************************************************/
+        //Mettre le flag payé a 1
+        /**************************************************************************************************************/
+        if(!payerReservation(idReservation)){
+            return new PacketCom(RMP.PROOM_NON, "Une erreur s'est déroulée lors du payement de la réservation.");
+        }
+
+        return new PacketCom(RMP.PROOM_OUI, "PROOM_OUI");
+
+    }
+
+    private synchronized PacketCom supprimerReservation(String numChambre, String nomClient, String dateReservaton) {
+        /**************************************************************************************************************/
+        //Verification de l'existence du client
+        /**************************************************************************************************************/
+        int numeroClient = -1;
+        numeroClient = getNumeroClient(nomClient);
+        if(numeroClient == -1){
+            return new PacketCom(RMP.CROOM_NON, "Le client n'existe pas.");
+        }
+        /**************************************************************************************************************/
+        //Verifier si la reservation existe
+        /**************************************************************************************************************/
+        int idReservation = -1;
+        idReservation = getIdReservationWithDate(numChambre, numeroClient, dateReservaton);
+        if(idReservation == -1){
+            return new PacketCom(RMP.CROOM_NON, "la réservation n'existe pas.");
+        }
+
+        /**************************************************************************************************************/
+        //Verifier si la reservation a pas déja été payé
+        /**************************************************************************************************************/
+        if(reservationDejaPayee(idReservation)){
+            return new PacketCom(RMP.CROOM_NON, "Vous ne pouvez annuler une réservation déja payée");
+        }
+
+        /**************************************************************************************************************/
+        //Verifier si la date est dépassée
+        /**************************************************************************************************************/
+        if(dateDepassee(idReservation)){
+            return new PacketCom(RMP.CROOM_NON, "date dépassée.");
+        }
+
+
+        /**************************************************************************************************************/
+        //Supprimer réservation
+        /**************************************************************************************************************/
+        if(!deleteReservation(idReservation)){
+            return new PacketCom(RMP.CROOM_NON, "Une erreur s'est déroulée lors de la suppression de la réservation.");
+        }
+
+        return new PacketCom(RMP.CROOM_OUI, "PROOM_OUI");
     }
 
     private int getNumeroClient(String nomClient) {
@@ -388,7 +563,7 @@ public class RMP {
         try{
             Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
             dbsql.init();
-            String request = "SELECT dateArrivee, nbNuit FROM reservationschambre where numeroChambre = '"+numeroChambre+"'";
+            String request = "SELECT dateArrivee, nbNuit FROM reservationschambre where numeroChambre = '"+numeroChambre+"' and dateArrivee = '"+date+"'";
             Object tuples = dbsql.select(request);
             String dateFound = dbsql.extract(tuples, 1, "dateArrivee");
             String nbFound = dbsql.extract(tuples, 1, "nbNuit");
@@ -396,8 +571,10 @@ public class RMP {
                 String dateFinCalculated = getDateFin(dateFound, nbFound);
                 Date dateFinDb = new SimpleDateFormat("dd/MM/yyyy").parse(dateFinCalculated);
                 Date dateFinChambre = new SimpleDateFormat("dd/MM/yyyy").parse(dateFin);
-                if(dateFinDb.after(dateFinChambre) || dateFinDb.before(dateFinChambre)){
-                    ok = true;
+                if(!date.equals(dateFound)){
+                    if(dateFinDb.after(dateFinChambre) || dateFinDb.before(dateFinChambre)){
+                        ok = true;
+                    }
                 }
             }else{
                 ok = true;
@@ -441,7 +618,7 @@ public class RMP {
         try {
             Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
             dbsql.init();
-            String request = "INSERT INTO reservationschambre(numeroChambre, dateArrivee, nbNuit, client) VALUES('"+numeroChambre+"', '"+date+"', '"+nbNuit+"', '"+numeroClient+"')";
+            String request = "INSERT INTO reservationschambre(numeroChambre, dateArrivee, nbNuit, client, paye) VALUES('"+numeroChambre+"', '"+date+"', '"+nbNuit+"', '"+numeroClient+"', '0')";
             dbsql.update(request);
             dbsql.Disconnect();
             return true;
@@ -449,5 +626,216 @@ public class RMP {
             Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
+    }
+
+    private int getIdReservationWithDate(String numChambre, int numeroClient, String dateReservaton) {
+        int idReservation = -1;
+        try{
+            Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
+            dbsql.init();
+            String request = "SELECT numeroReservation FROM reservationschambre where numeroChambre = '"+ numChambre +"' and client = '"+ numeroClient +"' and dateArrivee = '"+dateReservaton+"'";
+            Object tuples = dbsql.select(request);
+            String reservationFound = dbsql.extract(tuples, 1, "numeroReservation");
+            if(reservationFound != null){
+                idReservation = Integer.parseInt(reservationFound);
+            }
+            dbsql.endExtract();
+            dbsql.Disconnect();
+        } catch (IOException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return idReservation;
+    }
+
+    private int getIdReservation(String numChambre, int numeroClient) {
+        int idReservation = -1;
+        try{
+            Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
+            dbsql.init();
+            String request = "SELECT numeroReservation FROM reservationschambre where numeroChambre = '"+ numChambre +"' and client = '"+ numeroClient +"'";
+            Object tuples = dbsql.select(request);
+            String reservationFound = dbsql.extract(tuples, 1, "numeroReservation");
+            if(reservationFound != null){
+                idReservation = Integer.parseInt(reservationFound);
+            }
+            dbsql.endExtract();
+            dbsql.Disconnect();
+        } catch (IOException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return idReservation;
+    }
+
+    private boolean reservationDejaPayee(int idReservation) {
+        boolean retour = false;
+        try{
+            Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
+            dbsql.init();
+            String request = "SELECT numeroReservation FROM reservationschambre where numeroReservation = '"+idReservation+"' and paye = '1'";
+            Object tuples = dbsql.select(request);
+            String reservationFound = dbsql.extract(tuples, 1, "numeroReservation");
+            if(reservationFound != null){
+                retour = true;
+            }
+            dbsql.endExtract();
+            dbsql.Disconnect();
+        } catch (IOException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return retour;
+    }
+
+    private boolean enregistrerNumeroCarte(int numeroClient, String numCarteCredit) {
+        try {
+            Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
+            dbsql.init();
+            String request = "UPDATE voyageurs SET carteCredit = '"+numCarteCredit+"' WHERE id = '"+numeroClient+"'";
+            dbsql.update(request);
+            dbsql.Disconnect();
+            return true;
+        } catch (Exception ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+    }
+
+    private boolean payerReservation(int idReservation) {
+        try {
+            Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
+            dbsql.init();
+            String request = "UPDATE reservationsChambre SET paye = '1' WHERE numeroReservation = '"+idReservation+"'";
+            dbsql.update(request);
+            dbsql.Disconnect();
+            return true;
+        } catch (Exception ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+    }
+
+    private boolean dateDepassee(int idReservation) {
+        boolean retour = false;
+        String dateArrivee = null;
+        String nbNuit = null;
+        try{
+            Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
+            dbsql.init();
+            String request = "SELECT dateArrivee, nbNuit FROM reservationschambre where numeroReservation = '"+ idReservation +"'";
+            Object tuples = dbsql.select(request);
+            dateArrivee = dbsql.extract(tuples, 1, "dateArrivee");
+            nbNuit = dbsql.extract(tuples, 1, "nbNuit");
+            dbsql.endExtract();
+            dbsql.Disconnect();
+        } catch (IOException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        String dateFin = getDateFin(dateArrivee, nbNuit);
+
+        if(dateInferieurToday(dateFin)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    private boolean dateInferieurToday(String dateFin) {
+        try {
+            Date today = new Date();
+            Date dateReservation = new SimpleDateFormat("dd/MM/yyyy").parse(dateFin);
+            if(dateReservation.before(today)){
+                return true;
+            }else{
+                return false;
+            }
+        } catch (ParseException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    private boolean deleteReservation(int idReservation) {
+        try {
+            Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
+            dbsql.init();
+            String request = "DELETE FROM reservationschambre WHERE numeroReservation = '"+idReservation+"'";
+            dbsql.update(request);
+            dbsql.Disconnect();
+            return true;
+        } catch (Exception ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    private LinkedList<String> getAllReservations() {
+        LinkedList<String> listeReservation = new LinkedList<>();
+        try{
+            Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
+            dbsql.init();
+            String request = "SELECT numeroChambre, dateArrivee, client FROM reservationschambre";
+            ResultSet tuples = (ResultSet) dbsql.select(request);
+            while(tuples.next()){
+                int numeroChambre = tuples.getInt("numeroChambre");
+                String dateArrivee = tuples.getString("dateArrivee");
+                int client = tuples.getInt("client");
+                String nomClient = getNomClient(client);
+                String message = dateArrivee + " => " + numeroChambre + " => " + nomClient;
+                listeReservation.add(message);
+            }
+            dbsql.endExtract();
+            dbsql.Disconnect();
+        } catch (IOException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return listeReservation;
+    }
+
+    private LinkedList<byte[]> cryptListeReservation(LinkedList<String> listeReservation) {
+        LinkedList<byte[]> listeReservationCrypted = new LinkedList<>();
+        for(String message: listeReservation){
+            byte[] messageCrypted = cryptageServer.crypt(Cryptage.DES, message.getBytes(), cleSession);
+            listeReservationCrypted.add(messageCrypted);
+        }
+        return listeReservationCrypted;
+    }
+
+    private String getNomClient(int numeroClient) {
+        String nomClient = null;
+        try{
+            Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
+            dbsql.init();
+            String request = "SELECT nom from voyageurs where id = '"+numeroClient+"'";
+            Object tuples = dbsql.select(request);
+            nomClient = dbsql.extract(tuples, 1, "nom");
+            dbsql.endExtract();
+            dbsql.Disconnect();
+        } catch (IOException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return nomClient;
     }
 }

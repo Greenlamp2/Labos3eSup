@@ -6,29 +6,20 @@
 package Securite;
 
 import java.io.Serializable;
-import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
 
-public class MyCertificate implements Serializable{
-    private PrivateKey privateKey;
+public class SignatureWithCertificate implements Serializable{
     private X509Certificate certificate;
+    private byte[] signature;
 
-    public MyCertificate(){
+    public SignatureWithCertificate(){
 
     }
 
-    public MyCertificate(X509Certificate certif){
+    public SignatureWithCertificate(X509Certificate certif, byte[] sig){
         setCertificate(certif);
-        setPrivateKey(null);
-    }
-
-    public PrivateKey getPrivateKey() {
-        return privateKey;
-    }
-
-    public void setPrivateKey(PrivateKey privateKey) {
-        this.privateKey = privateKey;
+        setSignature(sig);
     }
 
     public X509Certificate getCertificate() {
@@ -39,4 +30,11 @@ public class MyCertificate implements Serializable{
         this.certificate = certificate;
     }
 
+    public byte[] getSignature() {
+        return signature;
+    }
+
+    public void setSignature(byte[] signature) {
+        this.signature = signature;
+    }
 }

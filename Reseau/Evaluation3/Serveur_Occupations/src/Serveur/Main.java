@@ -7,6 +7,7 @@ package Serveur;
 
 import Helpers.EasyFile;
 import Securite.MyCertificate;
+import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,47 +28,28 @@ import java.util.logging.Logger;
 public class Main {
     public static void main(String args[]) {
         KeyStore ks = null;
-        KeyStore ks_SSL = null;
-
-        MyCertificate myCertificate_no_ssl = new MyCertificate();
-        MyCertificate myCertificate_ssl = new MyCertificate();
-
-        String pathKeystoreServeurNoSSl = EasyFile.getConfig("Configs_Serveur_Occupations", "ADRESSE_KS_SERVEUR_NO_SSL");
-        String pathKeystoreServeurSSl = EasyFile.getConfig("Configs_Serveur_Occupations", "ADRESSE_KS_SERVEUR_SSL");
-
-        File fichierKeyStoreNoSSL = new File(pathKeystoreServeurNoSSl);
-        File fichierKeyStoreSSL = new File(pathKeystoreServeurSSl);
-
+        MyCertificate myCertificate = new MyCertificate();
+        int portVoyageurs = Integer.parseInt(EasyFile.getConfig("Configs_Serveur_Occupations", "PORT_VILLAGES_MOTELS"));
+        String path = EasyFile.getConfig("Configs_Serveur_Occupations", "ADRESSE_KS_SERVEUR_NO_SSL");
+        File fichierKeyStore = new File(path);
         try {
-            //No SSL
             ks = KeyStore.getInstance("PKCS12", "BC");
             String passKs = "lolilol";
-            ks.load(new FileInputStream(fichierKeyStoreNoSSL), passKs.toCharArray());
-            ((X509Certificate) ks.getCertificate("server")).checkValidity();
 
-            myCertificate_no_ssl.setCertificate((X509Certificate)ks.getCertificate("server"));
-            myCertificate_no_ssl.setPrivateKey((PrivateKey)ks.getKey("server", passKs.toCharArray()));
-            myCertificate_no_ssl.setPassword(passKs);
-            myCertificate_no_ssl.setKeystore(ks);
+            ks.load(new FileInputStream(fichierKeyStore), passKs.toCharArray());
+            myCertificate.setCertificate((X509Certificate) ks.getCertificate("server"));
+            myCertificate.getCertificate().checkValidity();
 
-
-            //SSL
-            ks_SSL = KeyStore.getInstance("JKS");
-            String passKs_SSL = "lolilol";
-            ks_SSL.load(new FileInputStream(fichierKeyStoreSSL), passKs_SSL.toCharArray());
-            ((X509Certificate) ks_SSL.getCertificate("serveur")).checkValidity();
-
-            myCertificate_ssl.setCertificate((X509Certificate)ks_SSL.getCertificate("serveur"));
-            myCertificate_ssl.setPrivateKey((PrivateKey)ks_SSL.getKey("serveur", passKs.toCharArray()));
-            myCertificate_ssl.setPassword(passKs_SSL);
-            myCertificate_ssl.setKeystore(ks_SSL);
-
+            String passKeyStore = "lolilol";
+            myCertificate.setPrivateKey((PrivateKey) ks.getKey("server", passKeyStore.toCharArray()));
 
         } catch (KeyStoreException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }catch (CertificateExpiredException ex) {
+        } catch (UnrecoverableKeyException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CertificateExpiredException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         } catch (CertificateNotYetValidException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
@@ -77,12 +59,9 @@ public class Main {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         } catch (CertificateException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnrecoverableKeyException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        int portVillagesMotel = Integer.parseInt(EasyFile.getConfig("Configs_Serveur_Occupations", "PORT_VILLAGES_MOTELS"));
-        Thread MyThread = new Thread(new ServeurPool(portVillagesMotel, myCertificate_no_ssl, myCertificate_ssl));
+        Thread MyThread = new Thread(new ServeurPool(portVoyageurs, myCertificate));
         MyThread.start();
     }
 }

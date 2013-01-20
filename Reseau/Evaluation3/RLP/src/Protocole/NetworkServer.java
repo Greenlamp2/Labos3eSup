@@ -13,74 +13,41 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
+import java.security.KeyStore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLServerSocketFactory;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.TrustManagerFactory;
 
 
 public class NetworkServer {
-    private SSLServerSocket socketServeur;
-    private SSLSocket socketClient;
+    private ServerSocket socketServeur;
+    private Socket socketClient;
     RLP protocole;
     boolean connected;
-    MyCertificate myCertificate_no_ssl;
-    MyCertificate myCertificate_ssl;
+    MyCertificate myCertificate;
 
-    public NetworkServer(int port, MyCertificate myCertificate_no_ssl, MyCertificate myCertificate_ssl){
-        this.myCertificate_no_ssl = myCertificate_no_ssl;
-        this.myCertificate_ssl = myCertificate_ssl;
-        protocole = new RLP(this.myCertificate_no_ssl, this.myCertificate_ssl, 666);
+    public NetworkServer(int port, MyCertificate myCertificate){
+        this.myCertificate = myCertificate;
+        protocole = new RLP(myCertificate, 123);
         try {
-            SSLContext context = SSLContext.getInstance("SSLv3");
-
-            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
-            keyManagerFactory.init(myCertificate_ssl.getKeystore(), myCertificate_ssl.getPassword().toCharArray());
-
-            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("SunX509");
-            trustManagerFactory.init(myCertificate_ssl.getKeystore());
-
-            context.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
-            SSLServerSocketFactory sslServerSocketFactory = context.getServerSocketFactory();
-            this.socketServeur = (SSLServerSocket)sslServerSocketFactory.createServerSocket(port);
-
+            socketServeur = new ServerSocket(port);
             connected = true;
             System.out.println("Socket créer");
-
         } catch (IOException ex) {
             Logger.getLogger(NetworkServer.class.getName()).log(Level.SEVERE, null, ex);
             connected = false;
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(NetworkServer.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (KeyStoreException ex) {
-            Logger.getLogger(NetworkServer.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnrecoverableKeyException ex) {
-            Logger.getLogger(NetworkServer.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (KeyManagementException ex) {
-            Logger.getLogger(NetworkServer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public NetworkServer(SSLSocket socket, MyCertificate myCertificate_no_ssl, MyCertificate myCertificate_ssl){
-        this.myCertificate_no_ssl = myCertificate_no_ssl;
-        this.myCertificate_ssl = myCertificate_ssl;
-        protocole = new RLP(this.myCertificate_no_ssl, this.myCertificate_ssl, 123);
-        this.setSocketClient(socket);
+    public NetworkServer(Socket socket, MyCertificate myCertificate){
+        protocole = new RLP(myCertificate, 123);
+        this.socketClient = socket;
         this.connected = true;
     }
 
     public boolean accept(){
         try {
             System.out.println("En attente d'un client");
-            socketClient = (SSLSocket) socketServeur.accept();
+            this.setSocketClient(socketServeur.accept());
             System.out.println("client connecté");
             return true;
         } catch (IOException ex) {
@@ -142,11 +109,11 @@ public class NetworkServer {
         }
     }
 
-    public SSLSocket getSocketClient() {
+    public Socket getSocketClient() {
         return socketClient;
     }
 
-    public void setSocketClient(SSLSocket socketClient) {
+    public void setSocketClient(Socket socketClient) {
         this.socketClient = socketClient;
     }
 

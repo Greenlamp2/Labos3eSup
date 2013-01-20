@@ -99,7 +99,7 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace pref="59" max="32767" attributes="0"/>
+                  <EmptySpace pref="58" max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -178,29 +178,15 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <Component id="Gstatus" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="Bload" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="GpassKs" pref="112" max="32767" attributes="0"/>
-                      </Group>
-                      <Group type="102" attributes="0">
-                          <Component id="GstatusSsl" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="BloadSSL" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="GpassKsSsl" max="32767" attributes="0"/>
-                      </Group>
-                  </Group>
+                  <Component id="Gstatus" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="Bload" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="GpassKs" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -214,13 +200,6 @@
                       <Component id="Gstatus" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="Bload" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="GpassKs" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="GstatusSsl" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="BloadSSL" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="GpassKsSsl" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -253,35 +232,6 @@
           </Events>
         </Component>
         <Component class="javax.swing.JPasswordField" name="GpassKs">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="lolilol"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JLabel" name="jLabel5">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="SSL:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JLabel" name="GstatusSsl">
-          <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-              <Font name="Tahoma" size="11" style="1"/>
-            </Property>
-            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="0" green="0" red="ff" type="rgb"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="not loaded"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JButton" name="BloadSSL">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="charger"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BloadSSLActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JPasswordField" name="GpassKsSsl">
           <Properties>
             <Property name="text" type="java.lang.String" value="lolilol"/>
           </Properties>

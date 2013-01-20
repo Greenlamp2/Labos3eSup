@@ -1,6 +1,6 @@
 <%--
-    Document   : accueil
-    Created on : 12-oct.-2012, 13:28:41
+    Document   : croom
+    Created on : 20-janv.-2013, 13:47:49
     Author     : Greenlamp
 --%>
 
@@ -14,17 +14,16 @@
 <% rd = sc.getRequestDispatcher("/Servlet_Controle?action=error&message=\"Impossible d'accéder à cette page sans être authentifié au préalable.\"");%>
 <% rd.forward(request, response); %>
 <% } %>
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" media="all" type="text/css" href="css/style.css" />
-        <title>Accueil: <%=beanUser.getNom()%></title>
+        <title>Croom <%=beanUser.getNom()%></title>
     </head>
     <body>
         <div class="site">
             <div class="header">
-                <span>Site de réservation de chambre</span>
+                <span>Site de réservation de chambre DANS motel & village</span>
             </div>
             <div class="clean"></div>
             <div class="corp">
@@ -33,22 +32,24 @@
                     <div class="menu_v_ctn">
                         <ul>
                             <li><a href="?action=accueil">Accueil</a></li>
-                            <li><a href="?action=magasin">Magasin</a></li>
-                            <li><a href="?action=caddy">Caddy</a></li>
-                            <li><a href="?action=motelVillage">Motels & villages</a></li>
+                            <li><a href="?action=broom">Booking Room</a></li>
+                            <li><a href="?action=proom">Pay Room</a></li>
+                            <li><a href="?action=croom">Cancel Room</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="corp_ctn">
-                    <h1>Accueil</h1>
+                    <h1>Caddy</h1>
                     <div class="paragraphe">
+                        <form action="Servlet_Controle" method="post">
+                            Numéro de chambre:<br/>
+                            <input type="text" name="numChambre"/><br/>
+                            Date:<br/>
+                            <input type="text" name="date"/><br/>
+                            <input type="hidden" name="action" value="croom_infos"/>
 
-
-                        Bonjour, Bienvenue sur la page d'accueil du site de réservation.<br/>
-                        Veuillez sélectionnez dans le menu de gauche votre destination.<br/>
-                        <br/>
-
-
+                            <input type="submit" value="payer"/>
+                        </form>
                     </div>
                 </div>
             </div>

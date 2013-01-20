@@ -40,8 +40,8 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jTabbedPane1" min="-2" pref="331" max="-2" attributes="0"/>
-              <EmptySpace pref="26" max="32767" attributes="0"/>
+              <Component id="jTabbedPane1" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -118,7 +118,7 @@
                           <Component id="jLabel12" min="-2" max="-2" attributes="0"/>
                           <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="14" max="32767" attributes="0"/>
+                      <EmptySpace pref="29" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -227,7 +227,7 @@
                 </Component>
                 <Component class="javax.swing.JTextField" name="GdateBroom">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="01/01/2013"/>
+                    <Property name="text" type="java.lang.String" value="01/03/2013"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel6">
@@ -296,7 +296,7 @@
                           <Component id="jLabel13" min="-2" max="-2" attributes="0"/>
                           <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="109" max="32767" attributes="0"/>
+                      <EmptySpace pref="78" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -326,6 +326,8 @@
                                           <Component id="GnomProom" alignment="0" pref="143" max="32767" attributes="0"/>
                                       </Group>
                                       <Component id="jButton1" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabel17" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="GdateProom" alignment="0" min="-2" pref="140" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="0" pref="176" max="32767" attributes="0"/>
                               </Group>
@@ -350,6 +352,10 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="GcarteProom" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
+                          <Component id="jLabel17" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="GdateProom" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Component id="jButton1" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="32767" attributes="0"/>
                       </Group>
@@ -363,6 +369,9 @@
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JTextField" name="GnumChambreProom">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="1"/>
+                  </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel8">
                   <Properties>
@@ -370,6 +379,9 @@
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JTextField" name="GnomProom">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="knuts"/>
+                  </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel9">
                   <Properties>
@@ -377,10 +389,26 @@
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JTextField" name="GcarteProom">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="123-123456-12"/>
+                  </Properties>
                 </Component>
                 <Component class="javax.swing.JButton" name="jButton1">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="valider"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jLabel17">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Date r&#xe9;servation:"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JTextField" name="GdateProom">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="01/02/2013"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -421,7 +449,7 @@
                           <Component id="jLabel14" min="-2" max="-2" attributes="0"/>
                           <Component id="jPanel4" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="155" max="32767" attributes="0"/>
+                      <EmptySpace pref="124" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -439,14 +467,14 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="103" alignment="0" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="jLabel10" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel11" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="GnumChambreProom1" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="GnomProom1" alignment="0" pref="143" max="32767" attributes="0"/>
-                              </Group>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="jLabel10" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel11" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="GnumChambreCroom" alignment="0" max="32767" attributes="0"/>
+                              <Component id="GnomCroom" alignment="0" pref="143" max="32767" attributes="0"/>
                               <Component id="jButton2" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel16" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="GdateCroom" alignment="0" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace pref="186" max="32767" attributes="0"/>
                       </Group>
@@ -458,14 +486,18 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jLabel10" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="GnumChambreProom1" min="-2" max="-2" attributes="0"/>
+                          <Component id="GnumChambreCroom" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jLabel11" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="GnomProom1" min="-2" max="-2" attributes="0"/>
+                          <Component id="GnomCroom" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jButton2" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel16" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="GdateCroom" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="32767" attributes="0"/>
+                          <Component id="jButton2" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -476,18 +508,37 @@
                     <Property name="text" type="java.lang.String" value="Num&#xe9;ro chambre:"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JTextField" name="GnumChambreProom1">
+                <Component class="javax.swing.JTextField" name="GnumChambreCroom">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="1"/>
+                  </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel11">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Nom du client:"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JTextField" name="GnomProom1">
+                <Component class="javax.swing.JTextField" name="GnomCroom">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="knuts"/>
+                  </Properties>
                 </Component>
                 <Component class="javax.swing.JButton" name="jButton2">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="valider"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton2ActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jLabel16">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Date r&#xe9;servation:"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JTextField" name="GdateCroom">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="01/03/2013"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -563,7 +614,7 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jButton3" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane1" pref="230" max="32767" attributes="0"/>
+                          <Component id="jScrollPane1" pref="245" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -590,6 +641,9 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="actualiser"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton3ActionPerformed"/>
+                  </Events>
                 </Component>
               </SubComponents>
             </Container>

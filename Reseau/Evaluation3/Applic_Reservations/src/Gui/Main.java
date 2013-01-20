@@ -4,29 +4,21 @@
  */
 package Gui;
 
-import Helpers.EasyFile;
+import Helpers.SwingUtils;
 import Protocole.NetworkClient;
 import Protocole.PacketCom;
 import Protocole.RMP;
-import Securite.KeyExchange;
-import Securite.MyCertificate;
 import Securite.MyKeys;
 import Utils.Cryptage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.security.InvalidKeyException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.security.cert.CertificateException;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.crypto.SecretKey;
 import javax.swing.JOptionPane;
 
 /**
@@ -90,14 +82,18 @@ public class Main extends javax.swing.JDialog {
         jLabel9 = new javax.swing.JLabel();
         GcarteProom = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        jLabel17 = new javax.swing.JLabel();
+        GdateProom = new javax.swing.JTextField();
         jLabel13 = new javax.swing.JLabel();
         GcRoom = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
-        GnumChambreProom1 = new javax.swing.JTextField();
+        GnumChambreCroom = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
-        GnomProom1 = new javax.swing.JTextField();
+        GnomCroom = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
+        jLabel16 = new javax.swing.JLabel();
+        GdateCroom = new javax.swing.JTextField();
         jLabel14 = new javax.swing.JLabel();
         GlRooms = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
@@ -142,7 +138,7 @@ public class Main extends javax.swing.JDialog {
 
         jLabel5.setText("Date d'arrivée:");
 
-        GdateBroom.setText("01/01/2013");
+        GdateBroom.setText("01/03/2013");
 
         jLabel6.setText("Nombre de nuits:");
 
@@ -230,7 +226,7 @@ public class Main extends javax.swing.JDialog {
                 .addGroup(GbRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel12)
                     .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addContainerGap(29, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("BROOM", GbRoom);
@@ -239,11 +235,26 @@ public class Main extends javax.swing.JDialog {
 
         jLabel2.setText("Numéro chambre:");
 
+        GnumChambreProom.setText("1");
+
         jLabel8.setText("Nom du client:");
+
+        GnomProom.setText("knuts");
 
         jLabel9.setText("Numéro de carte de crédit:");
 
+        GcarteProom.setText("123-123456-12");
+
         jButton1.setText("valider");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jLabel17.setText("Date réservation:");
+
+        GdateProom.setText("01/02/2013");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -261,7 +272,9 @@ public class Main extends javax.swing.JDialog {
                                 .addComponent(jLabel9)
                                 .addComponent(GnumChambreProom)
                                 .addComponent(GnomProom, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE))
-                            .addComponent(jButton1))
+                            .addComponent(jButton1)
+                            .addComponent(jLabel17)
+                            .addComponent(GdateProom, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 176, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -280,6 +293,10 @@ public class Main extends javax.swing.JDialog {
                 .addComponent(jLabel9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(GcarteProom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel17)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(GdateProom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -305,7 +322,7 @@ public class Main extends javax.swing.JDialog {
                 .addGroup(GpRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel13)
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(109, Short.MAX_VALUE))
+                .addContainerGap(78, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("PROOM", GpRoom);
@@ -314,9 +331,22 @@ public class Main extends javax.swing.JDialog {
 
         jLabel10.setText("Numéro chambre:");
 
+        GnumChambreCroom.setText("1");
+
         jLabel11.setText("Nom du client:");
 
+        GnomCroom.setText("knuts");
+
         jButton2.setText("valider");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jLabel16.setText("Date réservation:");
+
+        GdateCroom.setText("01/03/2013");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -324,13 +354,14 @@ public class Main extends javax.swing.JDialog {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jLabel10)
-                        .addComponent(jLabel11)
-                        .addComponent(GnumChambreProom1)
-                        .addComponent(GnomProom1, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE))
-                    .addComponent(jButton2))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel10)
+                    .addComponent(jLabel11)
+                    .addComponent(GnumChambreCroom)
+                    .addComponent(GnomCroom, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
+                    .addComponent(jButton2)
+                    .addComponent(jLabel16)
+                    .addComponent(GdateCroom))
                 .addContainerGap(186, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
@@ -339,14 +370,18 @@ public class Main extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(jLabel10)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(GnumChambreProom1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(GnumChambreCroom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel11)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(GnomProom1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(GnomCroom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel16)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(GdateCroom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButton2)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         jLabel14.setText("Suppression d'une reservation");
@@ -369,7 +404,7 @@ public class Main extends javax.swing.JDialog {
                 .addGroup(GcRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel14)
                     .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(155, Short.MAX_VALUE))
+                .addContainerGap(124, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("CROOM", GcRoom);
@@ -379,6 +414,11 @@ public class Main extends javax.swing.JDialog {
         jScrollPane1.setViewportView(Gliste);
 
         jButton3.setText("actualiser");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -397,7 +437,7 @@ public class Main extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(jButton3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 245, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -445,8 +485,8 @@ public class Main extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addComponent(jTabbedPane1)
+                .addContainerGap())
         );
 
         pack();
@@ -511,6 +551,115 @@ public class Main extends javax.swing.JDialog {
 
     }//GEN-LAST:event_BvaliderActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        String numChambre = GnumChambreProom.getText();
+        String nomClient = GnomProom.getText();
+        String numCarteCredit = GcarteProom.getText();
+        String date = GdateProom.getText();
+
+        byte[] numChambreCrypted = cryptage.crypt(Cryptage.DES, numChambre.getBytes(), myKeys.getCleSession());
+        byte[] nomClientCrypted = cryptage.crypt(Cryptage.DES, nomClient.getBytes(), myKeys.getCleSession());
+        byte[] numCarteCreditCrypted = cryptage.crypt(Cryptage.DES, numCarteCredit.getBytes(), myKeys.getCleSession());
+        byte[] dateCrypted = cryptage.crypt(Cryptage.DES, date.getBytes(), myKeys.getCleSession());
+
+        Signature signature;
+        byte[] signatureResponsable = null;
+        try {
+            signature = Signature.getInstance("SHA1withRSA", "BC");
+            signature.initSign(myKeys.getClePrivee());
+            signatureResponsable = signature.sign();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchProviderException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeyException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SignatureException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        MessageDigest md;
+        byte[] digest = null;
+        try {
+            md = MessageDigest.getInstance("SHA1");
+            md.update(numChambreCrypted);
+            md.update(nomClientCrypted);
+            md.update(numCarteCreditCrypted);
+            md.update(dateCrypted);
+            md.update(signatureResponsable);
+            digest = md.digest();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        Object[] infos = {numChambreCrypted, nomClientCrypted, numCarteCreditCrypted, dateCrypted, signatureResponsable, digest};
+        socket.send(new PacketCom(RMP.PROOM, (Object)infos));
+        PacketCom packetRetour;
+        try {
+            packetRetour = socket.receive();
+            traitementPacket(packetRetour);
+        } catch (Exception ex) {
+            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        String numChambre = GnumChambreCroom.getText();
+        String nomClient = GnomCroom.getText();
+        String dateReservaton = GdateCroom.getText();
+
+        Signature signature;
+        byte[] signatureResponsable = null;
+        try {
+            signature = Signature.getInstance("SHA1withRSA", "BC");
+            signature.initSign(myKeys.getClePrivee());
+            signatureResponsable = signature.sign();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchProviderException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeyException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SignatureException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        MessageDigest md;
+        byte[] digest = null;
+        try {
+            md = MessageDigest.getInstance("SHA1");
+            md.update(numChambre.getBytes());
+            md.update(nomClient.getBytes());
+            md.update(dateReservaton.getBytes());
+            md.update(signatureResponsable);
+            digest = md.digest();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        Object[] infos = {numChambre, nomClient, dateReservaton, signatureResponsable, digest};
+        socket.send(new PacketCom(RMP.CROOM, (Object)infos));
+        PacketCom packetRetour;
+        try {
+            packetRetour = socket.receive();
+            traitementPacket(packetRetour);
+        } catch (Exception ex) {
+            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        socket.send(new PacketCom(RMP.LROOM, null));
+        PacketCom packetRetour;
+        try {
+            packetRetour = socket.receive();
+            traitementPacket(packetRetour);
+        } catch (Exception ex) {
+            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -559,14 +708,16 @@ public class Main extends javax.swing.JDialog {
     private javax.swing.JTextField GcarteProom;
     private javax.swing.JComboBox GcategorieBroom;
     private javax.swing.JTextField GdateBroom;
+    private javax.swing.JTextField GdateCroom;
+    private javax.swing.JTextField GdateProom;
     private javax.swing.JPanel GlRooms;
     private javax.swing.JList Gliste;
     private javax.swing.JTextField GnbNuitBroom;
     private javax.swing.JTextField GnomBroom;
+    private javax.swing.JTextField GnomCroom;
     private javax.swing.JTextField GnomProom;
-    private javax.swing.JTextField GnomProom1;
+    private javax.swing.JTextField GnumChambreCroom;
     private javax.swing.JTextField GnumChambreProom;
-    private javax.swing.JTextField GnumChambreProom1;
     private javax.swing.JPanel GpRoom;
     private javax.swing.JComboBox GtypeBroom;
     private javax.swing.JButton jButton1;
@@ -579,6 +730,8 @@ public class Main extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -607,6 +760,32 @@ public class Main extends javax.swing.JDialog {
         }else if(type.equalsIgnoreCase(RMP.BROOM_NON)){
             String message = (String)contenu;
             JOptionPane.showMessageDialog(this, message);
+        }else if(type.equalsIgnoreCase(RMP.PROOM_NON)){
+            String message = (String)contenu;
+            JOptionPane.showMessageDialog(this, message);
+        }else if(type.equalsIgnoreCase(RMP.PROOM_OUI)){
+            JOptionPane.showMessageDialog(this, "Payement de la réservation éffectué");
+        }else if(type.equalsIgnoreCase(RMP.CROOM_NON)){
+            String message = (String)contenu;
+            JOptionPane.showMessageDialog(this, message);
+        }else if(type.equalsIgnoreCase(RMP.CROOM_OUI)){
+            JOptionPane.showMessageDialog(this, "Suppression de la réservation éffectuée");
+        }else if(type.equalsIgnoreCase(RMP.LROOM_OUI)){
+            lister(contenu);
+        }else if(type.equalsIgnoreCase(RMP.LROOM_NON)){
+            JOptionPane.showMessageDialog(this, "échec de listage des chambres réservée");
+        }else{
+            String message = (String)contenu;
+            JOptionPane.showMessageDialog(this, message);
+        }
+    }
+
+    private void lister(Object contenu) {
+        LinkedList<byte[]> infos = (LinkedList<byte[]>) contenu;
+        SwingUtils.emptyList(Gliste);
+        for(byte[] elm : infos){
+            String elmDecrypted = new String(cryptage.decrypt(Cryptage.DES, elm, myKeys.getCleSession()));
+            SwingUtils.addToList(Gliste, elmDecrypted);
         }
     }
 

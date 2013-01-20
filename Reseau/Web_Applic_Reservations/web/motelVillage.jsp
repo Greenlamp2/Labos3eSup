@@ -1,6 +1,6 @@
 <%--
-    Document   : accueil
-    Created on : 12-oct.-2012, 13:28:41
+    Document   : motelVillage
+    Created on : 20-janv.-2013, 13:10:12
     Author     : Greenlamp
 --%>
 
@@ -14,17 +14,16 @@
 <% rd = sc.getRequestDispatcher("/Servlet_Controle?action=error&message=\"Impossible d'accéder à cette page sans être authentifié au préalable.\"");%>
 <% rd.forward(request, response); %>
 <% } %>
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" media="all" type="text/css" href="css/style.css" />
-        <title>Accueil: <%=beanUser.getNom()%></title>
+        <title>motelVillage <%=beanUser.getNom()%></title>
     </head>
     <body>
         <div class="site">
             <div class="header">
-                <span>Site de réservation de chambre</span>
+                <span>Site de réservation de chambres DANS motel et villages</span>
             </div>
             <div class="clean"></div>
             <div class="corp">
@@ -33,18 +32,22 @@
                     <div class="menu_v_ctn">
                         <ul>
                             <li><a href="?action=accueil">Accueil</a></li>
-                            <li><a href="?action=magasin">Magasin</a></li>
-                            <li><a href="?action=caddy">Caddy</a></li>
-                            <li><a href="?action=motelVillage">Motels & villages</a></li>
+                            <li><a href="?action=broom">Booking Room</a></li>
+                            <li><a href="?action=proom">Pay Room</a></li>
+                            <li><a href="?action=croom">Cancel Room</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="corp_ctn">
                     <h1>Accueil</h1>
                     <div class="paragraphe">
+                        <% String msgConfirmation = (String)request.getSession(true).getAttribute("msgConfirmation"); %>
+                        <% if(msgConfirmation != null){ %>
+                            Réponse: <%=msgConfirmation%> <br/><br/>
+                            <% session.removeAttribute("msgConfirmation"); %>
+                        <% } %>
 
-
-                        Bonjour, Bienvenue sur la page d'accueil du site de réservation.<br/>
+                        Bonjour, Bienvenue sur la page d'accueil du site de réservation de chambres DANS motel et villages.<br/>
                         Veuillez sélectionnez dans le menu de gauche votre destination.<br/>
                         <br/>
 

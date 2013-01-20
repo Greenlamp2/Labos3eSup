@@ -8,7 +8,11 @@ import Helpers.EasyFile;
 import Protocole.NetworkClient;
 import Protocole.PacketCom;
 import Protocole.RLP;
+import Securite.KeyExchange;
 import Securite.MyCertificate;
+import Securite.MyKeys;
+import Securite.SignatureWithCertificate;
+import Utils.Cryptage;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,17 +50,17 @@ public class Connexion extends javax.swing.JFrame {
     int port;
     String host;
     KeyStore ks;
-    KeyStore ksSsl;
     MyCertificate myCertificate;
-    MyCertificate myCertificateSsl;
     String login;
     String password;
+    Cryptage cryptage;
     SecretKey cleSession;
 
     public Connexion() {
         initComponents();
         host = EasyFile.getConfig("Configs_Serveur_Occupations", "HOST");
         port = Integer.parseInt(EasyFile.getConfig("Configs_Serveur_Occupations", "PORT_VILLAGES_MOTELS"));
+        cryptage = new Cryptage();
     }
 
     /**
@@ -81,10 +85,6 @@ public class Connexion extends javax.swing.JFrame {
         Gstatus = new javax.swing.JLabel();
         Bload = new javax.swing.JButton();
         GpassKs = new javax.swing.JPasswordField();
-        jLabel5 = new javax.swing.JLabel();
-        GstatusSsl = new javax.swing.JLabel();
-        BloadSSL = new javax.swing.JButton();
-        GpassKsSsl = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -135,7 +135,7 @@ public class Connexion extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(59, Short.MAX_VALUE)
+                .addContainerGap(58, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
                     .addComponent(jLabel2))
@@ -179,44 +179,19 @@ public class Connexion extends javax.swing.JFrame {
 
         GpassKs.setText("lolilol");
 
-        jLabel5.setText("SSL:");
-
-        GstatusSsl.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        GstatusSsl.setForeground(new java.awt.Color(255, 0, 0));
-        GstatusSsl.setText("not loaded");
-
-        BloadSSL.setText("charger");
-        BloadSSL.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BloadSSLActionPerformed(evt);
-            }
-        });
-
-        GpassKsSsl.setText("lolilol");
-
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel5))
+                .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(Gstatus)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(Bload)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(GpassKs, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(GstatusSsl)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(BloadSSL)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(GpassKsSsl)))
+                .addComponent(Gstatus)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(Bload)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(GpassKs)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -228,12 +203,6 @@ public class Connexion extends javax.swing.JFrame {
                     .addComponent(Gstatus)
                     .addComponent(Bload)
                     .addComponent(GpassKs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(GstatusSsl)
-                    .addComponent(BloadSSL)
-                    .addComponent(GpassKsSsl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -270,7 +239,7 @@ public class Connexion extends javax.swing.JFrame {
     private void BconnexionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BconnexionActionPerformed
         if(verifChamps()){
             initConnexion();
-            socket = new NetworkClient(host, port, myCertificate, myCertificateSsl);
+            socket = new NetworkClient(host, port, myCertificate);
             if(!socket.isConnected()){
                 JOptionPane.showMessageDialog(this, "Impossible de contacter le serveur");
             }else{
@@ -290,7 +259,7 @@ public class Connexion extends javax.swing.JFrame {
     }//GEN-LAST:event_BconnexionActionPerformed
 
     private void BloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BloadActionPerformed
-        String path = EasyFile.getConfig("Configs_Serveur_Occupations", "ADRESSE_KS_NO_SSL");
+        String path = EasyFile.getConfig("Configs_Serveur_Reservations", "ADRESSE_KS_NOSSL");
         File fichierKeyStore = new File(path);
         try {
             ks = KeyStore.getInstance("PKCS12", "BC");
@@ -304,42 +273,17 @@ public class Connexion extends javax.swing.JFrame {
             Bload.setEnabled(false);
             GpassKs.setEnabled(false);
         } catch (KeyStoreException ex) {
-            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchProviderException ex) {
-            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         } catch (CertificateException ex) {
-            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_BloadActionPerformed
-
-    private void BloadSSLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BloadSSLActionPerformed
-        String pathSsl = EasyFile.getConfig("Configs_Serveur_Occupations", "ADRESSE_KS_SSL");
-        File fichierKeyStoreSsl = new File(pathSsl);
-        try {
-            ksSsl = KeyStore.getInstance("JKS");
-            String passKsSsl = new String(GpassKsSsl.getPassword());
-            ksSsl.load(new FileInputStream(fichierKeyStoreSsl), passKsSsl.toCharArray());
-            Glogin.setEnabled(true);
-            Gpassword.setEnabled(true);
-            Bconnexion.setEnabled(true);
-            GstatusSsl.setText("Loaded");
-            GstatusSsl.setForeground(Color.GREEN);
-            BloadSSL.setEnabled(false);
-            GpassKsSsl.setEnabled(false);
-        } catch (KeyStoreException ex) {
-            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
-        }catch (IOException ex) {
-            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (CertificateException ex) {
-            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_BloadSSLActionPerformed
 
     /**
      * @param args the command line arguments
@@ -378,18 +322,14 @@ public class Connexion extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Bconnexion;
     private javax.swing.JButton Bload;
-    private javax.swing.JButton BloadSSL;
     private javax.swing.JTextField Glogin;
     private javax.swing.JPasswordField GpassKs;
-    private javax.swing.JPasswordField GpassKsSsl;
     private javax.swing.JTextField Gpassword;
     private javax.swing.JLabel Gstatus;
-    private javax.swing.JLabel GstatusSsl;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -426,7 +366,14 @@ public class Connexion extends javax.swing.JFrame {
                 Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
             }
         }else if(type.equalsIgnoreCase(RLP.LOGIN_OUI)){
-            Main main = new Main(socket, myCertificate, myCertificateSsl);
+            initKeyExchance();
+        }else if(type.equalsIgnoreCase(RLP.SESSION_KEY)){
+            KeyExchange keyExchange = (KeyExchange) contenu;
+            byte[] cleSessionCrypted = keyExchange.getCleSession();
+            byte[] cleSessionDecrypted = cryptage.decrypt(Cryptage.RSA, cleSessionCrypted, myCertificate.getPrivateKey());
+            cleSession = cryptage.byteToCleSession(cleSessionDecrypted);
+            MyKeys myKeys = new MyKeys(myCertificate.getPrivateKey(), myCertificate.getCertificate().getPublicKey(), cleSession, myCertificate.getCertificate());
+            Main main = new Main(this, socket, myKeys);
             main.setVisible(true);
             this.dispose();
         }else if(type.equalsIgnoreCase(RLP.LOGIN_NON)){
@@ -453,22 +400,11 @@ public class Connexion extends javax.swing.JFrame {
 
     private void initConnexion() {
         myCertificate = new MyCertificate();
-        myCertificateSsl = new MyCertificate();
         try {
             myCertificate.setCertificate((X509Certificate) ks.getCertificate("client"));
             myCertificate.getCertificate().checkValidity();
             String passKs = new String(GpassKs.getPassword());
             myCertificate.setPrivateKey((PrivateKey) ks.getKey("client", passKs.toCharArray()));
-            myCertificate.setKeystore(ks);
-            myCertificate.setPassword(passKs);
-
-            myCertificateSsl.setCertificate((X509Certificate) ksSsl.getCertificate("client"));
-            myCertificateSsl.getCertificate().checkValidity();
-            String passKsSsl = new String(GpassKsSsl.getPassword());
-            myCertificateSsl.setPrivateKey((PrivateKey) ksSsl.getKey("client", passKsSsl.toCharArray()));
-            myCertificateSsl.setKeystore(ksSsl);
-            myCertificateSsl.setPassword(passKsSsl);
-
         } catch (KeyStoreException ex) {
             Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchAlgorithmException ex) {
@@ -480,5 +416,32 @@ public class Connexion extends javax.swing.JFrame {
         } catch (CertificateNotYetValidException ex) {
             Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    private void initKeyExchance() {
+        SignatureWithCertificate swc = new SignatureWithCertificate();
+        try {
+            Signature signature = Signature.getInstance("SHA1withRSA", "BC");
+            swc.setCertificate(myCertificate.getCertificate());
+            signature.initSign(myCertificate.getPrivateKey());
+            swc.setSignature(signature.sign());
+            socket.send(new PacketCom(RLP.KEY_EXCHANGE, (Object) swc));
+            PacketCom packetRetour;
+            try {
+                packetRetour = socket.receive();
+                traitementPacket(packetRetour);
+            } catch (Exception ex) {
+                Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchProviderException ex) {
+            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeyException ex) {
+            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SignatureException ex) {
+            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 }

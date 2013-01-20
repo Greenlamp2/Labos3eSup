@@ -243,10 +243,6 @@ public class Connexion extends javax.swing.JFrame {
             if(!socket.isConnected()){
                 JOptionPane.showMessageDialog(this, "Impossible de contacter le serveur");
             }else{
-                /*double nbAleatoire = Math.random();
-                byte[] digest = generateDigest(Glogin.getText(), Gpassword.getText(), nbAleatoire);
-                Object[] messageLogin = {Glogin.getText(), digest, nbAleatoire};*/
-                //PacketCom packet = new PacketCom(RMP.LOGIN, (Object)messageLogin);
                 this.login = Glogin.getText();
                 this.password = Gpassword.getText();
                 PacketCom packet = new PacketCom(RMP.LOGIN, null);

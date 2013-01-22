@@ -5,7 +5,7 @@
 
 package Protocole;
 
-import Securite.MyCertificate;
+import Securite.MyCertificateSSL;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -32,10 +32,10 @@ public class NetworkServerSSL {
     private SSLSocket socketClient;
     MAMP protocole;
     boolean connected;
-    MyCertificate myCertificate_no_ssl;
-    MyCertificate myCertificate_ssl;
+    MyCertificateSSL myCertificate_no_ssl;
+    MyCertificateSSL myCertificate_ssl;
 
-    public NetworkServerSSL(int port, MyCertificate myCertificate_no_ssl, MyCertificate myCertificate_ssl){
+    public NetworkServerSSL(int port, MyCertificateSSL myCertificate_no_ssl, MyCertificateSSL myCertificate_ssl){
         this.myCertificate_no_ssl = myCertificate_no_ssl;
         this.myCertificate_ssl = myCertificate_ssl;
         protocole = new MAMP(this.myCertificate_no_ssl, this.myCertificate_ssl, 666);
@@ -69,7 +69,7 @@ public class NetworkServerSSL {
         }
     }
 
-    public NetworkServerSSL(SSLSocket socket, MyCertificate myCertificate_no_ssl, MyCertificate myCertificate_ssl){
+    public NetworkServerSSL(SSLSocket socket, MyCertificateSSL myCertificate_no_ssl, MyCertificateSSL myCertificate_ssl){
         this.myCertificate_no_ssl = myCertificate_no_ssl;
         this.myCertificate_ssl = myCertificate_ssl;
         protocole = new MAMP(this.myCertificate_no_ssl, this.myCertificate_ssl, 123);

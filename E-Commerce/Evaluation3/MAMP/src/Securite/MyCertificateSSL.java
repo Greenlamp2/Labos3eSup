@@ -11,17 +11,17 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
 
-public class MyCertificate implements Serializable{
+public class MyCertificateSSL implements Serializable{
     private PrivateKey privateKey;
     private X509Certificate certificate;
     private KeyStore keystore;
     private String password;
 
-    public MyCertificate(){
+    public MyCertificateSSL(){
 
     }
 
-    public MyCertificate(X509Certificate certif){
+    public MyCertificateSSL(X509Certificate certif){
         setCertificate(certif);
         setPrivateKey(null);
     }

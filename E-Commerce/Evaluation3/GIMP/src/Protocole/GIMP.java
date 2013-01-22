@@ -5,7 +5,7 @@
 package Protocole;
 
 import Bean.Jdbc_MySQL;
-import Securite.MyCertificate;
+import Securite.MyCertificateSSL;
 import java.beans.Beans;
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -22,20 +22,20 @@ public class GIMP {
     public static String VERIF_CARD_FAILED = "VERIF_CARD_FAILED";
     public static String ERROR = "ERROR";
 
-    MyCertificate myCertificate_no_ssl_client;
-    MyCertificate myCertificate_ssl_client;
+    MyCertificateSSL myCertificate_no_ssl_client;
+    MyCertificateSSL myCertificate_ssl_client;
 
-    MyCertificate myCertificate_no_ssl_serveur;
-    MyCertificate myCertificate_ssl_serveur;
+    MyCertificateSSL myCertificate_no_ssl_serveur;
+    MyCertificateSSL myCertificate_ssl_serveur;
 
     int number1;
 
-    public GIMP(MyCertificate myCertificate_no_ssl_client, MyCertificate myCertificate_ssl_client){
+    public GIMP(MyCertificateSSL myCertificate_no_ssl_client, MyCertificateSSL myCertificate_ssl_client){
         this.myCertificate_no_ssl_client = myCertificate_no_ssl_client;
         this.myCertificate_ssl_client = myCertificate_ssl_client;
     }
 
-    public GIMP(MyCertificate myCertificate_no_ssl_serveur, MyCertificate myCertificate_ssl_serveur, int bidon){
+    public GIMP(MyCertificateSSL myCertificate_no_ssl_serveur, MyCertificateSSL myCertificate_ssl_serveur, int bidon){
         this.myCertificate_no_ssl_serveur = myCertificate_no_ssl_serveur;
         this.myCertificate_ssl_serveur = myCertificate_ssl_serveur;
     }
@@ -58,7 +58,11 @@ public class GIMP {
         Object contenu = packet.getObjet();
         System.out.println("Reçu: " + type);
         if (type.equals(GIMP.PAY_FOR_CLIENT)) {
-            return null;
+            Object[] infos = (Object[]) contenu;
+            String nomClient = (String)infos[0];
+            String numCarteCredit = (String)infos[1];
+            int idReservation = (int)infos[2];
+            return verificationCarte(nomClient, numCarteCredit, idReservation);
         }else{
             return new PacketCom(GIMP.ERROR, "ERROR");
         }
@@ -76,5 +80,9 @@ public class GIMP {
             PacketCom packetReponse = new PacketCom(GIMP.ERROR, "ERROR");
             return packetReponse;
         }
+    }
+
+    private PacketCom verificationCarte(String nomClient, String numCarteCredit, int idReservation) {
+        return new PacketCom(GIMP.VERIF_CARD_FAILED, "");
     }
 }

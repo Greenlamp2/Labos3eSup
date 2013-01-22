@@ -4,16 +4,7 @@
  */
 package Protocole;
 
-import Bean.Jdbc_MySQL;
-import Securite.MyCertificate;
-import java.beans.Beans;
-import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import Securite.MyCertificateSSL;
 
 
 public class MAMP {
@@ -22,20 +13,20 @@ public class MAMP {
     public static String VERIF_INT_FAILED = "VERIF_INT_FAILED";
     public static String ERROR = "ERROR";
 
-    MyCertificate myCertificate_no_ssl_client;
-    MyCertificate myCertificate_ssl_client;
+    MyCertificateSSL myCertificate_no_ssl_client;
+    MyCertificateSSL myCertificate_ssl_client;
 
-    MyCertificate myCertificate_no_ssl_serveur;
-    MyCertificate myCertificate_ssl_serveur;
+    MyCertificateSSL myCertificate_no_ssl_serveur;
+    MyCertificateSSL myCertificate_ssl_serveur;
 
     int number1;
 
-    public MAMP(MyCertificate myCertificate_no_ssl_client, MyCertificate myCertificate_ssl_client){
+    public MAMP(MyCertificateSSL myCertificate_no_ssl_client, MyCertificateSSL myCertificate_ssl_client){
         this.myCertificate_no_ssl_client = myCertificate_no_ssl_client;
         this.myCertificate_ssl_client = myCertificate_ssl_client;
     }
 
-    public MAMP(MyCertificate myCertificate_no_ssl_serveur, MyCertificate myCertificate_ssl_serveur, int bidon){
+    public MAMP(MyCertificateSSL myCertificate_no_ssl_serveur, MyCertificateSSL myCertificate_ssl_serveur, int bidon){
         this.myCertificate_no_ssl_serveur = myCertificate_no_ssl_serveur;
         this.myCertificate_ssl_serveur = myCertificate_ssl_serveur;
     }
@@ -58,7 +49,12 @@ public class MAMP {
         Object contenu = packet.getObjet();
         System.out.println("Reçu: " + type);
         if (type.equals(MAMP.TRANSFER_POGN)) {
-            return null;
+            Object[] infos = (Object[]) contenu;
+            int somme = (int)infos[0];
+            String nomClient = (String)infos[1];
+            int idReservation = (int)infos[2];
+            String numCompteInpresHollidays = (String)infos[3];
+            return effectuerVirement(somme, nomClient, idReservation, numCompteInpresHollidays);
         }else{
             return new PacketCom(MAMP.ERROR, "ERROR");
         }
@@ -76,5 +72,9 @@ public class MAMP {
             PacketCom packetReponse = new PacketCom(MAMP.ERROR, "ERROR");
             return packetReponse;
         }
+    }
+
+    private PacketCom effectuerVirement(int somme, String nomClient, int idReservation, String numCompteInpresHollidays) {
+        return new PacketCom(MAMP.VERIF_INT_FAILED, "");
     }
 }

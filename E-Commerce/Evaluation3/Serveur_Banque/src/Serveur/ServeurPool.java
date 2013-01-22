@@ -7,17 +7,17 @@ package Serveur;
 
 import Protocole.NetworkServerSSL;
 import Protocole.TraitementPacket;
-import Securite.MyCertificate;
+import Securite.MyCertificateSSL;
 
 
 public class ServeurPool implements Runnable{
     NetworkServerSSL reseau;
     int port;
     PoolThread poolThread;
-    MyCertificate myCertificate_no_ssl;
-    MyCertificate myCertificate_ssl;
+    MyCertificateSSL myCertificate_no_ssl;
+    MyCertificateSSL myCertificate_ssl;
 
-    ServeurPool(int port, MyCertificate myCertificate_no_ssl, MyCertificate myCertificate_ssl) {
+    ServeurPool(int port, MyCertificateSSL myCertificate_no_ssl, MyCertificateSSL myCertificate_ssl) {
         System.out.println("Mise à l'écoute sur le port: " + port);
         this.myCertificate_no_ssl = myCertificate_no_ssl;
         this.myCertificate_ssl = myCertificate_ssl;

@@ -8,6 +8,7 @@ import Bean.Jdbc_MySQL;
 import Helpers.EasyFile;
 import Securite.KeyExchange;
 import Securite.MyCertificate;
+import Securite.MyCertificateSSL;
 import Securite.MyKeys;
 import Securite.SignatureWithCertificate;
 import Utils.Cryptage;
@@ -1005,23 +1006,26 @@ public class RMP {
         String password = "lolilol";
         KeyStore keystoreSSL = getKeystore(fichierKsSSL, password);
         initMyKeysSSL(keystoreSSL, password);
-        MyCertificate myCertificateSSL = new MyCertificate(myKeysSSL.getCertificate());
+        MyCertificateSSL myCertificateSSL = new MyCertificateSSL(myKeysSSL.getCertificate());
         myCertificateSSL.setPassword(password);
         myCertificateSSL.setKeystore(keystoreSSL);
         myCertificateSSL.setPrivateKey(myKeysSSL.getClePrivee());
+
+        MyCertificateSSL myCertif = new MyCertificateSSL(myCertificateClient.getCertificate());
+        myCertif.setPrivateKey(myCertificateClient.getPrivateKey());
 
         /********************************************************************/
         //Credit VilVisa
         /********************************************************************/
         if(this.socketCreditVilvisa == null){
-            this.socketCreditVilvisa = new NetworkClientSSL(this.hostCredit, this.portCreditVilVisa, myCertificateClient, myCertificateSSL);
+            this.socketCreditVilvisa = new NetworkClientSSL(this.hostCredit, this.portCreditVilVisa, myCertif, myCertificateSSL);
         }
 
         /********************************************************************/
         //Credit MasterKuty
         /********************************************************************/
         if(this.socketCreditMasterKuty == null){
-            this.socketCreditMasterKuty = new NetworkClientSSL(this.hostCredit, this.portCreditMasterKuty, myCertificateClient, myCertificateSSL);
+            this.socketCreditMasterKuty = new NetworkClientSSL(this.hostCredit, this.portCreditMasterKuty, myCertif, myCertificateSSL);
         }
 
 
@@ -1029,7 +1033,7 @@ public class RMP {
         //Banque VilVisa
         /********************************************************************/
         if(this.socketBanqueVilVisa == null){
-            this.socketBanqueVilVisa = new NetworkClientSSL(this.hostBanque, this.portBanqueVilVisa, myCertificateClient, myCertificateSSL);
+            this.socketBanqueVilVisa = new NetworkClientSSL(this.hostBanque, this.portBanqueVilVisa, myCertif, myCertificateSSL);
         }
 
 
@@ -1037,7 +1041,7 @@ public class RMP {
         //Credit MasterKuty
         /********************************************************************/
         if(this.socketBanqueMasterKuty == null){
-            this.socketBanqueMasterKuty = new NetworkClientSSL(this.hostBanque, this.portBanqueMasterKuty, myCertificateClient, myCertificateSSL);
+            this.socketBanqueMasterKuty = new NetworkClientSSL(this.hostBanque, this.portBanqueMasterKuty, myCertif, myCertificateSSL);
         }
 
 

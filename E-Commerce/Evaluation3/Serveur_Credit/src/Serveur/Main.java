@@ -6,7 +6,7 @@
 package Serveur;
 
 import Helpers.EasyFile;
-import Securite.MyCertificate;
+import Securite.MyCertificateSSL;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -29,8 +29,8 @@ public class Main {
         KeyStore ks = null;
         KeyStore ks_SSL = null;
 
-        MyCertificate myCertificate_no_ssl = new MyCertificate();
-        MyCertificate myCertificate_ssl = new MyCertificate();
+        MyCertificateSSL myCertificate_no_ssl = new MyCertificateSSL();
+        MyCertificateSSL myCertificate_ssl = new MyCertificateSSL();
 
         String pathKeystoreServeurNoSSl = EasyFile.getConfig("Configs_Serveur_Credit", "ADRESSE_KS_SERVEUR_NO_SSL");
         String pathKeystoreServeurSSl = EasyFile.getConfig("Configs_Serveur_Credit", "ADRESSE_KS_SERVEUR_SSL");

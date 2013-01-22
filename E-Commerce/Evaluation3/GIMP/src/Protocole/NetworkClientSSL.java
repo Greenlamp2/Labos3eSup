@@ -5,7 +5,7 @@
 
 package Protocole;
 
-import Securite.MyCertificate;
+import Securite.MyCertificateSSL;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -25,10 +25,10 @@ import javax.net.ssl.TrustManagerFactory;
 public class NetworkClientSSL {
     private SSLSocket socketClient;
     GIMP protocole;
-    MyCertificate myCertificate;
-    MyCertificate myCertificateSsl;
+    MyCertificateSSL myCertificate;
+    MyCertificateSSL myCertificateSsl;
 
-    public NetworkClientSSL(String host, int port, MyCertificate myCertificate, MyCertificate myCertificateSsl){
+    public NetworkClientSSL(String host, int port, MyCertificateSSL myCertificate, MyCertificateSSL myCertificateSsl){
         this.myCertificate = myCertificate;
         this.myCertificateSsl = myCertificateSsl;
         protocole = new GIMP(myCertificate, myCertificateSsl);

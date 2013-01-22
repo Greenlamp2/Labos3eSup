@@ -7,7 +7,6 @@ package Serveur;
 
 import Helpers.EasyFile;
 import Securite.MyCertificate;
-import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,12 +29,13 @@ public class Main {
         KeyStore ks = null;
         MyCertificate myCertificate = new MyCertificate();
         int portVoyageurs = Integer.parseInt(EasyFile.getConfig("Configs_Serveur_Reservations", "PORT_VOYAGEURS"));
+        int portVoyageursMobile = Integer.parseInt(EasyFile.getConfig("Configs_Serveur_Reservations", "PORT_VOYAGEURS_MOBILE"));
         String path = EasyFile.getConfig("Configs_Serveur_Reservations", "ADRESSE_KS_SERVEUR_NOSSL");
         File fichierKeyStore = new File(path);
         try {
             ks = KeyStore.getInstance("PKCS12", "BC");
             String passKs = "lolilol";
-            
+
             ks.load(new FileInputStream(fichierKeyStore), passKs.toCharArray());
             myCertificate.setCertificate((X509Certificate) ks.getCertificate("server"));
             myCertificate.getCertificate().checkValidity();
@@ -60,6 +60,9 @@ public class Main {
         } catch (CertificateException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        Thread MyThreadMobile = new Thread(new ServeurPool_mobile(portVoyageursMobile, myCertificate));
+        MyThreadMobile.start();
 
         Thread MyThread = new Thread(new ServeurPool(portVoyageurs, myCertificate));
         MyThread.start();

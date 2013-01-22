@@ -33,20 +33,24 @@ import javax.crypto.SecretKey;
 
 
 public class RMP {
-    MyCertificate myCertificateClient;
+    private MyCertificate myCertificateClient;
     MyCertificate myCertificateServer;
     Cryptage cryptageServer;
     SecretKey cleSession;
     int number1 = 0;
     String ou = null;
+    boolean mobile = false;
 
     public static String LOGIN = "LOGIN";
     public static String LOGIN_OUI = "LOGIN_OUI";
     public static String LOGIN_NON = "LOGIN_NON";
     public static String NONCE = "NONCE";
     public static String LOGIN_NEXT_STEP = "LOGIN_NEXT_STEP";
+    public static String LOGIN_VOY_NEXT_STEP = "LOGIN_VOY_NEXT_STEP";
     public static String KEY_EXCHANGE = "KEY_EXCHANGE";
     public static String SESSION_KEY = "SESSION_KEY";
+    public static String GET_SESSION_KEY = "GET_SESSION_KEY";
+    public static String GET_SESSION_KEY_OUI = "GET_SESSION_KEY_OUI";
     public static String BROOM = "BROOM";
     public static String BROOM_OUI = "BROOM_OUI";
     public static String BROOM_NON = "BROOM_NON";
@@ -65,12 +69,14 @@ public class RMP {
 
     }
 
-    public RMP(MyCertificate myCertificateClient){
+    public RMP(MyCertificate myCertificateClient, boolean mobile){
+        this.mobile = mobile;
         this.myCertificateClient = myCertificateClient;
         this.ou = "client";
     }
 
-    public RMP(MyCertificate myCertificateServer, int bidon){
+    public RMP(MyCertificate myCertificateServer, int bidon, boolean mobile){
+        this.mobile = mobile;
         this.myCertificateServer = myCertificateServer;
         this.cryptageServer = new Cryptage(myCertificateServer);
         this.ou = "server";
@@ -111,13 +117,28 @@ public class RMP {
             }else{
                 return new PacketCom(RMP.LOGIN_NON, "LOGIN_NON");
             }
+        }else if(type.equals(RMP.LOGIN_VOY_NEXT_STEP)){
+            Object[] infos = (Object[]) contenu;
+            String login = (String) infos[0];
+            byte[] digest = (byte[]) infos[1];
+            int number2 = (Integer) infos[2];
+            String password = getPasswordVoy(login);
+            if(password == null){
+                return new PacketCom(RMP.LOGIN_NON, "LOGIN_NON");
+            }
+            byte[] digest2 = generateDigest(login, password, number1, number2);
+            if(digestCorrect(digest, digest2)){
+                return new PacketCom(RMP.LOGIN_OUI, "LOGIN_OUI");
+            }else{
+                return new PacketCom(RMP.LOGIN_NON, "LOGIN_NON");
+            }
         }else if(type.equals(RMP.KEY_EXCHANGE)){
             SignatureWithCertificate swc = (SignatureWithCertificate) contenu;
             if(!signatureCorrect(swc)){
                 return new PacketCom(RMP.ERROR, "La signature est incorecte");
             }
 
-            myCertificateClient = new MyCertificate(swc.getCertificate());
+            setMyCertificateClient(new MyCertificate(swc.getCertificate()));
 
             KeyExchange keyExchange = new KeyExchange();
             keyExchange.setCertificatServeur(myCertificateServer.getCertificate());
@@ -249,6 +270,11 @@ public class RMP {
             //envoyer tuple
             return new PacketCom(RMP.LROOM_OUI, (Object)listeReservationCrypted);
 
+        }else if(type.equals(RMP.GET_SESSION_KEY)){
+            cleSession = cryptageServer.getSessionKey("DES");
+            byte[] cleSessionByte = cryptageServer.cleSessionToByte(cleSession);
+            String message = Base64.encode(cleSessionByte);
+            return new PacketCom(RMP.GET_SESSION_KEY_OUI, (Object)message);
         }else{
             return new PacketCom(RMP.ERROR, "ERROR");
         }
@@ -294,6 +320,29 @@ public class RMP {
             Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
             dbsql.init();
             String request = "SELECT password FROM gestionnaires where login = '"+ login +"'";
+            Object tuples = dbsql.select(request);
+            String userFound = dbsql.extract(tuples, 1, "password");
+            if(userFound != null){
+                password = userFound;
+            }
+            dbsql.endExtract();
+            dbsql.Disconnect();
+        } catch (IOException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return password;
+    }
+
+    private String getPasswordVoy(String login) {
+        String password = null;
+        try{
+            Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
+            dbsql.init();
+            String request = "SELECT password FROM voyageurs where nom = '"+ login +"'";
             Object tuples = dbsql.select(request);
             String userFound = dbsql.extract(tuples, 1, "password");
             if(userFound != null){
@@ -837,5 +886,13 @@ public class RMP {
             Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
         }
         return nomClient;
+    }
+
+    public MyCertificate getMyCertificateClient() {
+        return myCertificateClient;
+    }
+
+    public void setMyCertificateClient(MyCertificate myCertificateClient) {
+        this.myCertificateClient = myCertificateClient;
     }
 }

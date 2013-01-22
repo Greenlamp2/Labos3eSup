@@ -5,13 +5,13 @@
 
 package Serveur;
 
-import Protocole.NetworkServer;
-import Protocole.TraitementPacket;
+import Protocole.NetworkServerMobile;
+import Protocole.TraitementPacketMobile;
 import Securite.MyCertificate;
 
 
-public class ServeurPool implements Runnable{
-    NetworkServer reseau;
+public class ServeurPool_mobile implements Runnable{
+    NetworkServerMobile reseau;
     int port;
     PoolThread poolThread;
     MyCertificate myCertificate;
@@ -23,10 +23,10 @@ public class ServeurPool implements Runnable{
         poolThread = new PoolThread(3);
     }*/
 
-    ServeurPool(int port, MyCertificate myCertificate) {
+    ServeurPool_mobile(int port, MyCertificate myCertificate) {
         System.out.println("Mise à l'écoute sur le port: " + port);
         this.myCertificate = myCertificate;
-        reseau = new NetworkServer(port, myCertificate);
+        reseau = new NetworkServerMobile(port, myCertificate);
         poolThread = new PoolThread(3);
     }
 
@@ -38,7 +38,7 @@ public class ServeurPool implements Runnable{
             while(goOn){
                 goOn = reseau.accept();
                 System.out.println("Nouveau client !");
-                TraitementPacket traitement = new TraitementPacket(new NetworkServer(reseau.getSocketClient(), myCertificate));
+                TraitementPacketMobile traitement = new TraitementPacketMobile(new NetworkServerMobile(reseau.getSocketClient(), myCertificate));
                 poolThread.assign(traitement);
                 nbClient++;
             }

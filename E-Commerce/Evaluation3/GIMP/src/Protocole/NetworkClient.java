@@ -15,19 +15,38 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
 
 
 public class NetworkClient {
-    private Socket socketClient;
-    RMP protocole;
+    private SSLSocket socketClient;
+    GIMP protocole;
     MyCertificate myCertificate;
+    MyCertificate myCertificateSsl;
 
-    public NetworkClient(String host, int port, MyCertificate myCertificate){
+    public NetworkClient(String host, int port, MyCertificate myCertificate, MyCertificate myCertificateSsl){
         this.myCertificate = myCertificate;
-        protocole = new RMP(myCertificate, false);
+        this.myCertificateSsl = myCertificateSsl;
+        protocole = new GIMP(myCertificate, myCertificateSsl);
         try {
             InetAddress ip = InetAddress.getByName(host);
-            socketClient = new Socket(ip, port);
+
+            SSLContext context = SSLContext.getInstance("SSLv3");
+
+            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
+            keyManagerFactory.init(myCertificateSsl.getKeystore(), myCertificateSsl.getPassword().toCharArray());
+
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("SunX509");
+            trustManagerFactory.init(myCertificateSsl.getKeystore());
+
+            context.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
+
+            SSLSocketFactory sslSocketFactory = context.getSocketFactory();
+            this.socketClient = (SSLSocket)sslSocketFactory.createSocket(ip, port);
         } catch (Exception ex) {
             Logger.getLogger(NetworkClient.class.getName()).log(Level.SEVERE, null, ex);
         }

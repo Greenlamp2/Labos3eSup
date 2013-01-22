@@ -5,22 +5,28 @@
 package Protocole;
 
 import Bean.Jdbc_MySQL;
+import Helpers.EasyFile;
 import Securite.KeyExchange;
+import Securite.MyCertificate;
+import Securite.MyKeys;
+import Securite.SignatureWithCertificate;
+import Utils.Cryptage;
 import java.beans.Beans;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import Securite.MyCertificate;
-import Securite.SignatureWithCertificate;
-import Utils.Cryptage;
-import java.security.InvalidKeyException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.ResultSet;
 import java.text.ParseException;
@@ -29,6 +35,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.crypto.SecretKey;
 
 
@@ -40,6 +48,23 @@ public class RMP {
     int number1 = 0;
     String ou = null;
     boolean mobile = false;
+
+    NetworkClientSSL socketBanqueVilVisa;
+    NetworkClientSSL socketBanqueMasterKuty;
+    NetworkClientSSL socketCreditVilvisa;
+    NetworkClientSSL socketCreditMasterKuty;
+
+    String hostBanque;
+    String hostCredit;
+    int portBanqueVilVisa;
+    int portBanqueMasterKuty;
+    int portCreditVilVisa;
+    int portCreditMasterKuty;
+
+    String pathKsSSL;
+
+    MyKeys myKeysSSL;
+
 
     public static String LOGIN = "LOGIN";
     public static String LOGIN_OUI = "LOGIN_OUI";
@@ -65,6 +90,8 @@ public class RMP {
     public static String LROOM_NON = "LROOM_NON";
     public static String ERROR = "ERROR";
 
+    public static enum Orga { VILVISA, MASTERKUTY, NONE };
+
     public RMP(){
 
     }
@@ -76,6 +103,24 @@ public class RMP {
     }
 
     public RMP(MyCertificate myCertificateServer, int bidon, boolean mobile){
+        socketBanqueVilVisa = null;
+        socketBanqueMasterKuty = null;
+        socketCreditVilvisa = null;
+        socketCreditMasterKuty = null;
+
+        hostBanque = EasyFile.getConfig("Configs_Serveur_Reservations", "HOST_BANQUE");
+        hostBanque = EasyFile.getConfig("Configs_Serveur_Reservations", "HOST_CREDIT");
+        portBanqueVilVisa = Integer.parseInt(EasyFile.getConfig("Configs_Serveur_Reservations", "PORT_BANQUE_VILVISA"));
+        portBanqueMasterKuty = Integer.parseInt(EasyFile.getConfig("Configs_Serveur_Reservations", "PORT_BANQUE_MASTERKUTY"));
+        portCreditVilVisa = Integer.parseInt(EasyFile.getConfig("Configs_Serveur_Reservations", "PORT_CREDIT_VILVISA"));
+        portCreditMasterKuty = Integer.parseInt(EasyFile.getConfig("Configs_Serveur_Reservations", "PORT_CREDIT_MASTERKUTY"));
+
+        pathKsSSL = EasyFile.getConfig("Configs_Serveur_Reservations", "ADRESSE_KS_SSL");
+
+        myKeysSSL = null;
+
+
+
         this.mobile = mobile;
         this.myCertificateServer = myCertificateServer;
         this.cryptageServer = new Cryptage(myCertificateServer);
@@ -475,6 +520,22 @@ public class RMP {
             return new PacketCom(RMP.PROOM_NON, "la réservation a déja été payée.");
         }
 
+        Orga orga = verificationCarte(nomClient, numCarteCredit, idReservation);
+        if(orga == RMP.Orga.NONE){
+            return new PacketCom(RMP.PROOM_NON, "La carte de crédit n'appartientà aucuns organisme");
+        }
+        String numCompteInpresHollidays = EasyFile.getConfig("Configs_Serveur_Reservations", "NUM_COMPTE_INPRES_HOLLIDAYS");
+        int prix = getPrixChambre(Integer.parseInt(numChambre));
+        int nbNuit = getNbNuit(idReservation);
+        int somme = prix * nbNuit;
+        PacketCom retour = effectuerPayement(orga, somme, nomClient, idReservation,numCompteInpresHollidays);
+        if(retour.getType().equals(MAMP.VERIF_INT_FAILED)){
+            String message = (String)retour.getObjet();
+            return new PacketCom(RMP.PROOM_NON, (Object)message);
+        }
+
+
+
         /**************************************************************************************************************/
         //Enregistrer numero carte credit
         /**************************************************************************************************************/
@@ -488,6 +549,8 @@ public class RMP {
         if(!payerReservation(idReservation)){
             return new PacketCom(RMP.PROOM_NON, "Une erreur s'est déroulée lors du payement de la réservation.");
         }
+
+
 
         return new PacketCom(RMP.PROOM_OUI, "PROOM_OUI");
 
@@ -894,5 +957,169 @@ public class RMP {
 
     public void setMyCertificateClient(MyCertificate myCertificateClient) {
         this.myCertificateClient = myCertificateClient;
+    }
+
+    private Orga verificationCarte(String nomClient, String numCarteCredit, int idReservation) {
+        /********************************************************************/
+        //Instanciation des sockets SSL si pas déja fait.
+        /********************************************************************/
+        initSocketSSL();
+        PacketCom packetVerifCarte = null;
+        PacketCom packetReponseVerif = null;
+
+        Object[] infos = {nomClient, numCarteCredit, idReservation};
+
+        /********************************************************************/
+        //Verification chez VilVisa
+        /********************************************************************/
+        packetVerifCarte = new PacketCom(GIMP.PAY_FOR_CLIENT, (Object)infos);
+        this.socketCreditVilvisa.send(packetVerifCarte);
+        try {
+            packetReponseVerif = this.socketCreditVilvisa.receive();
+            if(packetReponseVerif.getType().equals(GIMP.VERIF_CARD_SUCCESSFULL)){
+                return RMP.Orga.VILVISA;
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        /********************************************************************/
+        //Verification chez MasterKuty
+        /********************************************************************/
+        packetVerifCarte = new PacketCom(GIMP.PAY_FOR_CLIENT, (Object)infos);
+        this.socketCreditMasterKuty.send(packetVerifCarte);
+        try {
+            packetReponseVerif = this.socketCreditMasterKuty.receive();
+            if(packetReponseVerif.getType().equals(GIMP.VERIF_CARD_SUCCESSFULL)){
+                return RMP.Orga.MASTERKUTY;
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return RMP.Orga.NONE;
+    }
+
+    private void initSocketSSL() {
+        File fichierKsSSL = new File(this.pathKsSSL);
+        String password = "lolilol";
+        KeyStore keystoreSSL = getKeystore(fichierKsSSL, password);
+        initMyKeysSSL(keystoreSSL, password);
+        MyCertificate myCertificateSSL = new MyCertificate(myKeysSSL.getCertificate());
+        myCertificateSSL.setPassword(password);
+        myCertificateSSL.setKeystore(keystoreSSL);
+        myCertificateSSL.setPrivateKey(myKeysSSL.getClePrivee());
+
+        /********************************************************************/
+        //Credit VilVisa
+        /********************************************************************/
+        if(this.socketCreditVilvisa == null){
+            this.socketCreditVilvisa = new NetworkClientSSL(this.hostCredit, this.portCreditVilVisa, myCertificateClient, myCertificateSSL);
+        }
+
+        /********************************************************************/
+        //Credit MasterKuty
+        /********************************************************************/
+        if(this.socketCreditMasterKuty == null){
+            this.socketCreditMasterKuty = new NetworkClientSSL(this.hostCredit, this.portCreditMasterKuty, myCertificateClient, myCertificateSSL);
+        }
+
+
+        /********************************************************************/
+        //Banque VilVisa
+        /********************************************************************/
+        if(this.socketBanqueVilVisa == null){
+            this.socketBanqueVilVisa = new NetworkClientSSL(this.hostBanque, this.portBanqueVilVisa, myCertificateClient, myCertificateSSL);
+        }
+
+
+        /********************************************************************/
+        //Credit MasterKuty
+        /********************************************************************/
+        if(this.socketBanqueMasterKuty == null){
+            this.socketBanqueMasterKuty = new NetworkClientSSL(this.hostBanque, this.portBanqueMasterKuty, myCertificateClient, myCertificateSSL);
+        }
+
+
+    }
+
+    private KeyStore getKeystore(File pathKs, String password) {
+        KeyStore ks = null;
+        try {
+            ks = KeyStore.getInstance("JKS");
+            ks.load(new FileInputStream(pathKs), password.toCharArray());
+        } catch (KeyStoreException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CertificateException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return ks;
+    }
+
+    private void initMyKeysSSL(KeyStore keystoreSSL, String password) {
+        if(myKeysSSL == null){
+            myKeysSSL = new MyKeys();
+            try {
+                myKeysSSL.setCertificate((X509Certificate)keystoreSSL.getCertificate("client"));
+                myKeysSSL.setClePrivee((PrivateKey)keystoreSSL.getKey("client", password.toCharArray()));
+                myKeysSSL.setClePublic(myKeysSSL.getCertificate().getPublicKey());
+            } catch (KeyStoreException ex) {
+                Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (UnrecoverableKeyException ex) {
+                Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    private int getNbNuit(int idReservation) {
+        String nbNuit = null;
+        try{
+            Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
+            dbsql.init();
+            String request = "SELECT nbNuit from reservationschambre where numeroReservation = '"+idReservation+"'";
+            Object tuples = dbsql.select(request);
+            nbNuit = dbsql.extract(tuples, 1, "nbNuit");
+            dbsql.endExtract();
+            dbsql.Disconnect();
+        } catch (IOException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if(nbNuit == null){
+            return 0;
+        }else{
+            return Integer.parseInt(nbNuit);
+        }
+    }
+
+    private PacketCom effectuerPayement(Orga orga, int somme, String nomClient, int idReservation, String numCompteInpresHollidays) {
+        PacketCom retour = null;
+        Object[] infos = {somme, nomClient, idReservation, numCompteInpresHollidays};
+        PacketCom packet = new PacketCom(MAMP.TRANSFER_POGN, (Object)infos);
+        if(orga == Orga.VILVISA){
+            try {
+                this.socketBanqueVilVisa.send(packet);
+                retour = this.socketBanqueVilVisa.receive();
+            } catch (Exception ex) {
+                Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+            try {
+                this.socketBanqueMasterKuty.send(packet);
+                retour = this.socketBanqueMasterKuty.receive();
+            } catch (Exception ex) {
+                Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return retour;
     }
 }

@@ -22,13 +22,13 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
 
-public class NetworkClient {
+public class NetworkClientSSL {
     private SSLSocket socketClient;
     GIMP protocole;
     MyCertificate myCertificate;
     MyCertificate myCertificateSsl;
 
-    public NetworkClient(String host, int port, MyCertificate myCertificate, MyCertificate myCertificateSsl){
+    public NetworkClientSSL(String host, int port, MyCertificate myCertificate, MyCertificate myCertificateSsl){
         this.myCertificate = myCertificate;
         this.myCertificateSsl = myCertificateSsl;
         protocole = new GIMP(myCertificate, myCertificateSsl);
@@ -48,7 +48,7 @@ public class NetworkClient {
             SSLSocketFactory sslSocketFactory = context.getSocketFactory();
             this.socketClient = (SSLSocket)sslSocketFactory.createSocket(ip, port);
         } catch (Exception ex) {
-            Logger.getLogger(NetworkClient.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NetworkClientSSL.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -67,7 +67,7 @@ public class NetworkClient {
                 socketClient = null;
                 System.out.println("Déconnection réussie");
             } catch (IOException ex) {
-                Logger.getLogger(NetworkServer.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(NetworkServerSSL.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -79,7 +79,7 @@ public class NetworkClient {
                 ObjectOutputStream oos = new ObjectOutputStream(os);
                 oos.writeObject((Object)packet);
             } catch (IOException ex) {
-                Logger.getLogger(NetworkServer.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(NetworkServerSSL.class.getName()).log(Level.SEVERE, null, ex);
             }
         }else{
             System.out.println("Socket non connectée");

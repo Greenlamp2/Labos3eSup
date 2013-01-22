@@ -27,18 +27,18 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManagerFactory;
 
 
-public class NetworkServer {
+public class NetworkServerSSL {
     private SSLServerSocket socketServeur;
     private SSLSocket socketClient;
-    MAMP protocole;
+    GIMP protocole;
     boolean connected;
     MyCertificate myCertificate_no_ssl;
     MyCertificate myCertificate_ssl;
 
-    public NetworkServer(int port, MyCertificate myCertificate_no_ssl, MyCertificate myCertificate_ssl){
+    public NetworkServerSSL(int port, MyCertificate myCertificate_no_ssl, MyCertificate myCertificate_ssl){
         this.myCertificate_no_ssl = myCertificate_no_ssl;
         this.myCertificate_ssl = myCertificate_ssl;
-        protocole = new MAMP(this.myCertificate_no_ssl, this.myCertificate_ssl, 666);
+        protocole = new GIMP(this.myCertificate_no_ssl, this.myCertificate_ssl, 666);
         try {
             SSLContext context = SSLContext.getInstance("SSLv3");
 
@@ -56,23 +56,23 @@ public class NetworkServer {
             System.out.println("Socket créer");
 
         } catch (IOException ex) {
-            Logger.getLogger(NetworkServer.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NetworkServerSSL.class.getName()).log(Level.SEVERE, null, ex);
             connected = false;
         } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(NetworkServer.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NetworkServerSSL.class.getName()).log(Level.SEVERE, null, ex);
         } catch (KeyStoreException ex) {
-            Logger.getLogger(NetworkServer.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NetworkServerSSL.class.getName()).log(Level.SEVERE, null, ex);
         } catch (UnrecoverableKeyException ex) {
-            Logger.getLogger(NetworkServer.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NetworkServerSSL.class.getName()).log(Level.SEVERE, null, ex);
         } catch (KeyManagementException ex) {
-            Logger.getLogger(NetworkServer.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NetworkServerSSL.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public NetworkServer(SSLSocket socket, MyCertificate myCertificate_no_ssl, MyCertificate myCertificate_ssl){
+    public NetworkServerSSL(SSLSocket socket, MyCertificate myCertificate_no_ssl, MyCertificate myCertificate_ssl){
         this.myCertificate_no_ssl = myCertificate_no_ssl;
         this.myCertificate_ssl = myCertificate_ssl;
-        protocole = new MAMP(this.myCertificate_no_ssl, this.myCertificate_ssl, 123);
+        protocole = new GIMP(this.myCertificate_no_ssl, this.myCertificate_ssl, 123);
         this.setSocketClient(socket);
         this.connected = true;
     }
@@ -84,7 +84,7 @@ public class NetworkServer {
             System.out.println("client connecté");
             return true;
         } catch (IOException ex) {
-            Logger.getLogger(NetworkServer.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NetworkServerSSL.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
     }
@@ -95,7 +95,7 @@ public class NetworkServer {
                 socketServeur.close();
                 System.out.println("Déconnection réussie");
             } catch (IOException ex) {
-                Logger.getLogger(NetworkServer.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(NetworkServerSSL.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -106,7 +106,7 @@ public class NetworkServer {
                 getSocketClient().close();
                 System.out.println("Déconnection client réussie");
             } catch (IOException ex) {
-                Logger.getLogger(NetworkServer.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(NetworkServerSSL.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -122,7 +122,7 @@ public class NetworkServer {
                 ObjectOutputStream oos = new ObjectOutputStream(os);
                 oos.writeObject((Object)packet);
             } catch (IOException ex) {
-                Logger.getLogger(NetworkServer.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(NetworkServerSSL.class.getName()).log(Level.SEVERE, null, ex);
             }
         }else{
             System.out.println("Socket non connectée");

@@ -10,8 +10,8 @@ import java.util.logging.Logger;
 
 
 public class TraitementPacket implements Runnable{
-    private NetworkServer socket;
-    public TraitementPacket(NetworkServer sock){
+    private NetworkServerSSL socket;
+    public TraitementPacket(NetworkServerSSL sock){
         this.socket = sock;
         System.out.println("Démarrage du thread");
     }
@@ -30,11 +30,11 @@ public class TraitementPacket implements Runnable{
         }
     }
 
-    public NetworkServer getSocket() {
+    public NetworkServerSSL getSocket() {
         return socket;
     }
 
-    public void setSocket(NetworkServer socket) {
+    public void setSocket(NetworkServerSSL socket) {
         this.socket = socket;
     }
 

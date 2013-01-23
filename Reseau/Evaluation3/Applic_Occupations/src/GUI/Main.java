@@ -374,9 +374,9 @@ public class Main extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void GvaliderMisRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GvaliderMisRoomActionPerformed
-        String numChambre = GnumChambreArRoom.getText();
-        String nomClient = GnomArRoom.getText();
-        String date = GdateArRoom.getText();
+        String numChambre = GnumChambreMisRoom.getText();
+        String nomClient = GnomMisRoom.getText();
+        String date = GdateMisRoom.getText();
 
         Signature signature;
         byte[] signatureResponsable = null;

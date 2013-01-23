@@ -527,7 +527,7 @@ public class RMP {
             return new PacketCom(RMP.PROOM_NON, "la réservation a déja été payée.");
         }
 
-        Orga orga = verificationCarte(nomClient, numCarteCredit, idReservation);
+        /*Orga orga = verificationCarte(nomClient, numCarteCredit, idReservation);
         if(orga == RMP.Orga.NONE){
             return new PacketCom(RMP.PROOM_NON, "La carte de crédit n'appartientà aucuns organisme");
         }
@@ -539,7 +539,7 @@ public class RMP {
         if(retour.getType().equals(MAMP.VERIF_INT_FAILED)){
             String message = (String)retour.getObjet();
             return new PacketCom(RMP.PROOM_NON, (Object)message);
-        }
+        }*/
 
 
 
@@ -1038,17 +1038,17 @@ public class RMP {
         /********************************************************************/
         //Banque VilVisa
         /********************************************************************/
-        /*if(this.socketBanqueVilVisa == null){
+        if(this.socketBanqueVilVisa == null){
             this.socketBanqueVilVisa = new MAMPNetworkClientSSL(this.hostBanque, this.portBanqueVilVisa, myCertif, myCertificateSSL);
-        }*/
+        }
 
 
         /********************************************************************/
         //Credit MasterKuty
         /********************************************************************/
-        /*if(this.socketBanqueMasterKuty == null){
+        if(this.socketBanqueMasterKuty == null){
             this.socketBanqueMasterKuty = new MAMPNetworkClientSSL(this.hostBanque, this.portBanqueMasterKuty, myCertif, myCertificateSSL);
-        }*/
+        }
 
 
     }

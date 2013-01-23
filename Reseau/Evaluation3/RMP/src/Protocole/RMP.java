@@ -5,10 +5,15 @@
 package Protocole;
 
 import Bean.Jdbc_MySQL;
+import Commun.MyCertificateSSL;
+import Commun.PacketComSSL;
+import GIMP.GIMP;
+import GIMP.GIMPNetworkClientSSL;
 import Helpers.EasyFile;
+import MAMP.MAMP;
+import MAMP.MAMPNetworkClientSSL;
 import Securite.KeyExchange;
 import Securite.MyCertificate;
-import Securite.MyCertificateSSL;
 import Securite.MyKeys;
 import Securite.SignatureWithCertificate;
 import Utils.Cryptage;
@@ -41,6 +46,7 @@ import java.util.logging.Logger;
 import javax.crypto.SecretKey;
 
 
+
 public class RMP {
     private MyCertificate myCertificateClient;
     MyCertificate myCertificateServer;
@@ -50,10 +56,10 @@ public class RMP {
     String ou = null;
     boolean mobile = false;
 
-    NetworkClientSSL socketBanqueVilVisa;
-    NetworkClientSSL socketBanqueMasterKuty;
-    NetworkClientSSL socketCreditVilvisa;
-    NetworkClientSSL socketCreditMasterKuty;
+    MAMPNetworkClientSSL socketBanqueVilVisa;
+    MAMPNetworkClientSSL socketBanqueMasterKuty;
+    GIMPNetworkClientSSL socketCreditVilvisa;
+    GIMPNetworkClientSSL socketCreditMasterKuty;
 
     String hostBanque;
     String hostCredit;
@@ -529,7 +535,7 @@ public class RMP {
         int prix = getPrixChambre(Integer.parseInt(numChambre));
         int nbNuit = getNbNuit(idReservation);
         int somme = prix * nbNuit;
-        PacketCom retour = effectuerPayement(orga, somme, nomClient, idReservation,numCompteInpresHollidays);
+        PacketComSSL retour = effectuerPayement(orga, somme, nomClient, idReservation,numCompteInpresHollidays);
         if(retour.getType().equals(MAMP.VERIF_INT_FAILED)){
             String message = (String)retour.getObjet();
             return new PacketCom(RMP.PROOM_NON, (Object)message);
@@ -965,15 +971,15 @@ public class RMP {
         //Instanciation des sockets SSL si pas déja fait.
         /********************************************************************/
         initSocketSSL();
-        PacketCom packetVerifCarte = null;
-        PacketCom packetReponseVerif = null;
+        PacketComSSL packetVerifCarte = null;
+        PacketComSSL packetReponseVerif = null;
 
         Object[] infos = {nomClient, numCarteCredit, idReservation};
 
         /********************************************************************/
         //Verification chez VilVisa
         /********************************************************************/
-        packetVerifCarte = new PacketCom(GIMP.PAY_FOR_CLIENT, (Object)infos);
+        packetVerifCarte = new PacketComSSL(GIMP.PAY_FOR_CLIENT, (Object)infos);
         this.socketCreditVilvisa.send(packetVerifCarte);
         try {
             packetReponseVerif = this.socketCreditVilvisa.receive();
@@ -987,7 +993,7 @@ public class RMP {
         /********************************************************************/
         //Verification chez MasterKuty
         /********************************************************************/
-        packetVerifCarte = new PacketCom(GIMP.PAY_FOR_CLIENT, (Object)infos);
+        packetVerifCarte = new PacketComSSL(GIMP.PAY_FOR_CLIENT, (Object)infos);
         this.socketCreditMasterKuty.send(packetVerifCarte);
         try {
             packetReponseVerif = this.socketCreditMasterKuty.receive();
@@ -1006,7 +1012,7 @@ public class RMP {
         String password = "lolilol";
         KeyStore keystoreSSL = getKeystore(fichierKsSSL, password);
         initMyKeysSSL(keystoreSSL, password);
-        MyCertificateSSL myCertificateSSL = new MyCertificateSSL(myKeysSSL.getCertificate());
+        Commun.MyCertificateSSL myCertificateSSL = new MyCertificateSSL(myKeysSSL.getCertificate());
         myCertificateSSL.setPassword(password);
         myCertificateSSL.setKeystore(keystoreSSL);
         myCertificateSSL.setPrivateKey(myKeysSSL.getClePrivee());
@@ -1018,31 +1024,31 @@ public class RMP {
         //Credit VilVisa
         /********************************************************************/
         if(this.socketCreditVilvisa == null){
-            this.socketCreditVilvisa = new NetworkClientSSL(this.hostCredit, this.portCreditVilVisa, myCertif, myCertificateSSL);
+            this.socketCreditVilvisa = new GIMPNetworkClientSSL(this.hostCredit, this.portCreditVilVisa, myCertif, myCertificateSSL);
         }
 
         /********************************************************************/
         //Credit MasterKuty
         /********************************************************************/
         if(this.socketCreditMasterKuty == null){
-            this.socketCreditMasterKuty = new NetworkClientSSL(this.hostCredit, this.portCreditMasterKuty, myCertif, myCertificateSSL);
+            this.socketCreditMasterKuty = new GIMPNetworkClientSSL(this.hostCredit, this.portCreditMasterKuty, myCertif, myCertificateSSL);
         }
 
 
         /********************************************************************/
         //Banque VilVisa
         /********************************************************************/
-        if(this.socketBanqueVilVisa == null){
-            this.socketBanqueVilVisa = new NetworkClientSSL(this.hostBanque, this.portBanqueVilVisa, myCertif, myCertificateSSL);
-        }
+        /*if(this.socketBanqueVilVisa == null){
+            this.socketBanqueVilVisa = new MAMPNetworkClientSSL(this.hostBanque, this.portBanqueVilVisa, myCertif, myCertificateSSL);
+        }*/
 
 
         /********************************************************************/
         //Credit MasterKuty
         /********************************************************************/
-        if(this.socketBanqueMasterKuty == null){
-            this.socketBanqueMasterKuty = new NetworkClientSSL(this.hostBanque, this.portBanqueMasterKuty, myCertif, myCertificateSSL);
-        }
+        /*if(this.socketBanqueMasterKuty == null){
+            this.socketBanqueMasterKuty = new MAMPNetworkClientSSL(this.hostBanque, this.portBanqueMasterKuty, myCertif, myCertificateSSL);
+        }*/
 
 
     }
@@ -1105,10 +1111,10 @@ public class RMP {
         }
     }
 
-    private PacketCom effectuerPayement(Orga orga, int somme, String nomClient, int idReservation, String numCompteInpresHollidays) {
-        PacketCom retour = null;
-        Object[] infos = {somme, nomClient, idReservation, numCompteInpresHollidays};
-        PacketCom packet = new PacketCom(MAMP.TRANSFER_POGN, (Object)infos);
+    private PacketComSSL effectuerPayement(Orga orga, int somme, String nomClient, int idReservation, String numCompteInpresHollidays) {
+        PacketComSSL retour = null;
+        /*Object[] infos = {somme, nomClient, idReservation, numCompteInpresHollidays};
+        PacketComSSL packet = new PacketComSSL(MAMP.TRANSFER_POGN, (Object)infos);
         if(orga == Orga.VILVISA){
             try {
                 this.socketBanqueVilVisa.send(packet);
@@ -1123,7 +1129,7 @@ public class RMP {
             } catch (Exception ex) {
                 Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
+        }*/
         return retour;
     }
 }

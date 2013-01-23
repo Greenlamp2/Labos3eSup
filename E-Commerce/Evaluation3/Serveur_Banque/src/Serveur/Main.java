@@ -5,8 +5,8 @@
 
 package Serveur;
 
+import Commun.MyCertificateSSL;
 import Helpers.EasyFile;
-import Securite.MyCertificateSSL;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -82,11 +82,11 @@ public class Main {
         }
 
         int portBanqueVilVisa = Integer.parseInt(EasyFile.getConfig("Configs_Serveur_Banque", "PORT_BANQUE_VILVISA"));
-        Thread MyThread1 = new Thread(new ServeurPool(portBanqueVilVisa, myCertificate_no_ssl, myCertificate_ssl));
+        Thread MyThread1 = new Thread(new ServeurPool(portBanqueVilVisa, myCertificate_no_ssl, myCertificate_ssl, "vil"));
         MyThread1.start();
 
         int portBanqueMasterKuty = Integer.parseInt(EasyFile.getConfig("Configs_Serveur_Banque", "PORT_BANQUE_MASTERKUTY"));
-        Thread MyThread2 = new Thread(new ServeurPool(portBanqueMasterKuty, myCertificate_no_ssl, myCertificate_ssl));
+        Thread MyThread2 = new Thread(new ServeurPool(portBanqueMasterKuty, myCertificate_no_ssl, myCertificate_ssl, "kuty"));
         MyThread2.start();
     }
 }

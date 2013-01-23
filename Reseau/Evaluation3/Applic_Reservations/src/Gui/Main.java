@@ -235,7 +235,7 @@ public class Main extends javax.swing.JDialog {
 
         jLabel2.setText("Numéro chambre:");
 
-        GnumChambreProom.setText("1");
+        GnumChambreProom.setText("2");
 
         jLabel8.setText("Nom du client:");
 
@@ -254,7 +254,7 @@ public class Main extends javax.swing.JDialog {
 
         jLabel17.setText("Date réservation:");
 
-        GdateProom.setText("01/02/2013");
+        GdateProom.setText("01/04/2013");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);

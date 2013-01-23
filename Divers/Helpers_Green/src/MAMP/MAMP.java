@@ -5,8 +5,12 @@
 
 package MAMP;
 
+import Bean.Jdbc_MySQL;
 import Commun.MyCertificateSSL;
 import Commun.PacketComSSL;
+import java.beans.Beans;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class MAMP {
@@ -78,6 +82,25 @@ public class MAMP {
     }
 
     private PacketComSSL effectuerVirement(int somme, String nomClient, int idReservation, String numCompteInpresHollidays) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        boolean payementAutorise = true;
+        if(payementAutorise){
+            return ajouterTransaction(somme, nomClient, idReservation, numCompteInpresHollidays);
+        }else{
+            return new PacketComSSL(MAMP.VERIF_INT_FAILED, "Payement non autorisé");
+        }
+    }
+
+    private PacketComSSL ajouterTransaction(int somme, String nomClient, int idReservation, String numCompteInpresHollidays) {
+        try {
+            Jdbc_MySQL dbsql = (Jdbc_MySQL) Beans.instantiate(null, "Bean.Jdbc_MySQL");
+            dbsql.init();
+            String request = "INSERT INTO transaction_vilvisa(somme, nom_client, num_reservation, num_compte) VALUES('"+somme+"', '"+nomClient+"', '"+idReservation+"', '"+numCompteInpresHollidays+"')";
+            dbsql.update(request);
+            dbsql.Disconnect();
+            return new PacketComSSL(MAMP.VERIF_INT_SUCCESSFULL, "");
+        } catch (Exception ex) {
+            Logger.getLogger(MAMP.class.getName()).log(Level.SEVERE, null, ex);
+            return new PacketComSSL(MAMP.VERIF_INT_FAILED, "Payement échoué");
+        }
     }
 }

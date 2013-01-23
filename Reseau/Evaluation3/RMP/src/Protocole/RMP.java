@@ -1113,7 +1113,7 @@ public class RMP {
 
     private PacketComSSL effectuerPayement(Orga orga, int somme, String nomClient, int idReservation, String numCompteInpresHollidays) {
         PacketComSSL retour = null;
-        /*Object[] infos = {somme, nomClient, idReservation, numCompteInpresHollidays};
+        Object[] infos = {somme, nomClient, idReservation, numCompteInpresHollidays};
         PacketComSSL packet = new PacketComSSL(MAMP.TRANSFER_POGN, (Object)infos);
         if(orga == Orga.VILVISA){
             try {
@@ -1129,7 +1129,7 @@ public class RMP {
             } catch (Exception ex) {
                 Logger.getLogger(RMP.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }*/
+        }
         return retour;
     }
 }

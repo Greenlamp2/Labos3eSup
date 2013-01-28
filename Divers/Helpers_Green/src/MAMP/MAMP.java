@@ -8,7 +8,11 @@ package MAMP;
 import Bean.Jdbc_MySQL;
 import Commun.MyCertificateSSL;
 import Commun.PacketComSSL;
+import Mails.Messages;
+import Mails.Middle;
 import java.beans.Beans;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -97,6 +101,12 @@ public class MAMP {
             String request = "INSERT INTO transaction_vilvisa(somme, nom_client, num_reservation, num_compte) VALUES('"+somme+"', '"+nomClient+"', '"+idReservation+"', '"+numCompteInpresHollidays+"')";
             dbsql.update(request);
             dbsql.Disconnect();
+            /*Messages messages = new Messages();
+            messages.setFrom("knutsg@inxs.aileinfo");
+            messages.setTo("wirtht@inxs.aileinfo");
+            messages.setSujet("résumé");
+            messages.setMessage("numCompte: " + numCompteInpresHollidays + " somme:  " + somme + " nomClient: " + nomClient);
+            Middle.sendMessage(messages);*/
             return new PacketComSSL(MAMP.VERIF_INT_SUCCESSFULL, "");
         } catch (Exception ex) {
             Logger.getLogger(MAMP.class.getName()).log(Level.SEVERE, null, ex);
